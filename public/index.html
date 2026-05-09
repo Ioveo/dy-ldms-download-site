@@ -9,77 +9,81 @@
   </head>
   <body>
     <header class="topbar">
-      <a class="brand" href="#/home" data-route="home">
+      <a class="brand" href="#home">
         <img src="/logo.png" alt="" />
         <span>天才猫软件中心</span>
       </a>
       <nav aria-label="主导航">
-        <a href="#/home" data-route="home">首页</a>
-        <a href="#/download" data-route="download">下载</a>
-        <a href="#/license" data-route="license">授权</a>
+        <a href="#home">首页</a>
+        <a href="#download">下载</a>
+        <a href="#license">授权</a>
       </nav>
     </header>
 
     <main>
-      <section class="page page--home" data-page="home">
-        <div class="hero-shell">
-          <div class="hero-copy">
-            <p class="eyebrow">TianCaiMao Software Cloud</p>
-            <h1>给直播团队一套更稳的运营工具。</h1>
-            <p class="summary">数据中心版负责数据沉淀、复盘和结算；DY辅助工具负责现场自动讲解、快速回复和宏录制。两个产品独立交付，授权体系统一绑定。</p>
-            <div class="actions">
-              <a class="button button--primary" href="#/download">立即下载</a>
-              <a class="button button--ghost" href="#/license">了解授权</a>
-            </div>
-          </div>
-          <div class="hero-visual" aria-label="软件预览">
-            <div class="screen-stack screen-stack--front">
-              <img src="/datacenter-preview.jpg" alt="数据中心版软件截图" />
-            </div>
-            <div class="screen-stack screen-stack--back">
-              <div class="assistant-mock">
-                <span>DY Assistant</span>
-                <strong>自动讲解运行中</strong>
-                <p>快捷回复 · 宏录制 · 窗口绑定</p>
-              </div>
-            </div>
+      <section class="hero" id="home">
+        <div class="hero__copy">
+          <p class="eyebrow">TianCaiMao Software Center</p>
+          <h1>直播团队的数据管理与现场辅助工具。</h1>
+          <p class="summary">数据中心版用于直播数据沉淀、复盘报表和结算管理；DY辅助工具用于自动讲解、快速回复和宏录制。两个软件独立下载，授权系统统一绑定。</p>
+          <div class="actions">
+            <a class="button button--primary" href="#download">下载软件</a>
+            <a class="button button--ghost" href="#features">查看功能</a>
           </div>
         </div>
-
-        <div class="trust-strip">
-          <span>统一授权绑定</span>
-          <span>Cloudflare R2 下载</span>
-          <span>独立版本交付</span>
-          <span>适配直播运营场景</span>
+        <div class="hero__preview">
+          <img src="/datacenter-preview.jpg" alt="天才猫数据中心版界面截图" />
         </div>
-
-        <section class="intro-grid" aria-label="产品介绍">
-          <article class="intro-card intro-card--wide">
-            <div>
-              <p class="eyebrow">Data Center</p>
-              <h2>数据中心版</h2>
-              <p>面向管理者和复盘人员，沉淀直播场次、主播档案、账号数据、日报月报和结算记录。</p>
-            </div>
-            <img src="/datacenter-preview.jpg" alt="数据中心版界面" />
-          </article>
-          <article class="intro-card">
-            <p class="eyebrow">DY Assistant</p>
-            <h2>天才猫DY辅助工具</h2>
-            <p>面向直播现场操作，保留自动讲解、快速回复、宏录制，去掉数据中心模块，更轻更直接。</p>
-            <div class="feature-pills">
-              <span>自动讲解</span>
-              <span>快速回复</span>
-              <span>宏录制</span>
-            </div>
-          </article>
-        </section>
       </section>
 
-      <section class="page page--download" data-page="download" hidden>
-        <div class="page-head">
+      <section class="features" id="features">
+        <div class="section-head">
+          <p class="eyebrow">Products</p>
+          <h2>两个版本，覆盖管理和现场执行。</h2>
+          <p>不展示部署教程，只展示客户真正关心的软件能力、下载信息和授权方式。</p>
+        </div>
+        <div class="feature-grid">
+          <article class="feature-card feature-card--image">
+            <img src="/datacenter-preview.jpg" alt="数据中心版界面截图" />
+          </article>
+          <article class="feature-card">
+            <span>数据中心版</span>
+            <h3>直播数据、复盘、报表和结算集中管理。</h3>
+            <ul>
+              <li>直播场次数据录入，支持 OCR 辅助识别。</li>
+              <li>账号、主播、场次、接播数据统一沉淀。</li>
+              <li>日报、月报、复盘报表导入导出。</li>
+              <li>主播档案、结算方式和工资核销管理。</li>
+              <li>本地数据备份，适合团队长期使用。</li>
+            </ul>
+          </article>
+          <article class="feature-card feature-card--assistant">
+            <span>DY辅助工具</span>
+            <h3>现场运营使用的轻量自动化工具。</h3>
+            <ul>
+              <li>自动讲解循环，按设定间隔执行讲解/取消讲解。</li>
+              <li>讲解自检，方便定位当前商品讲解按钮。</li>
+              <li>三条快捷回复，可手动发送或自动循环发送。</li>
+              <li>支持后台控件调用、置顶频率和剪贴板恢复。</li>
+              <li>宏录制和回放，减少重复鼠标键盘操作。</li>
+            </ul>
+          </article>
+          <article class="feature-card feature-card--mini">
+            <div class="assistant-ui">
+              <strong>DY Assistant</strong>
+              <p>自动讲解：运行中</p>
+              <p>快捷回复：3 条短语</p>
+              <p>宏录制：F9 / F10</p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="download" id="download">
+        <div class="section-head">
           <p class="eyebrow">Downloads</p>
-          <h1>选择要交付给客户的软件。</h1>
-          <p>下载信息来自 R2 的发布清单。上传新版安装包和 manifest 后，按钮、版本、体积、校验值会自动更新。</p>
+          <h2>选择要下载的软件。</h2>
+          <p>版本号、文件体积和校验值会从发布清单自动读取。若按钮显示待发布，说明安装包或 manifest 还没有上传到 R2。</p>
         </div>
         <div class="product-grid" id="softwareGrid" aria-live="polite">
           <article class="product-card product-card--data">
@@ -117,32 +121,27 @@
         </div>
       </section>
 
-      <section class="page page--license" data-page="license" hidden>
-        <div class="page-head">
+      <section class="license" id="license">
+        <div class="section-head">
           <p class="eyebrow">License</p>
-          <h1>授权系统保持统一。</h1>
-          <p>两个产品使用同一套授权绑定逻辑。客户首次打开软件时联网验证，后续按设备和卡密状态控制使用。</p>
+          <h2>统一授权绑定。</h2>
+          <p>两个软件沿用同一套授权逻辑。客户首次打开时联网验证卡密和设备，授权通过后进入主界面。</p>
         </div>
-        <div class="license-layout">
-          <article class="license-card license-card--main">
-            <span>授权流程</span>
-            <h2>购买后开通卡密，软件自动绑定客户设备。</h2>
-            <p>适合单独销售数据中心版、单独销售 DY辅助工具，或给团队组合交付两个软件。</p>
-          </article>
-          <article class="license-step">
+        <div class="license-grid">
+          <article>
             <strong>01</strong>
-            <h3>客户安装</h3>
-            <p>从官方下载页获取 zip，解压后运行软件。</p>
+            <h3>下载安装</h3>
+            <p>从官方下载页下载对应版本，解压后运行。</p>
           </article>
-          <article class="license-step">
+          <article>
             <strong>02</strong>
-            <h3>输入授权</h3>
-            <p>软件启动时验证卡密和设备信息。</p>
+            <h3>输入卡密</h3>
+            <p>软件启动时验证卡密，并绑定当前客户设备。</p>
           </article>
-          <article class="license-step">
+          <article>
             <strong>03</strong>
             <h3>稳定使用</h3>
-            <p>授权成功后进入主界面，按到期时间管理。</p>
+            <p>授权成功后显示剩余时间，到期前可续费。</p>
           </article>
         </div>
       </section>

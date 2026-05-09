@@ -20,9 +20,7 @@ const PRODUCT_FALLBACKS = [
   }
 ];
 
-window.addEventListener("hashchange", applyRoute);
 loadRelease();
-applyRoute();
 
 async function loadRelease() {
   try {
@@ -37,21 +35,6 @@ async function loadRelease() {
   } catch {
     renderSoftwareGrid({ releases: [] });
   }
-}
-
-function applyRoute() {
-  const route = location.hash.replace(/^#\/?/, "") || "home";
-  const activeRoute = ["home", "download", "license"].includes(route) ? route : "home";
-
-  for (const page of document.querySelectorAll("[data-page]")) {
-    page.hidden = page.dataset.page !== activeRoute;
-  }
-
-  for (const link of document.querySelectorAll("[data-route]")) {
-    link.classList.toggle("is-active", link.dataset.route === activeRoute);
-  }
-
-  window.scrollTo({ top: 0, behavior: "instant" });
 }
 
 function renderSoftwareGrid(manifest) {
@@ -103,7 +86,7 @@ function renderSoftwareGrid(manifest) {
 
     const link = document.createElement("a");
     link.className = product.release ? "button button--primary" : "button button--disabled";
-    link.href = product.release ? downloadUrl(product.release) : "#/download";
+    link.href = product.release ? downloadUrl(product.release) : "#download";
     link.textContent = product.release ? "立即下载" : "待发布";
 
     card.append(media, badge, title, desc, list, meta, link);

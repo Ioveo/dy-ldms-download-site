@@ -1,0 +1,17 @@
+{
+  "name": "dy-ldms-download-site",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "pages:dev": "wrangler pages dev public",
+    "pages:deploy": "wrangler pages deploy public --project-name dy-ldms-download",
+    "upload:manifest": "wrangler r2 object put dy-ldms-downloads/releases/manifest.json --file ./docs/manifest.example.json",
+    "upload:installer": "wrangler r2 object put dy-ldms-downloads/releases/DyDataCenter.App.zip --file ../DataCenterPublishOut.zip"
+  },
+  "devDependencies": {
+    "wrangler": "^4.16.0"
+  }
+}

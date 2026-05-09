@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>天才猫直播数据管理 - 下载中心</title>
+    <meta name="description" content="天才猫直播数据管理系统官方下载中心。" />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="/">
+        <img src="/logo.png" alt="" />
+        <span>天才猫</span>
+      </a>
+      <nav>
+        <a href="#download">下载</a>
+        <a href="#deploy">部署</a>
+        <a href="#support">支持</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="hero__shade"></div>
+        <img class="hero__image" src="/app-preview.png" alt="天才猫直播数据管理系统界面预览" />
+        <div class="hero__content">
+          <p class="eyebrow">官方发布通道</p>
+          <h1>天才猫直播数据管理</h1>
+          <p class="summary">给客户一个稳定、清晰、可追溯的软件下载安装入口。</p>
+          <div class="actions">
+            <a class="button button--primary" href="/download/latest" id="primaryDownload">下载最新版</a>
+            <a class="button button--ghost" href="#release">查看版本</a>
+          </div>
+        </div>
+      </section>
+
+      <section class="release" id="download">
+        <div>
+          <p class="eyebrow">Latest Release</p>
+          <h2 id="releaseName">正在读取版本信息</h2>
+          <p id="releaseMeta">连接下载清单中...</p>
+        </div>
+        <div class="release__panel" id="release">
+          <dl>
+            <div>
+              <dt>版本</dt>
+              <dd id="versionText">--</dd>
+            </div>
+            <div>
+              <dt>文件</dt>
+              <dd id="fileText">--</dd>
+            </div>
+            <div>
+              <dt>校验</dt>
+              <dd id="hashText">--</dd>
+            </div>
+          </dl>
+          <ul id="noteList"></ul>
+        </div>
+      </section>
+
+      <section class="deploy" id="deploy">
+        <p class="eyebrow">Recommended Stack</p>
+        <h2>R2 存安装包，Worker 控下载入口。</h2>
+        <div class="steps">
+          <div>
+            <span>01</span>
+            <p>把 zip/exe 上传到 R2 的 <code>releases/</code> 目录。</p>
+          </div>
+          <div>
+            <span>02</span>
+            <p>上传 <code>manifest.json</code>，网站自动读取版本、文件名和更新说明。</p>
+          </div>
+          <div>
+            <span>03</span>
+            <p>Worker 负责下载路由，后续可加密码、授权、限速或统计。</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="support" id="support">
+        <h2>下载前请确认来自官方域名。</h2>
+        <p>如浏览器或杀毒软件拦截，请先核对文件名、版本号和 SHA256 校验值，再联系管理员。</p>
+      </section>
+    </main>
+
+    <footer>
+      <span>DY-LDMS</span>
+      <span>Powered by Cloudflare R2 + Workers</span>
+    </footer>
+
+    <script src="/site.js" type="module"></script>
+  </body>
+</html>

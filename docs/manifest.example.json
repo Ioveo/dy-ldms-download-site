@@ -1,0 +1,22 @@
+{
+  "product": "天才猫直播数据管理",
+  "latest": "datacenter-1.0.0",
+  "releases": [
+    {
+      "id": "datacenter-1.0.0",
+      "channel": "stable",
+      "name": "数据中心独立版",
+      "version": "1.0.0",
+      "date": "2026-05-09",
+      "key": "releases/DyDataCenter.App.zip",
+      "fileName": "天才猫数据中心独立版-1.0.0.zip",
+      "size": "请填写压缩包大小",
+      "sha256": "请填写 SHA256",
+      "notes": [
+        "系统设置新增数据备份和报表导入导出。",
+        "数据管理支持管理员密码保护的编辑和补图。",
+        "接播数据修改会联动后续场次并弹窗确认。"
+      ]
+    }
+  ]
+}

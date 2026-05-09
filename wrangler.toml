@@ -1,0 +1,16 @@
+name = "dy-ldms-download"
+main = "src/worker.js"
+compatibility_date = "2026-05-09"
+
+[assets]
+directory = "./public"
+binding = "ASSETS"
+
+[[r2_buckets]]
+binding = "SOFTWARE_BUCKET"
+bucket_name = "dy-ldms-downloads"
+preview_bucket_name = "dy-ldms-downloads-dev"
+
+[vars]
+PRODUCT_NAME = "天才猫直播数据管理"
+MANIFEST_KEY = "releases/manifest.json"

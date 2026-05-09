@@ -5,7 +5,9 @@ const PRODUCT_FALLBACKS = [
     title: "数据中心版",
     description: "适合需要沉淀直播场次、主播档案、账号数据和复盘报表的团队。",
     features: ["直播数据录入和 OCR 辅助识别", "日报、月报、复盘和结算管理", "本地数据备份与导入导出"],
-    className: "product-card--data"
+    className: "product-card--data",
+    image: "/app-preview.png",
+    alt: "数据中心版软件截图"
   },
   {
     match: /assistant|辅助|tool|live/i,
@@ -13,7 +15,9 @@ const PRODUCT_FALLBACKS = [
     title: "天才猫DY辅助工具",
     description: "适合现场运营使用，轻量保留自动讲解、快速回复和宏录制。",
     features: ["自动讲解循环与讲解自检", "三条快捷回复和自动发送", "鼠标键盘宏录制与回放"],
-    className: "product-card--assistant"
+    className: "product-card--assistant",
+    image: "/assistant-preview.jpg",
+    alt: "天才猫DY辅助工具软件截图"
   }
 ];
 
@@ -48,6 +52,14 @@ function renderSoftwareGrid(manifest) {
     badge.className = "product-card__badge";
     badge.textContent = product.badge;
 
+    const media = document.createElement("div");
+    media.className = "product-card__media";
+    const image = document.createElement("img");
+    image.src = product.image;
+    image.alt = product.alt;
+    image.loading = "lazy";
+    media.append(image);
+
     const title = document.createElement("h3");
     title.textContent = product.title;
 
@@ -71,7 +83,7 @@ function renderSoftwareGrid(manifest) {
     link.href = product.release ? downloadUrl(product.release) : "#products";
     link.textContent = product.release ? "立即下载" : "待发布";
 
-    card.append(badge, title, desc, list, meta, link);
+    card.append(media, badge, title, desc, list, meta, link);
     grid.append(card);
   }
 }

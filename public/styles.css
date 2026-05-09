@@ -90,6 +90,7 @@ section {
 }
 
 .showcase {
+  isolation: isolate;
   position: relative;
   min-height: calc(100vh - 72px);
   overflow: hidden;
@@ -103,16 +104,24 @@ section {
   inset: 0;
 }
 
+.showcase__slides {
+  z-index: 0;
+  overflow: hidden;
+}
+
 .showcase__slide {
+  display: block;
   margin: 0;
   opacity: 0;
   transform: scale(1.04);
+  pointer-events: none;
   transition: opacity 900ms ease, transform 6000ms ease;
 }
 
 .showcase__slide.is-active {
   opacity: 1;
   transform: scale(1);
+  pointer-events: auto;
 }
 
 .showcase__slide img {

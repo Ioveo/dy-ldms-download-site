@@ -1,113 +1,131 @@
-const PRODUCT_FALLBACKS = [
-  {
-    match: /data|center|数据|datacenter/i,
-    badge: "数据管理",
-    title: "数据中心版",
-    description: "直播数据录入、复盘、报表、主播档案和结算管理。",
-    features: ["直播数据录入和 OCR 辅助识别", "日报、月报、复盘和结算管理", "本地数据备份与导入导出"],
-    className: "product-card--data",
-    image: "/datacenter-preview.jpg",
-    alt: "数据中心版软件截图"
-  },
-  {
-    match: /assistant|辅助|tool|live/i,
-    badge: "直播辅助",
-    title: "天才猫DY辅助工具",
-    description: "独立轻量工具，适合现场运营和重复操作自动化。",
-    features: ["自动讲解循环与讲解自检", "三条快捷回复和自动发送", "鼠标键盘宏录制与回放"],
-    className: "product-card--assistant",
-    mock: true
-  }
-];
+let activeCategory = "all";
+let currentCatalog = null;
 
-loadRelease();
+loadCatalog();
 initShowcase();
 
-async function loadRelease() {
+async function loadCatalog() {
   try {
-    const response = await fetch("/api/releases", { cache: "no-store" });
-    if (!response.ok) {
-      throw new Error("manifest request failed");
-    }
-
-    const manifest = await response.json();
-    document.title = `${manifest.product || "天才猫软件中心"} - 官方下载`;
-    renderSoftwareGrid(manifest);
+    const response = await fetch("/api/catalog", { cache: "no-store" });
+    if (!response.ok) throw new Error("catalog request failed");
+    const catalog = await response.json();
+    document.title = `${catalog.product || "天才猫软件中心"} - 官方下载`;
+    currentCatalog = catalog;
+    renderCategoryTabs(catalog);
+    renderSoftwareGrid(catalog);
   } catch {
-    renderSoftwareGrid({ releases: [] });
+    const response = await fetch("/api/releases", { cache: "no-store" });
+    const manifest = response.ok ? await response.json() : { releases: [] };
+    renderLegacyGrid(manifest);
   }
 }
 
-function renderSoftwareGrid(manifest) {
+function renderCategoryTabs(catalog) {
+  const tabs = byId("categoryTabs");
+  if (!tabs) return;
+  const categories = [{ id: "all", name: "全部软件" }, ...(catalog.categories || [])];
+  tabs.replaceChildren();
+  for (const category of categories) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.textContent = category.name;
+    button.className = category.id === activeCategory ? "is-active" : "";
+    button.addEventListener("click", () => {
+      activeCategory = category.id;
+      renderCategoryTabs(catalog);
+      renderSoftwareGrid(catalog);
+    });
+    tabs.append(button);
+  }
+}
+
+function renderSoftwareGrid(catalog) {
   const grid = byId("softwareGrid");
-  const releases = Array.isArray(manifest.releases) ? manifest.releases : [];
-  const products = buildProducts(releases);
+  const software = (catalog.software || []).filter(item => activeCategory === "all" || item.categoryId === activeCategory);
   grid.replaceChildren();
 
-  for (const product of products) {
+  if (!software.length) {
+    const empty = document.createElement("article");
+    empty.className = "product-card";
+    empty.innerHTML = "<h3>暂无软件</h3><p>当前分类还没有上架软件。</p>";
+    grid.append(empty);
+    return;
+  }
+
+  for (const item of software) {
+    const latest = (item.releases || []).find(release => release.isLatest) || item.releases?.[0];
+    const category = catalog.categories?.find(entry => entry.id === item.categoryId);
     const card = document.createElement("article");
-    card.className = `product-card ${product.className}`;
+    card.className = `product-card product-card--${item.slug || "software"}`;
 
     const media = document.createElement("div");
-    media.className = product.mock ? "product-card__media product-card__media--mock" : "product-card__media";
-    if (product.mock) {
-      const panel = document.createElement("div");
-      panel.className = "assistant-panel";
-      panel.innerHTML = "<span>LIVE ASSISTANT</span><strong>天才猫DY辅助工具</strong><p>自动讲解 · 快速回复 · 宏录制</p>";
-      media.append(panel);
-    } else {
+    media.className = item.coverUrl ? "product-card__media" : "product-card__media product-card__media--mock";
+    if (item.coverUrl) {
       const image = document.createElement("img");
-      image.src = product.image;
-      image.alt = product.alt;
+      image.src = item.coverUrl;
+      image.alt = `${item.name}软件截图`;
       image.loading = "lazy";
       media.append(image);
+    } else {
+      const panel = document.createElement("div");
+      panel.className = "assistant-panel";
+      panel.innerHTML = `<span>${escapeHtml(category?.name || "SOFTWARE")}</span><strong>${escapeHtml(item.name)}</strong><p>${escapeHtml(item.slug || "download")}</p>`;
+      media.append(panel);
     }
 
     const badge = document.createElement("span");
     badge.className = "product-card__badge";
-    badge.textContent = product.badge;
+    badge.textContent = category?.name || "软件";
 
     const title = document.createElement("h3");
-    title.textContent = product.title;
+    title.textContent = item.name;
 
     const desc = document.createElement("p");
-    desc.textContent = product.release?.description || product.description;
+    desc.textContent = item.description || latest?.description || "软件包已上架，可下载最新版。";
 
     const list = document.createElement("ul");
-    for (const feature of product.release?.notes?.length ? product.release.notes : product.features) {
-      const item = document.createElement("li");
-      item.textContent = feature;
-      list.append(item);
+    const changelog = String(latest?.changelog || "").split("\n").filter(Boolean).slice(0, 4);
+    for (const note of changelog.length ? changelog : ["后台上传版本自动展示", "R2 稳定存储安装包", "支持后续版本更新"]) {
+      const li = document.createElement("li");
+      li.textContent = note;
+      list.append(li);
     }
 
     const meta = document.createElement("small");
-    meta.textContent = product.release
-      ? [product.release.version, product.release.size, product.release.sha256 ? `SHA256 ${product.release.sha256.slice(0, 12)}...` : ""].filter(Boolean).join(" · ")
-      : "安装包待上传";
+    meta.textContent = latest ? [latest.version, latest.size, formatDate(latest.createdAt)].filter(Boolean).join(" · ") : "安装包待上传";
 
     const link = document.createElement("a");
-    link.className = product.release ? "button button--primary" : "button button--disabled";
-    link.href = product.release ? downloadUrl(product.release) : "#download";
-    link.textContent = product.release ? "点击下载" : "待发布";
+    link.className = latest ? "button button--primary" : "button button--disabled";
+    link.href = latest ? `/download/${encodeURIComponent(latest.id)}` : "#download";
+    link.textContent = latest ? "点击下载" : "待发布";
 
     card.append(media, badge, title, desc, list, meta, link);
     grid.append(card);
   }
 }
 
-function buildProducts(releases) {
-  return PRODUCT_FALLBACKS.map(fallback => {
-    const release = releases.find(item => fallback.match.test([item.id, item.name, item.category, item.fileName, item.key].filter(Boolean).join(" ")));
-    return { ...fallback, release };
-  });
-}
-
-function downloadUrl(release) {
-  return `/download/${encodeURIComponent(release.id || "latest")}`;
-}
-
-function byId(id) {
-  return document.getElementById(id);
+function renderLegacyGrid(manifest) {
+  currentCatalog = null;
+  const catalog = {
+    categories: [
+      { id: "data", name: "数据管理" },
+      { id: "assistant", name: "直播辅助" }
+    ],
+    software: (manifest.releases || []).map(release => {
+      const isAssistant = /assistant|辅助|live/i.test([release.id, release.name, release.category].filter(Boolean).join(" "));
+      return {
+        id: release.id,
+        categoryId: isAssistant ? "assistant" : "data",
+        name: isAssistant ? "天才猫DY辅助工具" : "数据中心版",
+        slug: release.id,
+        description: release.description,
+        coverUrl: isAssistant ? "" : "/datacenter-preview.jpg",
+        releases: [{ ...release, fileKey: release.key, isLatest: true, createdAt: Date.parse(release.date || "") || Date.now() }]
+      };
+    })
+  };
+  renderCategoryTabs(catalog);
+  renderSoftwareGrid(catalog);
 }
 
 function initShowcase() {
@@ -137,4 +155,18 @@ function initShowcase() {
     slides[active].classList.add("is-active");
     dots[active].classList.add("is-active");
   }
+}
+
+function byId(id) {
+  return document.getElementById(id);
+}
+
+function formatDate(timestamp) {
+  if (!timestamp) return "";
+  const date = new Date(timestamp);
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+}
+
+function escapeHtml(value) {
+  return String(value ?? "").replace(/[&<>"']/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" })[char]);
 }

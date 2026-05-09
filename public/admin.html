@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>天才猫下载管理后台</title>
+    <link rel="icon" type="image/png" href="/logo.png?v=20260509" />
+    <link rel="stylesheet" href="/admin.css?v=20260509-admin" />
+  </head>
+  <body>
+    <div class="toast" id="toast"></div>
+
+    <main class="login" id="loginView">
+      <section class="panel login__panel">
+        <img src="/logo.png" alt="" />
+        <p class="eyebrow">TianCaiMao Admin</p>
+        <h1>下载管理后台</h1>
+        <label for="adminPassword">管理员密码</label>
+        <input id="adminPassword" type="password" placeholder="请输入后台密码" />
+        <button id="loginButton">进入后台</button>
+      </section>
+    </main>
+
+    <main class="app" id="appView" hidden>
+      <aside class="sidebar">
+        <a class="brand" href="/admin.html">
+          <img src="/logo.png" alt="" />
+          <span>天才猫后台</span>
+        </a>
+        <nav>
+          <button class="is-active" data-panel="softwarePanel">软件管理</button>
+          <button data-panel="categoryPanel">分类管理</button>
+          <button data-panel="releasePanel">版本上传</button>
+        </nav>
+        <a class="site-link" href="/" target="_blank" rel="noopener">打开前台</a>
+      </aside>
+
+      <section class="workspace">
+        <header class="workspace__head">
+          <div>
+            <p class="eyebrow">Download Center</p>
+            <h1>软件下载管理</h1>
+            <p>上传版本、维护分类、控制前台下载卡片。</p>
+          </div>
+          <button class="ghost" id="logoutButton">退出登录</button>
+        </header>
+
+        <section class="stats" id="stats"></section>
+
+        <section class="panel tab-panel" id="softwarePanel">
+          <div class="panel__head">
+            <div>
+              <h2>软件管理</h2>
+              <p>新增软件后，可在“版本上传”里上传安装包。</p>
+            </div>
+          </div>
+          <form class="form-grid" id="softwareForm">
+            <input type="hidden" id="softwareId" />
+            <label>软件名称<input id="softwareName" required placeholder="例如：数据中心版" /></label>
+            <label>软件标识<input id="softwareSlug" required placeholder="例如：datacenter" /></label>
+            <label>分类<select id="softwareCategory"></select></label>
+            <label>封面地址<input id="softwareCover" placeholder="/datacenter-preview.jpg" /></label>
+            <label class="span-2">简介<textarea id="softwareDescription" rows="3" placeholder="软件说明"></textarea></label>
+            <label>排序<input id="softwareSort" type="number" value="10" /></label>
+            <label>状态<select id="softwareStatus"><option value="active">上架</option><option value="disabled">下架</option></select></label>
+            <div class="form-actions span-2"><button type="submit">保存软件</button><button class="ghost" type="button" id="resetSoftware">清空</button></div>
+          </form>
+          <div class="table-wrap"><table><thead><tr><th>软件</th><th>分类</th><th>最新版本</th><th>状态</th><th>操作</th></tr></thead><tbody id="softwareRows"></tbody></table></div>
+        </section>
+
+        <section class="panel tab-panel" id="categoryPanel" hidden>
+          <div class="panel__head"><h2>分类管理</h2></div>
+          <form class="form-grid" id="categoryForm">
+            <input type="hidden" id="categoryId" />
+            <label>分类名称<input id="categoryName" required placeholder="例如：直播辅助" /></label>
+            <label>分类标识<input id="categorySlug" required placeholder="例如：assistant" /></label>
+            <label>排序<input id="categorySort" type="number" value="10" /></label>
+            <label>状态<select id="categoryStatus"><option value="active">启用</option><option value="disabled">隐藏</option></select></label>
+            <div class="form-actions span-2"><button type="submit">保存分类</button><button class="ghost" type="button" id="resetCategory">清空</button></div>
+          </form>
+          <div class="table-wrap"><table><thead><tr><th>分类</th><th>标识</th><th>排序</th><th>状态</th><th>操作</th></tr></thead><tbody id="categoryRows"></tbody></table></div>
+        </section>
+
+        <section class="panel tab-panel" id="releasePanel" hidden>
+          <div class="panel__head">
+            <div>
+              <h2>版本上传</h2>
+              <p>文件会上传到 R2，并自动写入软件目录。</p>
+            </div>
+          </div>
+          <form class="form-grid" id="releaseForm">
+            <label>所属软件<select id="releaseSoftware"></select></label>
+            <label>版本号<input id="releaseVersion" required placeholder="1.0.0" /></label>
+            <label class="span-2">安装包<input id="releaseFile" type="file" required /></label>
+            <label class="span-2">更新说明<textarea id="releaseChangelog" rows="4" placeholder="每行一条更新内容"></textarea></label>
+            <label><input id="releaseLatest" type="checkbox" checked /> 设为最新版</label>
+            <div class="form-actions span-2"><button type="submit">上传并发布</button></div>
+          </form>
+          <div class="table-wrap"><table><thead><tr><th>软件</th><th>版本</th><th>文件</th><th>大小</th><th>最新</th><th>下载</th></tr></thead><tbody id="releaseRows"></tbody></table></div>
+        </section>
+      </section>
+    </main>
+
+    <script src="/admin.js?v=20260509-admin" type="module"></script>
+  </body>
+</html>

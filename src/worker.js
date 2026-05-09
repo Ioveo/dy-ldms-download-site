@@ -5,7 +5,9 @@ const DEFAULT_MANIFEST = {
     {
       id: "datacenter-stable",
       channel: "stable",
+      category: "数据管理",
       name: "数据中心独立版",
+      description: "直播数据录入、复盘、报表和后台管理工具。",
       version: "待上传",
       date: "2026-05-09",
       key: "releases/DyDataCenter.App.zip",
@@ -13,6 +15,20 @@ const DEFAULT_MANIFEST = {
       size: "",
       sha256: "",
       notes: ["上传安装包和 manifest.json 后，这里会自动显示正式版本。"]
+    },
+    {
+      id: "live-assistant-stable",
+      channel: "stable",
+      category: "直播辅助",
+      name: "直播辅助工具",
+      description: "自动讲解、快速回复、宏录制独立打包，授权系统保持原绑定逻辑。",
+      version: "待上传",
+      date: "2026-05-09",
+      key: "releases/TianCaiMao.LiveAssistant.zip",
+      fileName: "TianCaiMao.LiveAssistant.zip",
+      size: "",
+      sha256: "",
+      notes: ["自动讲解、快速回复、宏录制已拆分为独立软件。"]
     }
   ]
 };
@@ -47,11 +63,19 @@ export default {
       return serveRelease(env, release);
     }
 
-    return env.ASSETS.fetch(request);
+    if (env.ASSETS?.fetch) {
+      return env.ASSETS.fetch(request);
+    }
+
+    return text("Static assets binding is not configured", 500);
   }
 };
 
 async function loadManifest(env) {
+  if (!env.SOFTWARE_BUCKET?.get) {
+    return DEFAULT_MANIFEST;
+  }
+
   const key = env.MANIFEST_KEY || "releases/manifest.json";
   const object = await env.SOFTWARE_BUCKET.get(key);
   if (!object) {
@@ -59,10 +83,14 @@ async function loadManifest(env) {
   }
 
   try {
-    return JSON.parse(await object.text());
+    return JSON.parse(stripBom(await object.text()));
   } catch {
     return DEFAULT_MANIFEST;
   }
+}
+
+function stripBom(value) {
+  return String(value || "").replace(/^\uFEFF/, "");
 }
 
 function findLatestRelease(manifest) {
@@ -71,6 +99,10 @@ function findLatestRelease(manifest) {
 }
 
 async function serveRelease(env, release) {
+  if (!env.SOFTWARE_BUCKET?.get) {
+    return text("R2 binding SOFTWARE_BUCKET is not configured", 500);
+  }
+
   if (!release?.key) {
     return text("Release is not configured", 404);
   }
@@ -86,13 +118,23 @@ async function serveRelease(env, release) {
   headers.set("Content-Length", object.size.toString());
   headers.set("ETag", object.httpEtag);
   headers.set("Cache-Control", "public, max-age=3600");
-  headers.set("Content-Disposition", `attachment; filename="${sanitizeFileName(release.fileName || release.key.split("/").pop())}"`);
+  headers.set("Content-Disposition", contentDisposition(release.fileName || release.key.split("/").pop()));
 
   return new Response(object.body, { headers });
 }
 
 function sanitizeFileName(value) {
   return String(value || "download.bin").replace(/["\\\r\n]/g, "");
+}
+
+function contentDisposition(fileName) {
+  const safeName = sanitizeFileName(fileName);
+  const asciiName = safeName.replace(/[^\x20-\x7E]/g, "_");
+  return `attachment; filename="${asciiName}"; filename*=UTF-8''${encodeRFC5987ValueChars(safeName)}`;
+}
+
+function encodeRFC5987ValueChars(value) {
+  return encodeURIComponent(value).replace(/['()*]/g, char => `%${char.charCodeAt(0).toString(16).toUpperCase()}`);
 }
 
 function json(data, status = 200) {

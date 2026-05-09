@@ -1,21 +1,41 @@
 {
-  "product": "天才猫直播数据管理",
+  "product": "天才猫软件中心",
   "latest": "datacenter-1.0.0",
   "releases": [
     {
       "id": "datacenter-1.0.0",
       "channel": "stable",
-      "name": "数据中心独立版",
+      "category": "数据管理",
+      "name": "数据中心版",
+      "description": "直播数据录入、复盘、报表、主播档案和结算管理工具。",
       "version": "1.0.0",
       "date": "2026-05-09",
-      "key": "releases/DyDataCenter.App.zip",
-      "fileName": "天才猫数据中心独立版-1.0.0.zip",
-      "size": "请填写压缩包大小",
-      "sha256": "请填写 SHA256",
+      "key": "releases/tiancaimao-datacenter-1.0.0.zip",
+      "fileName": "天才猫数据中心版-1.0.0.zip",
+      "size": "117.78 MB",
+      "sha256": "4b774ffda3dc774b0a60197b6a92e4fea6f84a54cb2c1ade1dbcc846d16bb0c7",
       "notes": [
-        "系统设置新增数据备份和报表导入导出。",
-        "数据管理支持管理员密码保护的编辑和补图。",
-        "接播数据修改会联动后续场次并弹窗确认。"
+        "直播数据录入和 OCR 辅助识别。",
+        "日报、月报、复盘和结算管理。",
+        "本地数据备份与导入导出。"
+      ]
+    },
+    {
+      "id": "live-assistant-1.0.0",
+      "channel": "stable",
+      "category": "直播辅助",
+      "name": "天才猫DY辅助工具",
+      "description": "自动讲解、快速回复、宏录制独立打包，授权系统保持原绑定逻辑。",
+      "version": "1.0.0",
+      "date": "2026-05-09",
+      "key": "releases/TianCaiMao.LiveAssistant.zip",
+      "fileName": "天才猫DY辅助工具-1.0.0.zip",
+      "size": "176.83 MB",
+      "sha256": "cb68a407053e00172a52b7d0d80700f4c104da091ead372ec3a05fdb83afef8a",
+      "notes": [
+        "自动讲解循环与讲解自检。",
+        "三条快捷回复和自动发送。",
+        "鼠标键盘宏录制与回放。"
       ]
     }
   ]

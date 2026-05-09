@@ -1,8 +1,21 @@
-const formatter = new Intl.DateTimeFormat("zh-CN", {
-  year: "numeric",
-  month: "2-digit",
-  day: "2-digit"
-});
+const PRODUCT_FALLBACKS = [
+  {
+    match: /data|center|数据|datacenter/i,
+    badge: "数据管理",
+    title: "数据中心版",
+    description: "适合需要沉淀直播场次、主播档案、账号数据和复盘报表的团队。",
+    features: ["直播数据录入和 OCR 辅助识别", "日报、月报、复盘和结算管理", "本地数据备份与导入导出"],
+    className: "product-card--data"
+  },
+  {
+    match: /assistant|辅助|tool|live/i,
+    badge: "直播辅助",
+    title: "天才猫DY辅助工具",
+    description: "适合现场运营使用，轻量保留自动讲解、快速回复和宏录制。",
+    features: ["自动讲解循环与讲解自检", "三条快捷回复和自动发送", "鼠标键盘宏录制与回放"],
+    className: "product-card--assistant"
+  }
+];
 
 loadRelease();
 
@@ -14,35 +27,64 @@ async function loadRelease() {
     }
 
     const manifest = await response.json();
-    const release = findLatest(manifest);
-    if (!release) {
-      return;
-    }
-
-    document.title = `${manifest.product || "天才猫"} - 下载中心`;
-    byId("releaseName").textContent = release.name || "下载最新版";
-    byId("releaseMeta").textContent = `${release.channel || "stable"} · ${release.date || formatter.format(new Date())}`;
-    byId("versionText").textContent = release.version || "--";
-    byId("fileText").textContent = [release.fileName, release.size].filter(Boolean).join(" · ") || "--";
-    byId("hashText").textContent = release.sha256 || "上传后填写 SHA256，方便客户校验文件";
-    byId("primaryDownload").href = `/download/${encodeURIComponent(release.id || "latest")}`;
-
-    const noteList = byId("noteList");
-    noteList.replaceChildren();
-    for (const note of release.notes || []) {
-      const item = document.createElement("li");
-      item.textContent = note;
-      noteList.append(item);
-    }
+    document.title = `${manifest.product || "天才猫软件中心"} - 官方下载`;
+    renderSoftwareGrid(manifest);
   } catch {
-    byId("releaseName").textContent = "下载清单暂未上传";
-    byId("releaseMeta").textContent = "先把 manifest.json 上传到 R2，即可自动显示版本。";
+    renderSoftwareGrid({ releases: [] });
   }
 }
 
-function findLatest(manifest) {
+function renderSoftwareGrid(manifest) {
+  const grid = byId("softwareGrid");
   const releases = Array.isArray(manifest.releases) ? manifest.releases : [];
-  return releases.find(item => item.id === manifest.latest) || releases[0];
+  const products = buildProducts(releases);
+  grid.replaceChildren();
+
+  for (const product of products) {
+    const card = document.createElement("article");
+    card.className = `product-card ${product.className}`;
+
+    const badge = document.createElement("span");
+    badge.className = "product-card__badge";
+    badge.textContent = product.badge;
+
+    const title = document.createElement("h3");
+    title.textContent = product.title;
+
+    const desc = document.createElement("p");
+    desc.textContent = product.release?.description || product.description;
+
+    const list = document.createElement("ul");
+    for (const feature of product.release?.notes?.length ? product.release.notes : product.features) {
+      const item = document.createElement("li");
+      item.textContent = feature;
+      list.append(item);
+    }
+
+    const meta = document.createElement("small");
+    meta.textContent = product.release
+      ? [product.release.version, product.release.size, product.release.sha256 ? `SHA256 ${product.release.sha256.slice(0, 12)}...` : ""].filter(Boolean).join(" · ")
+      : "安装包待上传";
+
+    const link = document.createElement("a");
+    link.className = product.release ? "button button--primary" : "button button--disabled";
+    link.href = product.release ? downloadUrl(product.release) : "#products";
+    link.textContent = product.release ? "立即下载" : "待发布";
+
+    card.append(badge, title, desc, list, meta, link);
+    grid.append(card);
+  }
+}
+
+function buildProducts(releases) {
+  return PRODUCT_FALLBACKS.map(fallback => {
+    const release = releases.find(item => fallback.match.test([item.id, item.name, item.category, item.fileName, item.key].filter(Boolean).join(" ")));
+    return { ...fallback, release };
+  });
+}
+
+function downloadUrl(release) {
+  return `/download/${encodeURIComponent(release.id || "latest")}`;
 }
 
 function byId(id) {

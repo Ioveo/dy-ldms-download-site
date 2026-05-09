@@ -87,7 +87,7 @@ function renderSoftwareGrid(manifest) {
     const link = document.createElement("a");
     link.className = product.release ? "button button--primary" : "button button--disabled";
     link.href = product.release ? downloadUrl(product.release) : "#download";
-    link.textContent = product.release ? "立即下载" : "待发布";
+    link.textContent = product.release ? "点击下载" : "待发布";
 
     card.append(media, badge, title, desc, list, meta, link);
     grid.append(card);

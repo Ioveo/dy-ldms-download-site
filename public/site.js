@@ -21,6 +21,7 @@ const PRODUCT_FALLBACKS = [
 ];
 
 loadRelease();
+initShowcase();
 
 async function loadRelease() {
   try {
@@ -107,4 +108,33 @@ function downloadUrl(release) {
 
 function byId(id) {
   return document.getElementById(id);
+}
+
+function initShowcase() {
+  const slides = Array.from(document.querySelectorAll(".showcase__slide"));
+  const dots = Array.from(document.querySelectorAll(".showcase__dots button"));
+  if (!slides.length || !dots.length) return;
+
+  let active = 0;
+  let timer = window.setInterval(nextSlide, 4800);
+
+  dots.forEach((dot, index) => {
+    dot.addEventListener("click", () => {
+      showSlide(index);
+      window.clearInterval(timer);
+      timer = window.setInterval(nextSlide, 4800);
+    });
+  });
+
+  function nextSlide() {
+    showSlide((active + 1) % slides.length);
+  }
+
+  function showSlide(index) {
+    slides[active].classList.remove("is-active");
+    dots[active].classList.remove("is-active");
+    active = index;
+    slides[active].classList.add("is-active");
+    dots[active].classList.add("is-active");
+  }
 }

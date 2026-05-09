@@ -31,6 +31,7 @@
           <button class="is-active" data-panel="softwarePanel">软件管理</button>
           <button data-panel="categoryPanel">分类管理</button>
           <button data-panel="releasePanel">版本上传</button>
+          <button data-panel="storagePanel">存储授权</button>
         </nav>
         <a class="site-link" href="/" target="_blank" rel="noopener">打开前台</a>
       </aside>
@@ -90,6 +91,7 @@
           </div>
           <form class="form-grid" id="releaseForm">
             <label>所属软件<select id="releaseSoftware"></select></label>
+            <label>存储位置<select id="releaseStorage"></select></label>
             <label>版本号<input id="releaseVersion" required placeholder="1.0.0" /></label>
             <label class="span-2">安装包<input id="releaseFile" type="file" required /></label>
             <label class="span-2">更新说明<textarea id="releaseChangelog" rows="4" placeholder="每行一条更新内容"></textarea></label>
@@ -97,6 +99,29 @@
             <div class="form-actions span-2"><button type="submit">上传并发布</button></div>
           </form>
           <div class="table-wrap"><table><thead><tr><th>软件</th><th>版本</th><th>文件</th><th>大小</th><th>最新</th><th>下载</th></tr></thead><tbody id="releaseRows"></tbody></table></div>
+        </section>
+
+        <section class="panel tab-panel" id="storagePanel" hidden>
+          <div class="panel__head">
+            <div>
+              <h2>存储授权</h2>
+              <p>添加其他 Cloudflare R2 账户，用于把软件上传到指定客户或团队的 R2。</p>
+            </div>
+          </div>
+          <form class="form-grid" id="storageForm">
+            <input type="hidden" id="storageId" />
+            <label>显示名称<input id="storageName" required placeholder="例如：客户A R2" /></label>
+            <label>Account ID<input id="storageAccountId" required placeholder="Cloudflare Account ID" /></label>
+            <label>Bucket<input id="storageBucket" required placeholder="bucket-name" /></label>
+            <label>Access Key ID<input id="storageAccessKeyId" required placeholder="R2 API Token Access Key" /></label>
+            <label class="span-2">Secret Access Key<input id="storageSecretAccessKey" type="password" placeholder="留空表示不修改已保存 Secret" /></label>
+            <label>Endpoint 选填<input id="storageEndpoint" placeholder="默认自动生成 R2 S3 Endpoint" /></label>
+            <label>公开访问地址 选填<input id="storagePublicBaseUrl" placeholder="https://files.example.com" /></label>
+            <label>排序<input id="storageSort" type="number" value="10" /></label>
+            <label>状态<select id="storageStatus"><option value="active">启用</option><option value="disabled">停用</option></select></label>
+            <div class="form-actions span-2"><button type="submit">保存存储授权</button><button class="ghost" type="button" id="resetStorage">清空</button></div>
+          </form>
+          <div class="table-wrap"><table><thead><tr><th>名称</th><th>Account</th><th>Bucket</th><th>Secret</th><th>状态</th><th>操作</th></tr></thead><tbody id="storageRows"></tbody></table></div>
         </section>
       </section>
     </main>

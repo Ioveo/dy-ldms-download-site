@@ -75,6 +75,7 @@ export function normalizeCatalog(catalog) {
       status: category.status || "active"
     })).sort(bySortOrder),
     software: software.map((item, index) => normalizeSoftware(item, index, now)).sort(bySortOrder),
+    storageAccounts: normalizeStorageAccounts(catalog?.storageAccounts || catalog?.storage_accounts || []),
     updatedAt: Number(catalog?.updatedAt || now)
   };
 }
@@ -106,6 +107,8 @@ export function normalizeRelease(release, softwareSlug) {
     description: String(release.description || ""),
     changelog: Array.isArray(release.notes) ? release.notes.join("\n") : String(release.changelog || ""),
     fileKey: String(release.fileKey || release.key || ""),
+    storageId: String(release.storageId || release.storage_id || "default"),
+    publicUrl: String(release.publicUrl || release.public_url || ""),
     fileName: String(release.fileName || release.file_name || release.key?.split("/").pop() || ""),
     fileSize: Number(release.fileSize || release.file_size || 0),
     size: String(release.size || formatBytes(Number(release.fileSize || release.file_size || 0))),
@@ -143,7 +146,45 @@ export function publicCatalog(catalog) {
         ...item,
         releases: (item.releases || []).filter(release => release.status !== "disabled")
       })),
+    storageAccounts: (catalog.storageAccounts || []).map(publicStorageAccount),
     updatedAt: catalog.updatedAt
+  };
+}
+
+export function normalizeStorageAccounts(accounts) {
+  return Array.isArray(accounts) ? accounts.map((account, index) => ({
+    id: String(account.id || `storage-${index + 1}`),
+    name: String(account.name || "未命名存储"),
+    provider: String(account.provider || "cloudflare-r2"),
+    accountId: String(account.accountId || account.account_id || ""),
+    bucket: String(account.bucket || ""),
+    region: String(account.region || "auto"),
+    endpoint: String(account.endpoint || ""),
+    accessKeyId: String(account.accessKeyId || account.access_key_id || ""),
+    encryptedSecretAccessKey: String(account.encryptedSecretAccessKey || account.encrypted_secret_access_key || ""),
+    publicBaseUrl: String(account.publicBaseUrl || account.public_base_url || ""),
+    status: account.status || "active",
+    sortOrder: Number(account.sortOrder ?? account.sort_order ?? index),
+    createdAt: Number(account.createdAt || Date.now()),
+    updatedAt: Number(account.updatedAt || Date.now())
+  })).sort(bySortOrder) : [];
+}
+
+export function publicStorageAccount(account) {
+  return {
+    id: account.id,
+    name: account.name,
+    provider: account.provider,
+    accountId: account.accountId,
+    bucket: account.bucket,
+    region: account.region,
+    endpoint: account.endpoint,
+    publicBaseUrl: account.publicBaseUrl,
+    status: account.status,
+    sortOrder: account.sortOrder,
+    createdAt: account.createdAt,
+    updatedAt: account.updatedAt,
+    hasSecret: Boolean(account.encryptedSecretAccessKey)
   };
 }
 

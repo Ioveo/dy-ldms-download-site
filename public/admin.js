@@ -11,9 +11,11 @@ byId("adminPassword").addEventListener("keydown", event => {
 byId("logoutButton").addEventListener("click", logout);
 byId("softwareForm").addEventListener("submit", saveSoftware);
 byId("categoryForm").addEventListener("submit", saveCategory);
+byId("storageForm").addEventListener("submit", saveStorage);
 byId("releaseForm").addEventListener("submit", uploadRelease);
 byId("resetSoftware").addEventListener("click", resetSoftwareForm);
 byId("resetCategory").addEventListener("click", resetCategoryForm);
+byId("resetStorage").addEventListener("click", resetStorageForm);
 
 document.querySelectorAll(".sidebar nav button").forEach(button => {
   button.addEventListener("click", () => showPanel(button.dataset.panel));
@@ -60,6 +62,7 @@ function render(nextCatalog) {
   renderCategoryOptions();
   renderSoftwareRows();
   renderCategoryRows();
+  renderStorageRows();
   renderReleaseRows();
 }
 
@@ -79,6 +82,7 @@ function renderCategoryOptions() {
   const options = catalog.categories.map(category => `<option value="${escapeAttr(category.id)}">${escapeHtml(category.name)}</option>`).join("");
   byId("softwareCategory").innerHTML = options;
   byId("releaseSoftware").innerHTML = catalog.software.map(item => `<option value="${escapeAttr(item.id)}">${escapeHtml(item.name)}</option>`).join("");
+  byId("releaseStorage").innerHTML = `<option value="default">默认 R2：dy-ldms-downloads</option>${(catalog.storageAccounts || []).filter(item => item.status !== "disabled").map(item => `<option value="${escapeAttr(item.id)}">${escapeHtml(item.name)} / ${escapeHtml(item.bucket)}</option>`).join("")}`;
 }
 
 function renderSoftwareRows() {
@@ -109,16 +113,50 @@ function renderCategoryRows() {
   }
 }
 
+function renderStorageRows() {
+  const rows = byId("storageRows");
+  rows.innerHTML = "";
+  for (const item of catalog.storageAccounts || []) {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td><strong>${escapeHtml(item.name)}</strong><br><small>${escapeHtml(item.provider)}</small></td><td class="code">${escapeHtml(item.accountId)}</td><td>${escapeHtml(item.bucket)}</td><td>${item.hasSecret ? "已保存" : "未保存"}</td><td class="status-${item.status === "disabled" ? "disabled" : "active"}">${item.status === "disabled" ? "停用" : "启用"}</td><td class="row-actions"></td>`;
+    const edit = actionButton("编辑", () => fillStorageForm(item));
+    const remove = actionButton("删除", () => deleteStorage(item.id), "danger");
+    tr.lastElementChild.append(edit, remove);
+    rows.append(tr);
+  }
+}
+
 function renderReleaseRows() {
   const rows = byId("releaseRows");
   rows.innerHTML = "";
   for (const item of catalog.software) {
     for (const release of item.releases) {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `<td>${escapeHtml(item.name)}</td><td>${escapeHtml(release.version)}</td><td class="code">${escapeHtml(release.fileName || "-")}</td><td>${escapeHtml(release.size || "-")}</td><td>${release.isLatest ? "是" : "否"}</td><td>${release.downloadCount || 0}</td>`;
+    const tr = document.createElement("tr");
+      tr.innerHTML = `<td>${escapeHtml(item.name)}</td><td>${escapeHtml(release.version)}</td><td class="code">${escapeHtml(release.fileName || "-")}<br><small>${escapeHtml(release.storageId || "default")}</small></td><td>${escapeHtml(release.size || "-")}</td><td>${release.isLatest ? "是" : "否"}</td><td>${release.downloadCount || 0}</td>`;
       rows.append(tr);
     }
   }
+}
+
+async function saveStorage(event) {
+  event.preventDefault();
+  const payload = {
+    id: byId("storageId").value,
+    name: byId("storageName").value.trim(),
+    accountId: byId("storageAccountId").value.trim(),
+    bucket: byId("storageBucket").value.trim(),
+    accessKeyId: byId("storageAccessKeyId").value.trim(),
+    secretAccessKey: byId("storageSecretAccessKey").value.trim(),
+    endpoint: byId("storageEndpoint").value.trim(),
+    publicBaseUrl: byId("storagePublicBaseUrl").value.trim(),
+    sortOrder: Number(byId("storageSort").value || 0),
+    status: byId("storageStatus").value
+  };
+  const result = await api("/api/admin/storage", payload);
+  if (!result.success) return toast(result.msg || "保存失败", true);
+  resetStorageForm();
+  render(result.catalog);
+  toast("存储授权已保存");
 }
 
 async function saveSoftware(event) {
@@ -167,6 +205,7 @@ async function uploadRelease(event) {
   const form = new FormData();
   form.append("password", password);
   form.append("softwareId", softwareId);
+  form.append("storageId", byId("releaseStorage").value);
   form.append("version", version);
   form.append("changelog", byId("releaseChangelog").value.trim());
   form.append("isLatest", byId("releaseLatest").checked ? "1" : "0");
@@ -196,6 +235,13 @@ async function deleteCategory(id) {
   render(result.catalog);
 }
 
+async function deleteStorage(id) {
+  if (!confirm("确定删除这个存储授权吗？")) return;
+  const result = await api("/api/admin/storage/delete", { id });
+  if (!result.success) return toast(result.msg || "删除失败", true);
+  render(result.catalog);
+}
+
 function fillSoftwareForm(item) {
   showPanel("softwarePanel");
   byId("softwareId").value = item.id;
@@ -217,6 +263,20 @@ function fillCategoryForm(item) {
   byId("categoryStatus").value = item.status || "active";
 }
 
+function fillStorageForm(item) {
+  showPanel("storagePanel");
+  byId("storageId").value = item.id;
+  byId("storageName").value = item.name;
+  byId("storageAccountId").value = item.accountId;
+  byId("storageBucket").value = item.bucket;
+  byId("storageAccessKeyId").value = item.accessKeyId;
+  byId("storageSecretAccessKey").value = "";
+  byId("storageEndpoint").value = item.endpoint || "";
+  byId("storagePublicBaseUrl").value = item.publicBaseUrl || "";
+  byId("storageSort").value = item.sortOrder || 0;
+  byId("storageStatus").value = item.status || "active";
+}
+
 function resetSoftwareForm() {
   byId("softwareForm").reset();
   byId("softwareId").value = "";
@@ -227,6 +287,12 @@ function resetCategoryForm() {
   byId("categoryForm").reset();
   byId("categoryId").value = "";
   byId("categorySort").value = "10";
+}
+
+function resetStorageForm() {
+  byId("storageForm").reset();
+  byId("storageId").value = "";
+  byId("storageSort").value = "10";
 }
 
 function showPanel(id) {

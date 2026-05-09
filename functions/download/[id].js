@@ -10,6 +10,9 @@ export async function onRequestGet({ env, params }) {
     ? findLatestCatalogRelease(catalog, "datacenter") || findLatestCatalogRelease(catalog, catalog.software?.[0]?.slug)
     : findRelease(catalog, releaseId);
   if (catalogMatch?.release?.fileKey) {
+    if (catalogMatch.release.storageId !== "default" && catalogMatch.release.publicUrl) {
+      return Response.redirect(catalogMatch.release.publicUrl, 302);
+    }
     return serveRelease(env, {
       key: catalogMatch.release.fileKey,
       fileName: catalogMatch.release.fileName,

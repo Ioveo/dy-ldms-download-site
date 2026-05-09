@@ -1,4 +1,6 @@
 import { formatBytes, id, loadCatalog, normalizeRelease, saveCatalog, slugify } from "../../_lib/catalog.js";
+import { decryptSecret } from "../../_lib/crypto.js";
+import { publicUrlFor, putExternalR2 } from "../../_lib/r2-s3.js";
 import { json } from "../../_lib/releases.js";
 import { requireAdmin, success } from "./_lib.js";
 
@@ -9,6 +11,7 @@ export async function onRequestPost({ request, env }) {
   if (!env.SOFTWARE_BUCKET?.put) return json({ success: false, msg: "R2 未配置" }, 500);
 
   const softwareId = String(formData.get("softwareId") || "");
+  const storageId = String(formData.get("storageId") || "default");
   const version = String(formData.get("version") || "").trim();
   const file = formData.get("file");
   if (!softwareId || !version || !file?.arrayBuffer) {
@@ -22,9 +25,18 @@ export async function onRequestPost({ request, env }) {
   const fileName = sanitizeFileName(file.name || `${software.slug}-${version}.zip`);
   const fileKey = `software/${software.slug}/${slugify(version)}/${Date.now()}-${fileName}`;
   const bytes = await file.arrayBuffer();
-  await env.SOFTWARE_BUCKET.put(fileKey, bytes, {
-    httpMetadata: { contentType: file.type || "application/octet-stream" }
-  });
+  let publicUrl = "";
+  if (storageId === "default") {
+    await env.SOFTWARE_BUCKET.put(fileKey, bytes, {
+      httpMetadata: { contentType: file.type || "application/octet-stream" }
+    });
+  } else {
+    const storage = catalog.storageAccounts.find(item => item.id === storageId && item.status !== "disabled");
+    if (!storage) return json({ success: false, msg: "存储授权不存在或已停用" }, 404);
+    const secret = await decryptSecret(env, storage.encryptedSecretAccessKey);
+    await putExternalR2(storage, secret, fileKey, bytes, file.type || "application/octet-stream");
+    publicUrl = publicUrlFor(storage, fileKey);
+  }
 
   const isLatest = String(formData.get("isLatest") || "") === "1";
   if (isLatest) {
@@ -36,6 +48,8 @@ export async function onRequestPost({ request, env }) {
     version,
     changelog: String(formData.get("changelog") || ""),
     fileKey,
+    storageId,
+    publicUrl,
     fileName,
     fileSize: file.size || bytes.byteLength,
     size: formatBytes(file.size || bytes.byteLength),

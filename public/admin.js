@@ -288,12 +288,8 @@ async function uploadArticleImage(target) {
   const mediaType = mediaTypeFor(file);
   if (isAudioTarget && mediaType !== "audio") return toast("请选择音频文件后再插入音频", true);
   if (isImageTarget && mediaType !== "image") return toast("请选择图片文件后再上传图片", true);
-  const form = new FormData();
-  form.append("password", password);
-  form.append("file", file);
-  form.append("kind", isAudioTarget ? "audio" : "image");
   toast("正在上传媒体");
-  const result = await uploadForm("/api/admin/article-image", form);
+  const result = await uploadArticleMedia(file, isAudioTarget ? "audio" : "image");
   if (!result.success) return toast(result.msg || "媒体上传失败", true);
   if (target === "cover") {
     byId("articleCover").value = result.url;
@@ -306,9 +302,20 @@ async function uploadArticleImage(target) {
   toast("媒体已插入");
 }
 
-async function uploadForm(url, form) {
+async function uploadArticleMedia(file, kind) {
   try {
-    const response = await fetch(url, { method: "POST", body: form });
+    const data = await fileToBase64(file);
+    const response = await fetch("/api/admin/article-image", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        password,
+        kind,
+        fileName: file.name || "article-media.bin",
+        contentType: file.type || "",
+        data
+      })
+    });
     const text = await response.text();
     const result = parseUploadResponse(text);
     if (!response.ok) return { success: false, msg: result.msg || `上传失败：HTTP ${response.status}` };
@@ -316,6 +323,15 @@ async function uploadForm(url, form) {
   } catch (error) {
     return { success: false, msg: `上传失败：${error.message || "网络或接口异常"}` };
   }
+}
+
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result || "").split(",")[1] || "");
+    reader.onerror = () => reject(reader.error || new Error("读取文件失败"));
+    reader.readAsDataURL(file);
+  });
 }
 
 function parseUploadResponse(text) {

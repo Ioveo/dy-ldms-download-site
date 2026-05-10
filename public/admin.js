@@ -283,9 +283,14 @@ async function saveArticle(event) {
 async function uploadArticleImage(target) {
   const file = byId("articleImageFile").files[0];
   if (!file) return toast("请选择要上传的图片或音频", true);
+  const isAudioTarget = target === "audio";
+  const isImageTarget = target === "cover" || target === "content";
+  if (isAudioTarget && !file.type.startsWith("audio/")) return toast("请选择音频文件后再插入音频", true);
+  if (isImageTarget && !file.type.startsWith("image/")) return toast("请选择图片文件后再上传图片", true);
   const form = new FormData();
   form.append("password", password);
   form.append("file", file);
+  form.append("kind", isAudioTarget ? "audio" : "image");
   toast("正在上传媒体");
   const response = await fetch("/api/admin/article-image", { method: "POST", body: form });
   const result = await response.json();
@@ -293,9 +298,9 @@ async function uploadArticleImage(target) {
   if (target === "cover") {
     byId("articleCover").value = result.url;
   } else if (target === "audio") {
-    insertAtCursor(byId("articleContent"), `\n<audio controls src="${result.url}"></audio>\n`);
+    insertAtCursor(byId("articleContent"), `\n<figure class="article-audio"><audio controls preload="metadata" src="${result.url}"></audio></figure>\n`);
   } else {
-    insertAtCursor(byId("articleContent"), `\n<img src="${result.url}" alt="">\n`);
+    insertAtCursor(byId("articleContent"), `\n<figure><img src="${result.url}" alt=""><figcaption>图片说明</figcaption></figure>\n`);
   }
   updateArticleEditorMeta();
   toast("媒体已插入");

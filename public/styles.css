@@ -870,8 +870,9 @@ h3 {
   position: relative;
   min-height: auto;
   align-items: start;
-  padding-top: clamp(28px, 4vw, 46px);
-  padding-bottom: clamp(36px, 5vw, 64px);
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: clamp(28px, 4vw, 46px) 24px clamp(30px, 4vw, 52px);
   background:
     radial-gradient(circle at 18% 18%, rgba(34, 211, 238, 0.16), transparent 30%),
     radial-gradient(circle at 82% 12%, rgba(103, 232, 165, 0.12), transparent 28%);
@@ -926,8 +927,12 @@ h3 {
 }
 
 .article-body--pro {
-  grid-template-columns: minmax(0, 820px) minmax(280px, 360px);
-  justify-content: center;
+  grid-template-columns: minmax(0, 800px) minmax(260px, 320px);
+  justify-content: start;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding-left: 24px;
+  padding-right: 24px;
 }
 
 .article-body article,
@@ -990,14 +995,35 @@ h3 {
 }
 
 .article-body article img {
+  display: block;
   max-width: 100%;
+  margin: 1.4em auto 0.35em;
   border-radius: 20px;
   box-shadow: 0 18px 50px rgba(0, 0, 0, 0.22);
+}
+
+.article-body article figure {
+  margin: 1.6em 0;
+}
+
+.article-body article figcaption {
+  margin-top: 10px;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.6;
+  text-align: center;
 }
 
 .article-body article audio {
   width: 100%;
   margin: 1.2em 0;
+}
+
+.article-body article .article-audio {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 18px;
+  padding: 14px;
+  background: rgba(255, 255, 255, 0.045);
 }
 
 .article-body article table {
@@ -1526,6 +1552,13 @@ footer {
 
   .article-related {
     position: static;
+  }
+
+  .article-cover--pro,
+  .article-body--pro {
+    max-width: none;
+    padding-left: clamp(18px, 5vw, 28px);
+    padding-right: clamp(18px, 5vw, 28px);
   }
 }
 

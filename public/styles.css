@@ -200,8 +200,35 @@ section {
 .hero,
 .features,
 .download,
-.license {
+.license,
+.page-hero,
+.page-section {
   padding: clamp(56px, 8vw, 104px) clamp(20px, 5vw, 72px);
+}
+
+.page-hero {
+  min-height: 420px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  border-bottom: 1px solid var(--line);
+  background:
+    radial-gradient(circle at 80% 20%, rgba(34, 211, 238, 0.18), transparent 34%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.04), transparent);
+}
+
+.page-hero h1 {
+  max-width: 900px;
+  font-size: clamp(46px, 9vw, 104px);
+  line-height: 0.94;
+}
+
+.page-hero p:not(.eyebrow) {
+  max-width: 650px;
+  margin: 22px 0 0;
+  color: var(--muted);
+  font-size: clamp(17px, 2vw, 22px);
+  line-height: 1.7;
 }
 
 .hero {
@@ -633,7 +660,9 @@ footer {
   .hero,
   .features,
   .download,
-  .license {
+  .license,
+  .page-hero,
+  .page-section {
     padding-top: 44px;
   }
 

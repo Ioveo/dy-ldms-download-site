@@ -5,6 +5,7 @@ loadCatalog();
 initShowcase();
 
 async function loadCatalog() {
+  if (!byId("softwareGrid")) return;
   try {
     const response = await fetch("/api/catalog", { cache: "no-store" });
     if (!response.ok) throw new Error("catalog request failed");

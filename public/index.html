@@ -11,16 +11,15 @@
   </head>
   <body>
     <header class="topbar">
-      <a class="brand" href="#home">
+      <a class="brand" href="/">
         <img src="/logo.png" alt="" />
         <span>天才猫软件中心</span>
       </a>
       <nav aria-label="主导航">
-        <a href="#home">首页</a>
-        <a href="#download">下载</a>
-        <a href="#license">授权</a>
+        <a href="/">首页</a>
+        <a href="/download.html">下载</a>
+        <a href="/license.html">授权</a>
         <a href="https://mk.nsy.me/buy" target="_blank" rel="noopener">购买授权</a>
-        <a href="/admin.html">后台</a>
       </nav>
     </header>
 
@@ -48,7 +47,7 @@
           <h1>功能界面，一屏看清。</h1>
           <p>数据中心、直播辅助、授权购买与下载入口集中展示，客户打开页面先看到实际功能效果。</p>
           <div class="actions">
-            <a class="button button--primary" href="#download">立即下载</a>
+            <a class="button button--primary" href="/download.html">立即下载</a>
             <a class="button button--ghost" href="https://mk.nsy.me/buy" target="_blank" rel="noopener">购买授权</a>
           </div>
         </div>
@@ -67,7 +66,7 @@
           <h1>直播运营，从记录到执行都更稳。</h1>
           <p class="summary">数据中心版管理直播数据、复盘报表和结算；DY辅助工具处理自动讲解、快速回复和宏录制。两个软件独立下载，统一授权。</p>
           <div class="actions">
-            <a class="button button--primary" href="#download">点击下载</a>
+            <a class="button button--primary" href="/download.html">点击下载</a>
             <a class="button button--ghost" href="https://mk.nsy.me/buy" target="_blank" rel="noopener">购买授权</a>
           </div>
           <div class="hero-points">
@@ -124,75 +123,15 @@
         </div>
       </section>
 
-      <section class="download" id="download">
+      <section class="license">
         <div class="section-head">
-          <p class="eyebrow">Downloads</p>
-          <h2>选择要下载的软件。</h2>
-          <p>两个软件独立下载。版本号、文件体积和校验值会自动读取最新发布清单。</p>
-        </div>
-        <div class="category-tabs" id="categoryTabs" aria-label="软件分类"></div>
-        <div class="product-grid" id="softwareGrid" aria-live="polite">
-          <article class="product-card product-card--data">
-            <div class="product-card__media">
-              <img src="/datacenter-preview.jpg" alt="数据中心版软件截图" />
-            </div>
-            <span class="product-card__badge">数据管理</span>
-            <h3>数据中心版</h3>
-            <p>直播数据录入、复盘、报表、主播档案和结算管理。</p>
-            <ul>
-              <li>直播数据录入和 OCR 辅助识别</li>
-              <li>日报、月报、复盘和结算管理</li>
-              <li>本地数据备份与导入导出</li>
-            </ul>
-            <a class="button button--primary" href="/download/latest">点击下载</a>
-          </article>
-          <article class="product-card product-card--assistant">
-            <div class="product-card__media product-card__media--mock">
-              <div class="assistant-panel">
-                <span>LIVE ASSISTANT</span>
-                <strong>天才猫DY辅助工具</strong>
-                <p>自动讲解 · 快速回复 · 宏录制</p>
-              </div>
-            </div>
-            <span class="product-card__badge">直播辅助</span>
-            <h3>天才猫DY辅助工具</h3>
-            <p>独立轻量工具，适合现场运营和重复操作自动化。</p>
-            <ul>
-              <li>自动讲解循环与讲解自检</li>
-              <li>三条快捷回复和自动发送</li>
-              <li>鼠标键盘宏录制与回放</li>
-            </ul>
-            <a class="button button--primary" href="/download/live-assistant-1.0.0">点击下载</a>
-          </article>
-        </div>
-      </section>
-
-      <section class="license" id="license">
-        <div class="section-head">
-          <p class="eyebrow">License</p>
-          <h2>统一授权绑定。</h2>
-          <p>两个软件沿用同一套授权逻辑。客户首次打开时联网验证卡密和设备，授权通过后进入主界面。</p>
-        </div>
-        <div class="license-grid">
-          <article>
-            <strong>01</strong>
-            <h3>下载安装</h3>
-            <p>从官方下载页下载对应版本，解压后运行。</p>
-          </article>
-          <article>
-            <strong>02</strong>
-            <h3>输入卡密</h3>
-            <p>软件启动时验证卡密，并绑定当前客户设备。</p>
-          </article>
-          <article>
-            <strong>03</strong>
-            <h3>稳定使用</h3>
-            <p>授权成功后显示剩余时间，到期前可续费。</p>
-          </article>
+          <p class="eyebrow">Next</p>
+          <h2>下载和授权拆分成独立页面。</h2>
+          <p>客户可以进入软件下载页选择版本，也可以进入授权页了解购买和绑定流程。</p>
         </div>
         <div class="license-action">
-          <a class="button button--primary" href="https://mk.nsy.me/buy" target="_blank" rel="noopener">进入授权购买页面</a>
-          <p>购买页面部署在授权域名，DY辅助工具和数据中心版会分别生成对应卡密，不会混用。</p>
+          <a class="button button--primary" href="/download.html">进入下载中心</a>
+          <p>软件列表、分类和版本由后台维护，首页只保留产品展示和入口。</p>
         </div>
       </section>
     </main>

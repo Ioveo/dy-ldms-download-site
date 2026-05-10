@@ -112,6 +112,7 @@ function renderCategoryOptions() {
 function renderArticleOptions() {
   const root = byId("articleSoftware");
   const categorySelect = byId("articleSoftwareCategory");
+  if (!root || !categorySelect) return;
   const existingIds = new Set((catalog.software || []).map(item => item.id));
   articleSoftwareSelection = new Set(Array.from(articleSoftwareSelection).filter(id => existingIds.has(id)));
 

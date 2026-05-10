@@ -11,6 +11,12 @@ binding = "SOFTWARE_BUCKET"
 bucket_name = "dy-ldms-downloads"
 preview_bucket_name = "dy-ldms-downloads-dev"
 
+# Configure this after creating the D1 database in Cloudflare.
+# [[d1_databases]]
+# binding = "DB"
+# database_name = "dy-ldms-download-db"
+# database_id = "replace-with-your-d1-database-id"
+
 [vars]
 PRODUCT_NAME = "天才猫直播数据管理"
 MANIFEST_KEY = "releases/manifest.json"

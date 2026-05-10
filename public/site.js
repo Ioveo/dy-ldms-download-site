@@ -5,7 +5,7 @@ loadCatalog();
 initShowcase();
 
 async function loadCatalog() {
-  if (!byId("softwareGrid")) return;
+  if (!byId("softwareGrid") && !byId("homeArticleGrid")) return;
   try {
     const response = await fetch("/api/catalog", { cache: "no-store" });
     if (!response.ok) throw new Error("catalog request failed");
@@ -15,12 +15,35 @@ async function loadCatalog() {
     renderNavigation(catalog);
     renderCategoryTabs(catalog);
     renderSoftwareGrid(catalog);
+    renderHomeArticles(catalog);
   } catch {
     const response = await fetch("/api/releases", { cache: "no-store" });
     const manifest = response.ok ? await response.json() : { releases: [] };
     renderNavigation({ navigation: defaultNavigation() });
     renderLegacyGrid(manifest);
   }
+}
+
+function renderHomeArticles(catalog) {
+  const grid = byId("homeArticleGrid");
+  if (!grid) return;
+  const articles = (catalog.articles || []).filter(item => item.status === "published").slice(0, 3);
+  grid.replaceChildren();
+
+  if (!articles.length) {
+    const empty = document.createElement("article");
+    empty.className = "home-article home-article--empty";
+    empty.innerHTML = "<div><span>Article</span><h3>文章准备中</h3><p>后台发布文章后，会在这里展示精选内容。</p></div>";
+    grid.append(empty);
+    return;
+  }
+
+  articles.forEach((article, index) => {
+    const card = document.createElement("article");
+    card.className = index === 0 ? "home-article home-article--featured" : "home-article";
+    card.innerHTML = `${article.coverUrl ? `<img src="${escapeAttr(article.coverUrl)}" alt="" loading="lazy">` : ""}<div><span>${formatDate(article.createdAt) || "Article"}</span><h3>${escapeHtml(article.title)}</h3><p>${escapeHtml(article.summary || "查看这篇软件介绍和使用说明。")}</p><a href="/article.html?slug=${encodeURIComponent(article.slug)}">阅读全文</a></div>`;
+    grid.append(card);
+  });
 }
 
 function renderCategoryTabs(catalog) {
@@ -64,6 +87,7 @@ function renderNavigation(catalog) {
 
 function renderSoftwareGrid(catalog) {
   const grid = byId("softwareGrid");
+  if (!grid) return;
   const software = (catalog.software || []).filter(item => activeCategory === "all" || item.categoryId === activeCategory);
   grid.replaceChildren();
 
@@ -196,6 +220,10 @@ function formatDate(timestamp) {
 
 function escapeHtml(value) {
   return String(value ?? "").replace(/[&<>"']/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" })[char]);
+}
+
+function escapeAttr(value) {
+  return escapeHtml(value).replace(/`/g, "&#96;");
 }
 
 function defaultNavigation() {

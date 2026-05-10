@@ -9,17 +9,20 @@ async function loadArticles() {
 
 function renderArticles(articles) {
   const grid = document.getElementById("articleGrid");
+  const meta = document.getElementById("articleListMeta");
+  const published = articles.filter(item => item.status === "published");
+  if (meta) meta.textContent = published.length ? `共 ${published.length} 篇已发布内容` : "暂无已发布内容";
   grid.replaceChildren();
-  if (!articles.length) {
-    grid.innerHTML = "<article class='article-card'><h2>暂无文章</h2><p>后台发布文章后会显示在这里。</p></article>";
+  if (!published.length) {
+    grid.innerHTML = "<article class='article-card article-card--empty'><div><span>Article</span><h2>暂无文章</h2><p>后台发布文章后会显示在这里。</p></div></article>";
     return;
   }
-  for (const article of articles) {
+  published.forEach((article, index) => {
     const card = document.createElement("article");
-    card.className = "article-card";
-    card.innerHTML = `${article.coverUrl ? `<img src="${escapeAttr(article.coverUrl)}" alt="">` : ""}<div><span>${formatDate(article.createdAt)}</span><h2>${escapeHtml(article.title)}</h2><p>${escapeHtml(article.summary || "查看这篇软件介绍。")}</p><a class="button button--primary" href="/article.html?slug=${encodeURIComponent(article.slug)}">阅读全文</a></div>`;
+    card.className = index === 0 ? "article-card article-card--lead" : "article-card";
+    card.innerHTML = `${article.coverUrl ? `<img src="${escapeAttr(article.coverUrl)}" alt="" loading="lazy">` : ""}<div><span>${formatDate(article.createdAt) || "Article"}</span><h2>${escapeHtml(article.title)}</h2><p>${escapeHtml(article.summary || "查看这篇软件介绍。")}</p><a class="button button--primary" href="/article.html?slug=${encodeURIComponent(article.slug)}">阅读全文</a></div>`;
     grid.append(card);
-  }
+  });
 }
 
 function renderNavigation(items) {

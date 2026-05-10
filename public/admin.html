@@ -149,28 +149,52 @@
           <div class="panel__head">
             <div>
               <h2>文章管理</h2>
-              <p>发布软件介绍、教程和更新说明，可关联已经上传的软件。</p>
+              <p>专业文章编辑台，支持草稿、发布、封面、关联软件和正文排版。</p>
             </div>
           </div>
-          <form class="form-grid" id="articleForm">
-            <input type="hidden" id="articleId" />
-            <label>文章标题<input id="articleTitle" required placeholder="例如：数据中心版使用介绍" /></label>
-            <label>文章标识<input id="articleSlug" placeholder="datacenter-guide" /></label>
-            <label class="span-2">摘要<textarea id="articleSummary" rows="2" placeholder="显示在文章列表中的简短说明"></textarea></label>
-            <label class="span-2">封面图地址<input id="articleCover" placeholder="/datacenter-preview.jpg 或图片 URL" /></label>
-            <label class="span-2">上传本地图片<input id="articleImageFile" type="file" accept="image/*" /></label>
-            <div class="form-actions span-2"><button class="ghost" type="button" id="uploadArticleImage">上传图片并填入封面</button><button class="ghost" type="button" id="insertArticleImage">上传图片并插入正文</button></div>
-            <div class="span-2"><label>关联软件</label><div class="check-grid" id="articleSoftware"></div></div>
-            <label class="span-2">正文<textarea id="articleContent" rows="12" placeholder="支持普通文本和简单 HTML。可以点击上方按钮上传图片并插入正文。"></textarea></label>
-            <label>排序<input id="articleSort" type="number" value="10" /></label>
-            <label>状态<select id="articleStatus"><option value="draft">草稿</option><option value="published">发布</option><option value="disabled">隐藏</option></select></label>
-            <div class="form-actions span-2"><button type="submit">保存文章</button><button class="ghost" type="button" id="resetArticle">清空</button></div>
-          </form>
-          <div class="table-wrap"><table><thead><tr><th>文章</th><th>关联软件</th><th>状态</th><th>更新时间</th><th>操作</th></tr></thead><tbody id="articleRows"></tbody></table></div>
+          <div class="article-admin-shell">
+            <form class="article-editor" id="articleForm">
+              <input type="hidden" id="articleId" />
+              <div class="editor-toolbar">
+                <div>
+                  <p class="eyebrow">Editor</p>
+                  <strong id="articleEditorMode">新建文章</strong>
+                </div>
+                <div class="editor-toolbar__actions">
+                  <button type="submit">保存文章</button>
+                  <button class="ghost" type="button" id="resetArticle">新建</button>
+                </div>
+              </div>
+              <label class="editor-title">文章标题<input id="articleTitle" required placeholder="例如：数据中心版使用介绍" /></label>
+              <div class="editor-grid">
+                <label>文章标识<input id="articleSlug" placeholder="datacenter-guide" /></label>
+                <label>状态<select id="articleStatus"><option value="draft">草稿</option><option value="published">发布</option><option value="disabled">隐藏</option></select></label>
+                <label>排序<input id="articleSort" type="number" value="10" /></label>
+              </div>
+              <label>摘要<textarea id="articleSummary" rows="3" maxlength="180" placeholder="显示在文章列表中的简短说明，建议 60-120 字。"></textarea></label>
+              <div class="editor-meta"><span id="articleWordCount">0 字</span><span id="articleSummaryCount">摘要 0/180</span></div>
+              <label>封面图地址<input id="articleCover" placeholder="/datacenter-preview.jpg 或图片 URL" /></label>
+              <div class="article-cover-preview" id="articleCoverPreview"><span>封面预览</span></div>
+              <label>上传本地图片<input id="articleImageFile" type="file" accept="image/*" /></label>
+              <div class="form-actions"><button class="ghost" type="button" id="uploadArticleImage">上传并设为封面</button><button class="ghost" type="button" id="insertArticleImage">上传并插入正文</button></div>
+              <div><label>关联软件</label><div class="check-grid" id="articleSoftware"></div></div>
+              <label>正文<textarea id="articleContent" rows="18" placeholder="支持普通文本和简单 HTML。普通文本会自动按段落排版；也可以插入 h2、h3、ul、blockquote、img 等 HTML。"></textarea></label>
+            </form>
+            <div class="article-manager">
+              <div class="article-manager__head">
+                <div>
+                  <p class="eyebrow">Library</p>
+                  <h3>文章库</h3>
+                </div>
+                <span id="articleCount">0 篇</span>
+              </div>
+              <div class="article-admin-list" id="articleRows"></div>
+            </div>
+          </div>
         </section>
       </section>
     </main>
 
-    <script src="/admin.js?v=20260509-admin" type="module"></script>
+    <script src="/admin.js?v=20260510-articles-pro" type="module"></script>
   </body>
 </html>

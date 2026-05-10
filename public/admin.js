@@ -23,6 +23,10 @@ byId("resetArticle").addEventListener("click", resetArticleForm);
 byId("testStorage").addEventListener("click", testStorage);
 byId("uploadArticleImage").addEventListener("click", () => uploadArticleImage("cover"));
 byId("insertArticleImage").addEventListener("click", () => uploadArticleImage("content"));
+byId("articleTitle").addEventListener("input", updateArticleEditorMeta);
+byId("articleSummary").addEventListener("input", updateArticleEditorMeta);
+byId("articleContent").addEventListener("input", updateArticleEditorMeta);
+byId("articleCover").addEventListener("input", updateArticleEditorMeta);
 
 document.querySelectorAll(".sidebar nav button").forEach(button => {
   button.addEventListener("click", () => showPanel(button.dataset.panel));
@@ -158,16 +162,23 @@ function renderNavigationRows() {
 
 function renderArticleRows() {
   const rows = byId("articleRows");
-  rows.innerHTML = "";
-  for (const item of catalog.articles || []) {
+  const articles = catalog.articles || [];
+  byId("articleCount").textContent = `${articles.length} 篇`;
+  rows.replaceChildren();
+  if (!articles.length) {
+    rows.innerHTML = `<article class="article-admin-empty"><h4>还没有文章</h4><p>在左侧写一篇产品介绍、使用教程或更新说明。</p></article>`;
+    return;
+  }
+  for (const item of articles) {
     const related = (item.softwareIds || []).map(id => catalog.software.find(software => software.id === id)?.name).filter(Boolean).join("、") || "-";
-    const tr = document.createElement("tr");
-    tr.innerHTML = `<td><strong>${escapeHtml(item.title)}</strong><br><small>${escapeHtml(item.slug)}</small></td><td>${escapeHtml(related)}</td><td class="status-${item.status === "published" ? "active" : "disabled"}">${item.status === "published" ? "发布" : item.status === "draft" ? "草稿" : "隐藏"}</td><td>${formatDateTime(item.updatedAt)}</td><td class="row-actions"></td>`;
+    const card = document.createElement("article");
+    card.className = `article-admin-card ${item.id === byId("articleId").value ? "is-editing" : ""}`;
+    card.innerHTML = `${item.coverUrl ? `<img src="${escapeAttr(item.coverUrl)}" alt="">` : `<div class="article-admin-card__placeholder">Article</div>`}<div class="article-admin-card__body"><div class="article-admin-card__meta"><span class="status-${articleStatusClass(item.status)}">${articleStatusLabel(item.status)}</span><small>${formatDateTime(item.updatedAt)}</small></div><h4>${escapeHtml(item.title)}</h4><p>${escapeHtml(item.summary || "暂无摘要")}</p><small>${escapeHtml(item.slug)} · ${escapeHtml(related)}</small><div class="row-actions"></div></div>`;
     const edit = actionButton("编辑", () => fillArticleForm(item));
     const view = actionButton("预览", () => window.open(`/article.html?slug=${encodeURIComponent(item.slug)}`, "_blank"));
     const remove = actionButton("删除", () => deleteArticle(item.id), "danger");
-    tr.lastElementChild.append(edit, view, remove);
-    rows.append(tr);
+    card.querySelector(".row-actions").append(edit, view, remove);
+    rows.append(card);
   }
 }
 
@@ -228,6 +239,7 @@ async function uploadArticleImage(target) {
     const start = textarea.selectionStart || textarea.value.length;
     textarea.value = textarea.value.slice(0, start) + snippet + textarea.value.slice(start);
   }
+  updateArticleEditorMeta();
   toast("图片已上传");
 }
 
@@ -393,6 +405,9 @@ function fillArticleForm(item) {
   byId("articleStatus").value = item.status || "draft";
   const selected = new Set(item.softwareIds || []);
   Array.from(byId("articleSoftware").querySelectorAll("input[type='checkbox']")).forEach(input => input.checked = selected.has(input.value));
+  updateArticleEditorMeta();
+  renderArticleRows();
+  byId("articleTitle").focus();
 }
 
 function storagePayload() {
@@ -463,6 +478,35 @@ function resetArticleForm() {
   byId("articleForm").reset();
   byId("articleId").value = "";
   byId("articleSort").value = "10";
+  Array.from(byId("articleSoftware").querySelectorAll("input[type='checkbox']")).forEach(input => input.checked = false);
+  updateArticleEditorMeta();
+  renderArticleRows();
+}
+
+function updateArticleEditorMeta() {
+  const isEditing = Boolean(byId("articleId").value);
+  const title = byId("articleTitle").value.trim();
+  const summary = byId("articleSummary").value.trim();
+  const content = byId("articleContent").value.trim();
+  const cover = byId("articleCover").value.trim();
+  byId("articleEditorMode").textContent = isEditing ? `正在编辑：${title || "未命名文章"}` : "新建文章";
+  byId("articleWordCount").textContent = `${countWords(content)} 字`;
+  byId("articleSummaryCount").textContent = `摘要 ${summary.length}/180`;
+  const preview = byId("articleCoverPreview");
+  preview.innerHTML = cover ? `<img src="${escapeAttr(cover)}" alt=""><span>封面预览</span>` : "<span>封面预览</span>";
+}
+
+function countWords(value) {
+  const text = String(value || "").replace(/<[^>]+>/g, " ").trim();
+  return text ? text.length : 0;
+}
+
+function articleStatusLabel(status) {
+  return status === "published" ? "已发布" : status === "draft" ? "草稿" : "隐藏";
+}
+
+function articleStatusClass(status) {
+  return status === "published" ? "active" : status === "draft" ? "draft" : "disabled";
 }
 
 function showPanel(id) {

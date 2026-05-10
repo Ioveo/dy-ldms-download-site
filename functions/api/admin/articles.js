@@ -1,3 +1,4 @@
+import { listArticles, saveArticle } from "../../_lib/articles-db.js";
 import { id, loadCatalog, saveCatalog, slugify } from "../../_lib/catalog.js";
 import { json } from "../../_lib/releases.js";
 import { requireAdmin, success } from "./_lib.js";
@@ -8,7 +9,13 @@ export async function onRequestPost({ request, env }) {
   const body = auth.body || {};
   if (!body.title) return json({ success: false, msg: "请填写文章标题" }, 400);
 
-  const catalog = await loadCatalog(env);
+  let catalog = await loadCatalog(env);
+  const savedToDb = await saveArticle(env, body);
+  if (savedToDb) {
+    catalog = await loadCatalog(env);
+    return success({ ...catalog, articles: await listArticles(env, { publicOnly: false }) });
+  }
+
   const now = Date.now();
   const article = {
     id: body.id || id("article"),

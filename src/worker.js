@@ -47,6 +47,14 @@ export default {
       return json(await loadManifest(env));
     }
 
+    if (url.pathname === "/api/admin/article-image") {
+      return uploadArticleMedia(request, env);
+    }
+
+    if (url.pathname.startsWith("/media/")) {
+      return serveMedia(request, env, decodeURIComponent(url.pathname.slice("/media/".length)));
+    }
+
     if (url.pathname === "/download/latest") {
       const manifest = await loadManifest(env);
       const release = findLatestRelease(manifest);
@@ -70,6 +78,68 @@ export default {
     return text("Static assets binding is not configured", 500);
   }
 };
+
+async function uploadArticleMedia(request, env) {
+  if (request.method !== "POST") return text("Method Not Allowed", 405);
+  let formData;
+  try {
+    formData = await request.formData();
+  } catch (error) {
+    return json({ success: false, msg: `读取上传文件失败：${error.message || "表单格式错误"}` }, 400);
+  }
+
+  const password = String(formData.get("password") || "");
+  if (!env.ADMIN_PASSWORD || password !== env.ADMIN_PASSWORD) {
+    return json({ success: false, msg: "密码错误或未配置 ADMIN_PASSWORD" }, 403);
+  }
+  if (!env.SOFTWARE_BUCKET?.put) return json({ success: false, msg: "R2 未配置或当前环境未绑定 SOFTWARE_BUCKET" }, 500);
+
+  const file = formData.get("file");
+  if (!file?.arrayBuffer) return json({ success: false, msg: "请选择媒体文件" }, 400);
+  const kind = String(formData.get("kind") || "");
+  const type = String(file.type || inferredContentType(file.name) || "");
+  const mediaKind = type.startsWith("audio/") ? "audio" : type.startsWith("image/") ? "image" : "";
+  if (!mediaKind) return json({ success: false, msg: "只能上传图片或音频文件" }, 400);
+  if (kind === "image" && mediaKind !== "image") return json({ success: false, msg: "请选择图片文件" }, 400);
+  if (kind === "audio" && mediaKind !== "audio") return json({ success: false, msg: "请选择音频文件" }, 400);
+
+  const prefix = mediaKind === "audio" ? "article-audio" : "article-image";
+  const key = `${prefix}-${crypto.randomUUID()}-${sanitizeMediaFileName(file.name || "article-media.bin")}`;
+  try {
+    await env.SOFTWARE_BUCKET.put(key, await file.arrayBuffer(), {
+      httpMetadata: { contentType: type || "application/octet-stream" }
+    });
+  } catch (error) {
+    return json({ success: false, msg: `上传到 R2 失败：${error.message || "未知错误"}` }, 500);
+  }
+
+  return json({ success: true, key, url: `/media/${encodeURIComponent(key)}` });
+}
+
+async function serveMedia(request, env, key) {
+  if (request.method !== "GET" && request.method !== "HEAD") return text("Method Not Allowed", 405);
+  if (!env.SOFTWARE_BUCKET?.get) return text("R2 binding SOFTWARE_BUCKET is not configured", 500);
+  const range = parseRange(request.headers.get("Range"));
+  const object = await env.SOFTWARE_BUCKET.get(key, range ? { range } : undefined);
+  if (!object) return text("Media not found", 404);
+
+  const headers = new Headers(SECURITY_HEADERS);
+  object.writeHttpMetadata(headers);
+  headers.set("Accept-Ranges", "bytes");
+  headers.set("Cache-Control", "public, max-age=31536000, immutable");
+
+  if (range && object.range) {
+    const offset = object.range.offset || 0;
+    const length = object.range.length || object.size;
+    const completeLength = object.range.completeLength || object.size;
+    headers.set("Content-Length", String(length));
+    headers.set("Content-Range", `bytes ${offset}-${offset + length - 1}/${completeLength}`);
+    return new Response(request.method === "HEAD" ? null : object.body, { status: 206, headers });
+  }
+
+  headers.set("Content-Length", String(object.size));
+  return new Response(request.method === "HEAD" ? null : object.body, { headers });
+}
 
 async function loadManifest(env) {
   if (!env.SOFTWARE_BUCKET?.get) {
@@ -125,6 +195,41 @@ async function serveRelease(env, release) {
 
 function sanitizeFileName(value) {
   return String(value || "download.bin").replace(/["\\\r\n]/g, "");
+}
+
+function sanitizeMediaFileName(value) {
+  return String(value || "article-media.bin").replace(/["\\\r\n]/g, "").replace(/[^a-zA-Z0-9._-]/g, "-");
+}
+
+function inferredContentType(name) {
+  const ext = String(name || "").toLowerCase().split(".").pop();
+  return {
+    png: "image/png",
+    jpg: "image/jpeg",
+    jpeg: "image/jpeg",
+    gif: "image/gif",
+    webp: "image/webp",
+    avif: "image/avif",
+    svg: "image/svg+xml",
+    mp3: "audio/mpeg",
+    m4a: "audio/mp4",
+    aac: "audio/aac",
+    wav: "audio/wav",
+    ogg: "audio/ogg",
+    oga: "audio/ogg",
+    webm: "audio/webm",
+    flac: "audio/flac"
+  }[ext] || "";
+}
+
+function parseRange(value) {
+  const match = /^bytes=(\d+)-(\d*)$/.exec(value || "");
+  if (!match) return null;
+  const offset = Number(match[1]);
+  const end = match[2] ? Number(match[2]) : undefined;
+  if (!Number.isSafeInteger(offset) || offset < 0) return null;
+  if (end !== undefined && (!Number.isSafeInteger(end) || end < offset)) return null;
+  return end === undefined ? { offset } : { offset, length: end - offset + 1 };
 }
 
 function contentDisposition(fileName) {

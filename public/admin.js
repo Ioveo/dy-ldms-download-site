@@ -310,12 +310,20 @@ async function uploadForm(url, form) {
   try {
     const response = await fetch(url, { method: "POST", body: form });
     const text = await response.text();
-    const result = text ? JSON.parse(text) : {};
+    const result = parseUploadResponse(text);
     if (!response.ok) return { success: false, msg: result.msg || `上传失败：HTTP ${response.status}` };
     return result;
   } catch (error) {
     return { success: false, msg: `上传失败：${error.message || "网络或接口异常"}` };
   }
+}
+
+function parseUploadResponse(text) {
+  const value = String(text || "").trim();
+  if (!value) return {};
+  if (value.startsWith("{")) return JSON.parse(value);
+  const title = /<title[^>]*>([\s\S]*?)<\/title>/i.exec(value)?.[1]?.replace(/\s+/g, " ").trim();
+  return { success: false, msg: title ? `上传接口返回 HTML：${title}` : "上传接口返回 HTML，未命中上传 API" };
 }
 
 function mediaTypeFor(file) {

@@ -116,13 +116,13 @@ function renderSoftwareGrid(catalog) {
     } else {
       const panel = document.createElement("div");
       panel.className = "assistant-panel";
-      panel.innerHTML = `<span>${escapeHtml(category?.name || "SOFTWARE")}</span><strong>${escapeHtml(item.name)}</strong><p>${escapeHtml(item.slug || "download")}</p>`;
+      panel.innerHTML = `<span>${escapeHtml(category?.name || "SOFTWARE")}</span><strong>${escapeHtml(item.name)}</strong><p>${escapeHtml(item.slug || "download")}</p><i>✦</i>`;
       media.append(panel);
     }
 
     const badge = document.createElement("span");
     badge.className = "product-card__badge";
-    badge.textContent = category?.name || "软件";
+    badge.innerHTML = `<i>⬢</i>${escapeHtml(category?.name || "软件")}`;
 
     const title = document.createElement("h3");
     title.textContent = item.name;
@@ -134,12 +134,12 @@ function renderSoftwareGrid(catalog) {
     const changelog = String(latest?.changelog || "").split("\n").filter(Boolean).slice(0, 4);
     for (const note of changelog.length ? changelog : ["后台上传版本自动展示", "R2 稳定存储安装包", "支持后续版本更新"]) {
       const li = document.createElement("li");
-      li.textContent = note;
+      li.innerHTML = `<span>✓</span>${escapeHtml(note)}`;
       list.append(li);
     }
 
     const meta = document.createElement("small");
-    meta.textContent = latest ? [latest.version, latest.size, formatDate(latest.createdAt)].filter(Boolean).join(" · ") : "安装包待上传";
+    meta.innerHTML = latest ? `<b>${escapeHtml(latest.version || "最新版")}</b><span>${[latest.size, formatDate(latest.createdAt)].filter(Boolean).map(escapeHtml).join(" · ")}</span>` : "安装包待上传";
 
     const footer = document.createElement("div");
     footer.className = "product-card__footer";
@@ -147,10 +147,14 @@ function renderSoftwareGrid(catalog) {
     const link = document.createElement("a");
     link.className = latest ? "button button--primary" : "button button--disabled";
     link.href = latest ? `/download/${encodeURIComponent(latest.id)}` : "#download";
-    link.textContent = latest ? "点击下载" : "待发布";
+    link.innerHTML = latest ? `<span>点击下载</span><i>↓</i>` : "待发布";
     footer.append(meta, link);
 
-    card.append(media, badge, title, desc, list, footer);
+    const status = document.createElement("div");
+    status.className = "product-card__status";
+    status.innerHTML = `<span>官方版本</span><span>${latest ? "可下载" : "待发布"}</span>`;
+
+    card.append(media, status, badge, title, desc, list, footer);
     grid.append(card);
   }
 }

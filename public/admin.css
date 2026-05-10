@@ -25,6 +25,10 @@ body {
   font-family: "Segoe UI", "Microsoft YaHei", system-ui, sans-serif;
 }
 
+body.is-admin-ready {
+  overflow-x: hidden;
+}
+
 button, input, select, textarea { font: inherit; }
 
 button {

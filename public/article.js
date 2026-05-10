@@ -25,7 +25,7 @@ function renderArticle(article, software) {
 
 function renderRelated(software) {
   if (!software.length) return "";
-  return `<aside class="article-related"><p class="eyebrow">Related</p><h2>相关软件</h2>${software.map(item => `<a href="/download.html"><strong>${escapeHtml(item.name)}</strong><span>${escapeHtml(item.description || "查看下载")}</span></a>`).join("")}</aside>`;
+  return `<aside class="article-related article-related--download"><p class="eyebrow">Download</p><h2>相关软件</h2>${software.map(item => `<a class="related-download" href="/download/latest/${encodeURIComponent(item.slug || item.id)}"><span class="related-download__icon">↓</span><span><strong>${escapeHtml(item.name)}</strong><small>${escapeHtml(item.description || "下载最新版安装包")}</small></span><em>点击下载</em></a>`).join("")}</aside>`;
 }
 
 function renderContent(content) {

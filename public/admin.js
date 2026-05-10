@@ -69,6 +69,8 @@ function logout() {
 function showApp() {
   loginView.hidden = true;
   appView.hidden = false;
+  document.body.classList.add("is-admin-ready");
+  window.scrollTo({ top: 0, left: 0, behavior: "auto" });
 }
 
 async function loadCatalog() {

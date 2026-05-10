@@ -117,12 +117,16 @@ function renderSoftwareGrid(catalog) {
     const meta = document.createElement("small");
     meta.textContent = latest ? [latest.version, latest.size, formatDate(latest.createdAt)].filter(Boolean).join(" · ") : "安装包待上传";
 
+    const footer = document.createElement("div");
+    footer.className = "product-card__footer";
+
     const link = document.createElement("a");
     link.className = latest ? "button button--primary" : "button button--disabled";
     link.href = latest ? `/download/${encodeURIComponent(latest.id)}` : "#download";
     link.textContent = latest ? "点击下载" : "待发布";
+    footer.append(meta, link);
 
-    card.append(media, badge, title, desc, list, meta, link);
+    card.append(media, badge, title, desc, list, footer);
     grid.append(card);
   }
 }

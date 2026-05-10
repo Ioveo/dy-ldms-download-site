@@ -148,13 +148,20 @@ function renderSoftwareGrid(catalog) {
     link.className = latest ? "button button--primary" : "button button--disabled";
     link.href = latest ? `/download/${encodeURIComponent(latest.id)}` : "#download";
     link.innerHTML = latest ? `<span>点击下载</span><i>↓</i>` : "待发布";
-    footer.append(meta, link);
+    const helper = document.createElement("span");
+    helper.className = "product-card__helper";
+    helper.textContent = latest ? "官方发布包，点击后开始下载" : "上传版本后自动开放下载";
+    footer.append(meta, link, helper);
 
     const status = document.createElement("div");
     status.className = "product-card__status";
     status.innerHTML = `<span>官方版本</span><span>${latest ? "可下载" : "待发布"}</span>`;
 
-    card.append(media, status, badge, title, desc, list, footer);
+    const content = document.createElement("div");
+    content.className = "product-card__content";
+    content.append(status, badge, title, desc, list, footer);
+
+    card.append(media, content);
     grid.append(card);
   }
 }

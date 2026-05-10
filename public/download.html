@@ -7,7 +7,7 @@
     <meta name="description" content="天才猫软件官方下载中心，按分类选择数据中心版、DY辅助工具和其他工具版本。" />
     <link rel="icon" type="image/png" href="/logo.png?v=20260509" />
     <link rel="apple-touch-icon" href="/logo.png?v=20260509" />
-    <link rel="stylesheet" href="/styles.css?v=20260510-premium-detail" />
+    <link rel="stylesheet" href="/styles.css?v=20260510-download-redesign" />
   </head>
   <body class="download-page">
     <header class="topbar">
@@ -28,18 +28,24 @@
       <section class="download-hero">
         <div class="download-hero__copy">
           <p class="eyebrow">TianCaiMao Downloads</p>
-          <h1>下载中心</h1>
-          <p>选择需要的软件，获取当前发布版本。所有安装包统一托管、版本清晰、下载路径稳定。</p>
+          <h1>稳定交付每一个工具版本。</h1>
+          <p>面向直播团队的软件交付中心。版本、说明、安装包统一维护，客户打开页面就能清楚知道该下载什么。</p>
           <div class="download-hero__meta">
-            <span>✦ 官方发布</span>
-            <span>⬢ 分类下载</span>
-            <span>◆ 版本维护</span>
+            <span><i>✦</i> 官方发布</span>
+            <span><i>⬢</i> R2 稳定托管</span>
+            <span><i>◆</i> 后台版本维护</span>
           </div>
         </div>
-        <aside class="download-hero__panel">
-          <span>Download Center</span>
-          <strong>稳定、清晰、可信的交付中心</strong>
-          <p>后台维护软件资料、版本说明和安装包，客户只需要点击下载。</p>
+        <aside class="download-hero__panel" aria-label="下载中心状态">
+          <div class="download-orbit"><span></span><span></span><span></span></div>
+          <p class="eyebrow">Release Hub</p>
+          <strong>版本清晰，下载路径稳定。</strong>
+          <p>每个软件独立维护版本、更新说明和安装包，下载入口自动指向当前可用版本。</p>
+          <div class="download-hero__stats">
+            <span><b>01</b>分类筛选</span>
+            <span><b>02</b>最新版下载</span>
+            <span><b>03</b>说明同步</span>
+          </div>
         </aside>
       </section>
 
@@ -47,9 +53,9 @@
         <div class="download-shell__head">
           <div>
             <p class="eyebrow">Software Library</p>
-            <h2>软件详情</h2>
+            <h2>选择软件，开始下载。</h2>
           </div>
-          <p>高亮当前版本、核心能力、更新说明和下载入口。</p>
+          <p>卡片展示软件截图、当前版本、更新说明和下载按钮。没有关联版本的软件会显示为待发布。</p>
         </div>
         <div class="category-tabs" id="categoryTabs" aria-label="软件分类"></div>
         <div class="product-grid" id="softwareGrid" aria-live="polite"></div>
@@ -61,6 +67,6 @@
       <span>Downloads</span>
     </footer>
 
-    <script src="/site.js?v=20260510-premium-detail" type="module"></script>
+    <script src="/site.js?v=20260510-download-redesign" type="module"></script>
   </body>
 </html>

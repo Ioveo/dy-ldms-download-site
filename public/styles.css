@@ -1166,6 +1166,16 @@ h3 {
   to { opacity: 1; transform: translateY(0); }
 }
 
+@keyframes floatPanel {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes orbitDot {
+  from { transform: rotate(0deg) translateX(22px) rotate(0deg); }
+  to { transform: rotate(360deg) translateX(22px) rotate(-360deg); }
+}
+
 .assistant-ui strong,
 .assistant-panel strong {
   font-size: 26px;
@@ -1406,20 +1416,16 @@ footer {
     grid-template-columns: 1fr;
   }
 
+  .download-hero__panel {
+    animation: none;
+  }
+
   .download-shell .product-card {
     grid-template-columns: 1fr;
   }
 
-  .download-shell .product-card__badge,
-  .download-shell .product-card h3,
-  .download-shell .product-card > p,
-  .download-shell .product-card ul,
-  .download-shell .product-card__footer {
-    grid-column: 1;
-  }
-
   .download-shell .product-card__media {
-    min-height: 280px;
+    min-height: 300px;
     margin-bottom: 24px;
   }
 
@@ -1523,7 +1529,7 @@ footer {
 
   .download-shell .product-card__footer {
     align-items: flex-start;
-    flex-direction: column;
+    grid-template-columns: 1fr;
   }
 
   .showcase,

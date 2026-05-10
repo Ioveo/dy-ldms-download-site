@@ -285,15 +285,15 @@ async function uploadArticleImage(target) {
   if (!file) return toast("请选择要上传的图片或音频", true);
   const isAudioTarget = target === "audio";
   const isImageTarget = target === "cover" || target === "content";
-  if (isAudioTarget && !file.type.startsWith("audio/")) return toast("请选择音频文件后再插入音频", true);
-  if (isImageTarget && !file.type.startsWith("image/")) return toast("请选择图片文件后再上传图片", true);
+  const mediaType = mediaTypeFor(file);
+  if (isAudioTarget && mediaType !== "audio") return toast("请选择音频文件后再插入音频", true);
+  if (isImageTarget && mediaType !== "image") return toast("请选择图片文件后再上传图片", true);
   const form = new FormData();
   form.append("password", password);
   form.append("file", file);
   form.append("kind", isAudioTarget ? "audio" : "image");
   toast("正在上传媒体");
-  const response = await fetch("/api/admin/article-image", { method: "POST", body: form });
-  const result = await response.json();
+  const result = await uploadForm("/api/admin/article-image", form);
   if (!result.success) return toast(result.msg || "媒体上传失败", true);
   if (target === "cover") {
     byId("articleCover").value = result.url;
@@ -304,6 +304,28 @@ async function uploadArticleImage(target) {
   }
   updateArticleEditorMeta();
   toast("媒体已插入");
+}
+
+async function uploadForm(url, form) {
+  try {
+    const response = await fetch(url, { method: "POST", body: form });
+    const text = await response.text();
+    const result = text ? JSON.parse(text) : {};
+    if (!response.ok) return { success: false, msg: result.msg || `上传失败：HTTP ${response.status}` };
+    return result;
+  } catch (error) {
+    return { success: false, msg: `上传失败：${error.message || "网络或接口异常"}` };
+  }
+}
+
+function mediaTypeFor(file) {
+  const type = String(file?.type || "").toLowerCase();
+  if (type.startsWith("image/")) return "image";
+  if (type.startsWith("audio/")) return "audio";
+  const name = String(file?.name || "").toLowerCase();
+  if (/\.(png|jpe?g|gif|webp|avif|svg)$/i.test(name)) return "image";
+  if (/\.(mp3|m4a|aac|wav|ogg|oga|webm|flac)$/i.test(name)) return "audio";
+  return "";
 }
 
 function insertArticleTable() {

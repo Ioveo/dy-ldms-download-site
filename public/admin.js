@@ -16,6 +16,7 @@ byId("releaseForm").addEventListener("submit", uploadRelease);
 byId("resetSoftware").addEventListener("click", resetSoftwareForm);
 byId("resetCategory").addEventListener("click", resetCategoryForm);
 byId("resetStorage").addEventListener("click", resetStorageForm);
+byId("testStorage").addEventListener("click", testStorage);
 
 document.querySelectorAll(".sidebar nav button").forEach(button => {
   button.addEventListener("click", () => showPanel(button.dataset.panel));
@@ -140,23 +141,19 @@ function renderReleaseRows() {
 
 async function saveStorage(event) {
   event.preventDefault();
-  const payload = {
-    id: byId("storageId").value,
-    name: byId("storageName").value.trim(),
-    accountId: byId("storageAccountId").value.trim(),
-    bucket: byId("storageBucket").value.trim(),
-    accessKeyId: byId("storageAccessKeyId").value.trim(),
-    secretAccessKey: byId("storageSecretAccessKey").value.trim(),
-    endpoint: byId("storageEndpoint").value.trim(),
-    publicBaseUrl: byId("storagePublicBaseUrl").value.trim(),
-    sortOrder: Number(byId("storageSort").value || 0),
-    status: byId("storageStatus").value
-  };
-  const result = await api("/api/admin/storage", payload);
+  const result = await api("/api/admin/storage", storagePayload());
   if (!result.success) return toast(result.msg || "保存失败", true);
   resetStorageForm();
   render(result.catalog);
   toast("存储授权已保存");
+}
+
+async function testStorage() {
+  const payload = storagePayload();
+  toast("正在测试 R2 连接，请稍候");
+  const result = await api("/api/admin/storage/test", payload);
+  if (!result.success) return toast(result.msg || "连接测试失败", true);
+  toast(result.msg || "连接测试成功");
 }
 
 async function saveSoftware(event) {
@@ -275,6 +272,21 @@ function fillStorageForm(item) {
   byId("storagePublicBaseUrl").value = item.publicBaseUrl || "";
   byId("storageSort").value = item.sortOrder || 0;
   byId("storageStatus").value = item.status || "active";
+}
+
+function storagePayload() {
+  return {
+    id: byId("storageId").value,
+    name: byId("storageName").value.trim(),
+    accountId: byId("storageAccountId").value.trim(),
+    bucket: byId("storageBucket").value.trim(),
+    accessKeyId: byId("storageAccessKeyId").value.trim(),
+    secretAccessKey: byId("storageSecretAccessKey").value.trim(),
+    endpoint: byId("storageEndpoint").value.trim(),
+    publicBaseUrl: byId("storagePublicBaseUrl").value.trim(),
+    sortOrder: Number(byId("storageSort").value || 0),
+    status: byId("storageStatus").value
+  };
 }
 
 function resetSoftwareForm() {

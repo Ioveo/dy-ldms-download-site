@@ -42,10 +42,7 @@ document.querySelectorAll(".sidebar nav button").forEach(button => {
   button.addEventListener("click", () => showPanel(button.dataset.panel));
 });
 
-if (password) {
-  showApp();
-  loadCatalog();
-}
+if (password) loadCatalog();
 
 async function login() {
   password = byId("adminPassword").value.trim();
@@ -75,8 +72,21 @@ function showApp() {
 
 async function loadCatalog() {
   const result = await api("/api/admin/catalog");
-  if (result.success) render(result.catalog);
-  else toast(result.msg || "读取失败", true);
+  if (result.success) {
+    showApp();
+    render(result.catalog);
+  } else {
+    password = "";
+    sessionStorage.removeItem("downloadAdminPassword");
+    hideApp();
+    toast(result.msg || "读取失败", true);
+  }
+}
+
+function hideApp() {
+  loginView.hidden = false;
+  appView.hidden = true;
+  document.body.classList.remove("is-admin-ready");
 }
 
 function render(nextCatalog) {

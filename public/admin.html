@@ -32,6 +32,7 @@
           <button data-panel="categoryPanel">分类管理</button>
           <button data-panel="releasePanel">版本上传</button>
           <button data-panel="storagePanel">存储授权</button>
+          <button data-panel="navigationPanel">导航设置</button>
         </nav>
         <a class="site-link" href="/" target="_blank" rel="noopener">打开前台</a>
       </aside>
@@ -122,6 +123,25 @@
             <div class="form-actions span-2"><button type="submit">保存存储授权</button><button class="ghost" type="button" id="testStorage">测试连接</button><button class="ghost" type="button" id="resetStorage">清空</button></div>
           </form>
           <div class="table-wrap"><table><thead><tr><th>名称</th><th>Account</th><th>Bucket</th><th>Secret</th><th>状态</th><th>操作</th></tr></thead><tbody id="storageRows"></tbody></table></div>
+        </section>
+
+        <section class="panel tab-panel" id="navigationPanel" hidden>
+          <div class="panel__head">
+            <div>
+              <h2>导航设置</h2>
+              <p>控制前台顶部导航。后台入口不会自动显示，仍使用隐藏地址 /lvtuang。</p>
+            </div>
+          </div>
+          <form class="form-grid" id="navigationForm">
+            <input type="hidden" id="navigationId" />
+            <label>导航名称<input id="navigationLabel" required placeholder="例如：首页" /></label>
+            <label>链接地址<input id="navigationHref" required placeholder="/download.html" /></label>
+            <label>排序<input id="navigationSort" type="number" value="10" /></label>
+            <label>状态<select id="navigationStatus"><option value="active">显示</option><option value="disabled">隐藏</option></select></label>
+            <label><input id="navigationExternal" type="checkbox" /> 新窗口打开</label>
+            <div class="form-actions span-2"><button type="submit">保存导航</button><button class="ghost" type="button" id="resetNavigation">清空</button></div>
+          </form>
+          <div class="table-wrap"><table><thead><tr><th>名称</th><th>链接</th><th>排序</th><th>打开方式</th><th>状态</th><th>操作</th></tr></thead><tbody id="navigationRows"></tbody></table></div>
         </section>
       </section>
     </main>

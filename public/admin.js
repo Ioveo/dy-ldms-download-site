@@ -12,10 +12,12 @@ byId("logoutButton").addEventListener("click", logout);
 byId("softwareForm").addEventListener("submit", saveSoftware);
 byId("categoryForm").addEventListener("submit", saveCategory);
 byId("storageForm").addEventListener("submit", saveStorage);
+byId("navigationForm").addEventListener("submit", saveNavigation);
 byId("releaseForm").addEventListener("submit", uploadRelease);
 byId("resetSoftware").addEventListener("click", resetSoftwareForm);
 byId("resetCategory").addEventListener("click", resetCategoryForm);
 byId("resetStorage").addEventListener("click", resetStorageForm);
+byId("resetNavigation").addEventListener("click", resetNavigationForm);
 byId("testStorage").addEventListener("click", testStorage);
 
 document.querySelectorAll(".sidebar nav button").forEach(button => {
@@ -64,6 +66,7 @@ function render(nextCatalog) {
   renderSoftwareRows();
   renderCategoryRows();
   renderStorageRows();
+  renderNavigationRows();
   renderReleaseRows();
 }
 
@@ -127,6 +130,19 @@ function renderStorageRows() {
   }
 }
 
+function renderNavigationRows() {
+  const rows = byId("navigationRows");
+  rows.innerHTML = "";
+  for (const item of catalog.navigation || []) {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td>${escapeHtml(item.label)}</td><td class="code">${escapeHtml(item.href)}</td><td>${item.sortOrder}</td><td>${item.external ? "新窗口" : "当前窗口"}</td><td class="status-${item.status === "disabled" ? "disabled" : "active"}">${item.status === "disabled" ? "隐藏" : "显示"}</td><td class="row-actions"></td>`;
+    const edit = actionButton("编辑", () => fillNavigationForm(item));
+    const remove = actionButton("删除", () => deleteNavigation(item.id), "danger");
+    tr.lastElementChild.append(edit, remove);
+    rows.append(tr);
+  }
+}
+
 function renderReleaseRows() {
   const rows = byId("releaseRows");
   rows.innerHTML = "";
@@ -146,6 +162,15 @@ async function saveStorage(event) {
   resetStorageForm();
   render(result.catalog);
   toast("存储授权已保存");
+}
+
+async function saveNavigation(event) {
+  event.preventDefault();
+  const result = await api("/api/admin/navigation", navigationPayload());
+  if (!result.success) return toast(result.msg || "保存失败", true);
+  resetNavigationForm();
+  render(result.catalog);
+  toast("导航已保存");
 }
 
 async function testStorage() {
@@ -239,6 +264,13 @@ async function deleteStorage(id) {
   render(result.catalog);
 }
 
+async function deleteNavigation(id) {
+  if (!confirm("确定删除这个导航项吗？")) return;
+  const result = await api("/api/admin/navigation/delete", { id });
+  if (!result.success) return toast(result.msg || "删除失败", true);
+  render(result.catalog);
+}
+
 function fillSoftwareForm(item) {
   showPanel("softwarePanel");
   byId("softwareId").value = item.id;
@@ -274,6 +306,16 @@ function fillStorageForm(item) {
   byId("storageStatus").value = item.status || "active";
 }
 
+function fillNavigationForm(item) {
+  showPanel("navigationPanel");
+  byId("navigationId").value = item.id;
+  byId("navigationLabel").value = item.label;
+  byId("navigationHref").value = item.href;
+  byId("navigationSort").value = item.sortOrder || 0;
+  byId("navigationStatus").value = item.status || "active";
+  byId("navigationExternal").checked = Boolean(item.external);
+}
+
 function storagePayload() {
   return {
     id: byId("storageId").value,
@@ -286,6 +328,17 @@ function storagePayload() {
     publicBaseUrl: byId("storagePublicBaseUrl").value.trim(),
     sortOrder: Number(byId("storageSort").value || 0),
     status: byId("storageStatus").value
+  };
+}
+
+function navigationPayload() {
+  return {
+    id: byId("navigationId").value,
+    label: byId("navigationLabel").value.trim(),
+    href: byId("navigationHref").value.trim(),
+    sortOrder: Number(byId("navigationSort").value || 0),
+    status: byId("navigationStatus").value,
+    external: byId("navigationExternal").checked
   };
 }
 
@@ -305,6 +358,12 @@ function resetStorageForm() {
   byId("storageForm").reset();
   byId("storageId").value = "";
   byId("storageSort").value = "10";
+}
+
+function resetNavigationForm() {
+  byId("navigationForm").reset();
+  byId("navigationId").value = "";
+  byId("navigationSort").value = "10";
 }
 
 function showPanel(id) {

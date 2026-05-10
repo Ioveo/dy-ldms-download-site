@@ -12,11 +12,13 @@ async function loadCatalog() {
     const catalog = await response.json();
     document.title = `${catalog.product || "天才猫软件中心"} - 官方下载`;
     currentCatalog = catalog;
+    renderNavigation(catalog);
     renderCategoryTabs(catalog);
     renderSoftwareGrid(catalog);
   } catch {
     const response = await fetch("/api/releases", { cache: "no-store" });
     const manifest = response.ok ? await response.json() : { releases: [] };
+    renderNavigation({ navigation: defaultNavigation() });
     renderLegacyGrid(manifest);
   }
 }
@@ -24,12 +26,16 @@ async function loadCatalog() {
 function renderCategoryTabs(catalog) {
   const tabs = byId("categoryTabs");
   if (!tabs) return;
-  const categories = [{ id: "all", name: "全部软件" }, ...(catalog.categories || [])];
+  const allCount = catalog.software?.length || 0;
+  const categories = [{ id: "all", name: "全部软件", count: allCount }, ...(catalog.categories || []).map(category => ({
+    ...category,
+    count: (catalog.software || []).filter(item => item.categoryId === category.id).length
+  }))];
   tabs.replaceChildren();
   for (const category of categories) {
     const button = document.createElement("button");
     button.type = "button";
-    button.textContent = category.name;
+    button.innerHTML = `<span>${escapeHtml(category.name)}</span><strong>${category.count || 0}</strong>`;
     button.className = category.id === activeCategory ? "is-active" : "";
     button.addEventListener("click", () => {
       activeCategory = category.id;
@@ -37,6 +43,22 @@ function renderCategoryTabs(catalog) {
       renderSoftwareGrid(catalog);
     });
     tabs.append(button);
+  }
+}
+
+function renderNavigation(catalog) {
+  const nav = document.querySelector("[data-nav]");
+  if (!nav || !Array.isArray(catalog.navigation)) return;
+  nav.replaceChildren();
+  for (const item of catalog.navigation.filter(entry => entry.status !== "disabled")) {
+    const link = document.createElement("a");
+    link.href = item.href;
+    link.textContent = item.label;
+    if (item.external) {
+      link.target = "_blank";
+      link.rel = "noopener";
+    }
+    nav.append(link);
   }
 }
 
@@ -170,4 +192,13 @@ function formatDate(timestamp) {
 
 function escapeHtml(value) {
   return String(value ?? "").replace(/[&<>"']/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" })[char]);
+}
+
+function defaultNavigation() {
+  return [
+    { label: "首页", href: "/" },
+    { label: "下载", href: "/download.html" },
+    { label: "授权", href: "/license.html" },
+    { label: "购买授权", href: "https://mk.nsy.me/buy", external: true }
+  ];
 }

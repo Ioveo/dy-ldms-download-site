@@ -387,26 +387,72 @@ h3 {
 }
 
 .category-tabs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-bottom: 22px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 14px;
+  margin-bottom: 26px;
 }
 
 .category-tabs button {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  min-height: 76px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
   border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 999px;
-  padding: 10px 16px;
+  border-radius: 22px;
+  padding: 18px;
   color: var(--muted);
-  background: rgba(255, 255, 255, 0.045);
+  background:
+    radial-gradient(circle at 90% 10%, rgba(34, 211, 238, 0.14), transparent 36%),
+    rgba(255, 255, 255, 0.045);
   font-weight: 900;
   cursor: pointer;
+  text-align: left;
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.12);
+  transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+}
+
+.category-tabs button:hover {
+  transform: translateY(-2px);
+  border-color: rgba(34, 211, 238, 0.38);
+}
+
+.category-tabs button span {
+  position: relative;
+  z-index: 1;
+  color: var(--ink);
+}
+
+.category-tabs button strong {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  min-width: 42px;
+  height: 42px;
+  place-items: center;
+  border-radius: 14px;
+  color: var(--green);
+  background: rgba(103, 232, 165, 0.12);
+  font-size: 18px;
 }
 
 .category-tabs button.is-active {
   color: #06101a;
-  border-color: transparent;
-  background: linear-gradient(135deg, var(--cyan), var(--green));
+  border-color: rgba(103, 232, 165, 0.42);
+  background:
+    linear-gradient(135deg, rgba(34, 211, 238, 0.96), rgba(103, 232, 165, 0.96));
+}
+
+.category-tabs button.is-active span,
+.category-tabs button.is-active strong {
+  color: #06101a;
+}
+
+.category-tabs button.is-active strong {
+  background: rgba(255, 255, 255, 0.38);
 }
 
 .license-grid {

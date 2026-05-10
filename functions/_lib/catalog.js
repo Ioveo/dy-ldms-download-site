@@ -8,6 +8,13 @@ export const DEFAULT_CATEGORIES = [
   { id: "tools", name: "工具插件", slug: "tools", sortOrder: 30, status: "active" }
 ];
 
+export const DEFAULT_NAVIGATION = [
+  { id: "home", label: "首页", href: "/", sortOrder: 10, status: "active", external: false },
+  { id: "download", label: "下载", href: "/download.html", sortOrder: 20, status: "active", external: false },
+  { id: "license", label: "授权", href: "/license.html", sortOrder: 30, status: "active", external: false },
+  { id: "buy", label: "购买授权", href: "https://mk.nsy.me/buy", sortOrder: 40, status: "active", external: true }
+];
+
 export async function loadCatalog(env) {
   const fallback = manifestToCatalog(DEFAULT_MANIFEST);
   if (!env.SOFTWARE_BUCKET?.get) return fallback;
@@ -74,6 +81,7 @@ export function normalizeCatalog(catalog) {
       sortOrder: Number(category.sortOrder ?? category.sort_order ?? index),
       status: category.status || "active"
     })).sort(bySortOrder),
+    navigation: normalizeNavigation(catalog?.navigation || []),
     software: software.map((item, index) => normalizeSoftware(item, index, now)).sort(bySortOrder),
     storageAccounts: normalizeStorageAccounts(catalog?.storageAccounts || catalog?.storage_accounts || []),
     updatedAt: Number(catalog?.updatedAt || now)
@@ -140,6 +148,7 @@ export function publicCatalog(catalog) {
   return {
     product: catalog.product,
     categories: catalog.categories.filter(item => item.status !== "disabled"),
+    navigation: (catalog.navigation || DEFAULT_NAVIGATION).filter(item => item.status !== "disabled"),
     software: catalog.software
       .filter(item => item.status !== "disabled")
       .map(item => ({
@@ -149,6 +158,18 @@ export function publicCatalog(catalog) {
     storageAccounts: (catalog.storageAccounts || []).map(publicStorageAccount),
     updatedAt: catalog.updatedAt
   };
+}
+
+export function normalizeNavigation(items) {
+  const source = Array.isArray(items) && items.length ? items : DEFAULT_NAVIGATION;
+  return source.map((item, index) => ({
+    id: String(item.id || `nav-${index + 1}`),
+    label: String(item.label || item.name || "导航"),
+    href: String(item.href || "/"),
+    sortOrder: Number(item.sortOrder ?? item.sort_order ?? index),
+    status: item.status || "active",
+    external: Boolean(item.external)
+  })).sort(bySortOrder);
 }
 
 export function normalizeStorageAccounts(accounts) {

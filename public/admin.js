@@ -25,6 +25,9 @@ byId("resetArticle").addEventListener("click", resetArticleForm);
 byId("testStorage").addEventListener("click", testStorage);
 byId("uploadArticleImage").addEventListener("click", () => uploadArticleImage("cover"));
 byId("insertArticleImage").addEventListener("click", () => uploadArticleImage("content"));
+byId("insertArticleAudio").addEventListener("click", () => uploadArticleImage("audio"));
+byId("insertArticleTable").addEventListener("click", insertArticleTable);
+byId("insertArticleQuote").addEventListener("click", insertArticleQuote);
 byId("articleTitle").addEventListener("input", updateArticleEditorMeta);
 byId("articleSummary").addEventListener("input", updateArticleEditorMeta);
 byId("articleContent").addEventListener("input", updateArticleEditorMeta);
@@ -279,24 +282,41 @@ async function saveArticle(event) {
 
 async function uploadArticleImage(target) {
   const file = byId("articleImageFile").files[0];
-  if (!file) return toast("请选择要上传的图片", true);
+  if (!file) return toast("请选择要上传的图片或音频", true);
   const form = new FormData();
   form.append("password", password);
   form.append("file", file);
-  toast("正在上传图片");
+  toast("正在上传媒体");
   const response = await fetch("/api/admin/article-image", { method: "POST", body: form });
   const result = await response.json();
-  if (!result.success) return toast(result.msg || "图片上传失败", true);
+  if (!result.success) return toast(result.msg || "媒体上传失败", true);
   if (target === "cover") {
     byId("articleCover").value = result.url;
+  } else if (target === "audio") {
+    insertAtCursor(byId("articleContent"), `\n<audio controls src="${result.url}"></audio>\n`);
   } else {
-    const textarea = byId("articleContent");
-    const snippet = `\n<img src="${result.url}" alt="">\n`;
-    const start = textarea.selectionStart || textarea.value.length;
-    textarea.value = textarea.value.slice(0, start) + snippet + textarea.value.slice(start);
+    insertAtCursor(byId("articleContent"), `\n<img src="${result.url}" alt="">\n`);
   }
   updateArticleEditorMeta();
-  toast("图片已上传");
+  toast("媒体已插入");
+}
+
+function insertArticleTable() {
+  insertAtCursor(byId("articleContent"), `\n<table>\n  <thead>\n    <tr><th>项目</th><th>说明</th><th>状态</th></tr>\n  </thead>\n  <tbody>\n    <tr><td>示例</td><td>填写说明</td><td>完成</td></tr>\n  </tbody>\n</table>\n`);
+  updateArticleEditorMeta();
+}
+
+function insertArticleQuote() {
+  insertAtCursor(byId("articleContent"), `\n<blockquote>这里填写重点说明、提示或案例总结。</blockquote>\n`);
+  updateArticleEditorMeta();
+}
+
+function insertAtCursor(textarea, snippet) {
+  const start = textarea.selectionStart ?? textarea.value.length;
+  const end = textarea.selectionEnd ?? start;
+  textarea.value = textarea.value.slice(0, start) + snippet + textarea.value.slice(end);
+  textarea.focus();
+  textarea.selectionStart = textarea.selectionEnd = start + snippet.length;
 }
 
 async function testStorage() {

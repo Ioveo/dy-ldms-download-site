@@ -15,6 +15,7 @@ async function loadCatalog() {
     renderNavigation(catalog);
     renderCategoryTabs(catalog);
     renderSoftwareGrid(catalog);
+    renderDownloadRank(catalog);
     renderHomeArticles(catalog);
   } catch {
     const response = await fetch("/api/releases", { cache: "no-store" });
@@ -161,9 +162,50 @@ function renderSoftwareGrid(catalog) {
     content.className = "product-card__content";
     content.append(status, badge, title, desc, list, footer);
 
+    const recommendations = relatedSoftware(catalog, item).slice(0, 3);
+    if (recommendations.length) {
+      const related = document.createElement("div");
+      related.className = "product-card__related";
+      related.innerHTML = `<span>相关推荐</span>${recommendations.map(entry => `<a href="/download/latest/${encodeURIComponent(entry.slug || entry.id)}">${escapeHtml(entry.name)}</a>`).join("")}`;
+      content.append(related);
+    }
+
     card.append(media, content);
     grid.append(card);
   }
+}
+
+function renderDownloadRank(catalog) {
+  const root = byId("downloadRankList");
+  if (!root) return;
+  const ranked = (catalog.software || [])
+    .map(item => ({
+      ...item,
+      latest: (item.releases || []).find(release => release.isLatest) || item.releases?.[0],
+      downloads: (item.releases || []).reduce((sum, release) => sum + Number(release.downloadCount || 0), 0)
+    }))
+    .filter(item => item.status !== "disabled")
+    .sort((a, b) => (b.downloads - a.downloads) || ((b.latest?.createdAt || 0) - (a.latest?.createdAt || 0)))
+    .slice(0, 6);
+
+  root.replaceChildren();
+  if (!ranked.length) {
+    root.innerHTML = `<p class="muted">暂无可下载软件。</p>`;
+    return;
+  }
+
+  ranked.forEach((item, index) => {
+    const category = catalog.categories?.find(entry => entry.id === item.categoryId);
+    const link = document.createElement("a");
+    link.className = "download-rank-item";
+    link.href = item.latest ? `/download/${encodeURIComponent(item.latest.id)}` : "/download.html";
+    link.innerHTML = `<b>${String(index + 1).padStart(2, "0")}</b><span><strong>${escapeHtml(item.name)}</strong><small>${escapeHtml(category?.name || "软件")} · ${escapeHtml(item.latest?.version || "待发布")}</small></span><em>${item.latest ? "下载" : "待发布"}</em>`;
+    root.append(link);
+  });
+}
+
+function relatedSoftware(catalog, item) {
+  return (catalog.software || []).filter(entry => entry.id !== item.id && entry.status !== "disabled" && entry.categoryId === item.categoryId);
 }
 
 function renderLegacyGrid(manifest) {

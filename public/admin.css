@@ -232,6 +232,16 @@ td small { color: var(--muted); }
   gap: 10px;
 }
 
+.article-editor-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.article-editor-tools button {
+  min-height: 40px;
+}
+
 .editor-title input {
   padding: 16px;
   font-size: 24px;

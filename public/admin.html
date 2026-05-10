@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>天才猫下载管理后台</title>
     <link rel="icon" type="image/png" href="/logo.png?v=20260509" />
-    <link rel="stylesheet" href="/admin.css?v=20260510-auth-guard" />
+    <link rel="stylesheet" href="/admin.css?v=20260510-editor-tools" />
   </head>
   <body>
     <div class="toast" id="toast"></div>
@@ -175,8 +175,14 @@
               <div class="editor-meta"><span id="articleWordCount">0 字</span><span id="articleSummaryCount">摘要 0/180</span></div>
               <label>封面图地址<input id="articleCover" placeholder="/datacenter-preview.jpg 或图片 URL" /></label>
               <div class="article-cover-preview" id="articleCoverPreview"><span>封面预览</span></div>
-              <label>上传本地图片<input id="articleImageFile" type="file" accept="image/*" /></label>
-              <div class="form-actions"><button class="ghost" type="button" id="uploadArticleImage">上传并设为封面</button><button class="ghost" type="button" id="insertArticleImage">上传并插入正文</button></div>
+              <label>上传本地媒体<input id="articleImageFile" type="file" accept="image/*,audio/*" /></label>
+              <div class="article-editor-tools" aria-label="文章编辑工具">
+                <button class="ghost" type="button" id="uploadArticleImage">上传并设为封面</button>
+                <button class="ghost" type="button" id="insertArticleImage">插入图片</button>
+                <button class="ghost" type="button" id="insertArticleAudio">插入音频</button>
+                <button class="ghost" type="button" id="insertArticleTable">插入表格</button>
+                <button class="ghost" type="button" id="insertArticleQuote">插入引用</button>
+              </div>
               <div class="article-software-picker">
                 <div class="article-software-picker__head">
                   <label>关联软件<select id="articleSoftwareCategory"></select></label>
@@ -202,6 +208,6 @@
       </section>
     </main>
 
-    <script src="/admin.js?v=20260510-auth-guard" type="module"></script>
+    <script src="/admin.js?v=20260510-editor-tools" type="module"></script>
   </body>
 </html>

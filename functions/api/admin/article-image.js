@@ -9,11 +9,12 @@ export async function onRequestPost({ request, env }) {
   if (!env.SOFTWARE_BUCKET?.put) return json({ success: false, msg: "R2 未配置" }, 500);
 
   const file = formData.get("file");
-  if (!file?.arrayBuffer) return json({ success: false, msg: "请选择图片" }, 400);
-  if (!String(file.type || "").startsWith("image/")) return json({ success: false, msg: "只能上传图片文件" }, 400);
+  if (!file?.arrayBuffer) return json({ success: false, msg: "请选择媒体文件" }, 400);
+  const type = String(file.type || "");
+  if (!type.startsWith("image/") && !type.startsWith("audio/")) return json({ success: false, msg: "只能上传图片或音频文件" }, 400);
 
-  const fileName = sanitizeFileName(file.name || "article-image.png");
-  const key = `${id("article-image")}-${fileName}`;
+  const fileName = sanitizeFileName(file.name || "article-media.bin");
+  const key = `${id(type.startsWith("audio/") ? "article-audio" : "article-image")}-${fileName}`;
   await env.SOFTWARE_BUCKET.put(key, await file.arrayBuffer(), {
     httpMetadata: { contentType: file.type || "application/octet-stream" }
   });

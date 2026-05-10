@@ -21,6 +21,8 @@ byId("resetStorage").addEventListener("click", resetStorageForm);
 byId("resetNavigation").addEventListener("click", resetNavigationForm);
 byId("resetArticle").addEventListener("click", resetArticleForm);
 byId("testStorage").addEventListener("click", testStorage);
+byId("uploadArticleImage").addEventListener("click", () => uploadArticleImage("cover"));
+byId("insertArticleImage").addEventListener("click", () => uploadArticleImage("content"));
 
 document.querySelectorAll(".sidebar nav button").forEach(button => {
   button.addEventListener("click", () => showPanel(button.dataset.panel));
@@ -94,7 +96,10 @@ function renderCategoryOptions() {
 }
 
 function renderArticleOptions() {
-  byId("articleSoftware").innerHTML = catalog.software.map(item => `<option value="${escapeAttr(item.id)}">${escapeHtml(item.name)}</option>`).join("");
+  const root = byId("articleSoftware");
+  root.innerHTML = catalog.software.length
+    ? catalog.software.map(item => `<label><input type="checkbox" value="${escapeAttr(item.id)}"> <span>${escapeHtml(item.name)}</span></label>`).join("")
+    : `<p class="muted">还没有上传软件，先到“软件管理”添加软件。</p>`;
 }
 
 function renderSoftwareRows() {
@@ -203,6 +208,27 @@ async function saveArticle(event) {
   resetArticleForm();
   render(result.catalog);
   toast("文章已保存");
+}
+
+async function uploadArticleImage(target) {
+  const file = byId("articleImageFile").files[0];
+  if (!file) return toast("请选择要上传的图片", true);
+  const form = new FormData();
+  form.append("password", password);
+  form.append("file", file);
+  toast("正在上传图片");
+  const response = await fetch("/api/admin/article-image", { method: "POST", body: form });
+  const result = await response.json();
+  if (!result.success) return toast(result.msg || "图片上传失败", true);
+  if (target === "cover") {
+    byId("articleCover").value = result.url;
+  } else {
+    const textarea = byId("articleContent");
+    const snippet = `\n<img src="${result.url}" alt="">\n`;
+    const start = textarea.selectionStart || textarea.value.length;
+    textarea.value = textarea.value.slice(0, start) + snippet + textarea.value.slice(start);
+  }
+  toast("图片已上传");
 }
 
 async function testStorage() {
@@ -366,7 +392,7 @@ function fillArticleForm(item) {
   byId("articleSort").value = item.sortOrder || 0;
   byId("articleStatus").value = item.status || "draft";
   const selected = new Set(item.softwareIds || []);
-  Array.from(byId("articleSoftware").options).forEach(option => option.selected = selected.has(option.value));
+  Array.from(byId("articleSoftware").querySelectorAll("input[type='checkbox']")).forEach(input => input.checked = selected.has(input.value));
 }
 
 function storagePayload() {
@@ -403,7 +429,7 @@ function articlePayload() {
     summary: byId("articleSummary").value.trim(),
     coverUrl: byId("articleCover").value.trim(),
     content: byId("articleContent").value.trim(),
-    softwareIds: Array.from(byId("articleSoftware").selectedOptions).map(option => option.value),
+    softwareIds: Array.from(byId("articleSoftware").querySelectorAll("input[type='checkbox']:checked")).map(input => input.value),
     sortOrder: Number(byId("articleSort").value || 0),
     status: byId("articleStatus").value
   };

@@ -179,9 +179,32 @@ th, td { border-bottom: 1px solid var(--line); padding: 12px; text-align: left; 
 th { color: var(--muted); font-weight: 500; }
 td small { color: var(--muted); }
 .code { color: #a5b4fc; font-family: Consolas, monospace; cursor: pointer; }
+.muted { color: var(--muted); }
 .status-active { color: var(--green); }
 .status-disabled { color: var(--red); }
 .row-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.check-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.check-grid label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 12px;
+  color: var(--text);
+  background: #09090b;
+}
+
+.check-grid input {
+  width: auto;
+}
 
 .toast {
   position: fixed;

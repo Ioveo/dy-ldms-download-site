@@ -158,8 +158,10 @@
             <label>文章标识<input id="articleSlug" placeholder="datacenter-guide" /></label>
             <label class="span-2">摘要<textarea id="articleSummary" rows="2" placeholder="显示在文章列表中的简短说明"></textarea></label>
             <label class="span-2">封面图地址<input id="articleCover" placeholder="/datacenter-preview.jpg 或图片 URL" /></label>
-            <label class="span-2">关联软件<select id="articleSoftware" multiple size="5"></select></label>
-            <label class="span-2">正文<textarea id="articleContent" rows="12" placeholder="支持普通文本和简单 HTML，例如 <h2>标题</h2><p>内容</p><img src='/2.jpg'>"></textarea></label>
+            <label class="span-2">上传本地图片<input id="articleImageFile" type="file" accept="image/*" /></label>
+            <div class="form-actions span-2"><button class="ghost" type="button" id="uploadArticleImage">上传图片并填入封面</button><button class="ghost" type="button" id="insertArticleImage">上传图片并插入正文</button></div>
+            <div class="span-2"><label>关联软件</label><div class="check-grid" id="articleSoftware"></div></div>
+            <label class="span-2">正文<textarea id="articleContent" rows="12" placeholder="支持普通文本和简单 HTML。可以点击上方按钮上传图片并插入正文。"></textarea></label>
             <label>排序<input id="articleSort" type="number" value="10" /></label>
             <label>状态<select id="articleStatus"><option value="draft">草稿</option><option value="published">发布</option><option value="disabled">隐藏</option></select></label>
             <div class="form-actions span-2"><button type="submit">保存文章</button><button class="ghost" type="button" id="resetArticle">清空</button></div>

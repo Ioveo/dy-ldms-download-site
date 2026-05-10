@@ -11,8 +11,9 @@ export const DEFAULT_CATEGORIES = [
 export const DEFAULT_NAVIGATION = [
   { id: "home", label: "首页", href: "/", sortOrder: 10, status: "active", external: false },
   { id: "download", label: "下载", href: "/download.html", sortOrder: 20, status: "active", external: false },
-  { id: "license", label: "授权", href: "/license.html", sortOrder: 30, status: "active", external: false },
-  { id: "buy", label: "购买授权", href: "https://mk.nsy.me/buy", sortOrder: 40, status: "active", external: true }
+  { id: "articles", label: "文章", href: "/articles.html", sortOrder: 30, status: "active", external: false },
+  { id: "license", label: "授权", href: "/license.html", sortOrder: 40, status: "active", external: false },
+  { id: "buy", label: "购买授权", href: "https://mk.nsy.me/buy", sortOrder: 50, status: "active", external: true }
 ];
 
 export async function loadCatalog(env) {
@@ -83,6 +84,7 @@ export function normalizeCatalog(catalog) {
     })).sort(bySortOrder),
     navigation: normalizeNavigation(catalog?.navigation || []),
     software: software.map((item, index) => normalizeSoftware(item, index, now)).sort(bySortOrder),
+    articles: normalizeArticles(catalog?.articles || []),
     storageAccounts: normalizeStorageAccounts(catalog?.storageAccounts || catalog?.storage_accounts || []),
     updatedAt: Number(catalog?.updatedAt || now)
   };
@@ -155,9 +157,26 @@ export function publicCatalog(catalog) {
         ...item,
         releases: (item.releases || []).filter(release => release.status !== "disabled")
       })),
+    articles: (catalog.articles || []).filter(item => item.status === "published"),
     storageAccounts: (catalog.storageAccounts || []).map(publicStorageAccount),
     updatedAt: catalog.updatedAt
   };
+}
+
+export function normalizeArticles(articles) {
+  return Array.isArray(articles) ? articles.map((article, index) => ({
+    id: String(article.id || `article-${index + 1}`),
+    title: String(article.title || "未命名文章"),
+    slug: slugify(article.slug || article.title || `article-${index + 1}`),
+    summary: String(article.summary || ""),
+    coverUrl: String(article.coverUrl || article.cover_url || ""),
+    content: String(article.content || ""),
+    softwareIds: Array.isArray(article.softwareIds) ? article.softwareIds.map(String) : [],
+    status: article.status || "draft",
+    sortOrder: Number(article.sortOrder ?? article.sort_order ?? index),
+    createdAt: Number(article.createdAt || Date.now()),
+    updatedAt: Number(article.updatedAt || Date.now())
+  })).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0)) : [];
 }
 
 export function normalizeNavigation(items) {

@@ -13,11 +13,13 @@ byId("softwareForm").addEventListener("submit", saveSoftware);
 byId("categoryForm").addEventListener("submit", saveCategory);
 byId("storageForm").addEventListener("submit", saveStorage);
 byId("navigationForm").addEventListener("submit", saveNavigation);
+byId("articleForm").addEventListener("submit", saveArticle);
 byId("releaseForm").addEventListener("submit", uploadRelease);
 byId("resetSoftware").addEventListener("click", resetSoftwareForm);
 byId("resetCategory").addEventListener("click", resetCategoryForm);
 byId("resetStorage").addEventListener("click", resetStorageForm);
 byId("resetNavigation").addEventListener("click", resetNavigationForm);
+byId("resetArticle").addEventListener("click", resetArticleForm);
 byId("testStorage").addEventListener("click", testStorage);
 
 document.querySelectorAll(".sidebar nav button").forEach(button => {
@@ -67,6 +69,8 @@ function render(nextCatalog) {
   renderCategoryRows();
   renderStorageRows();
   renderNavigationRows();
+  renderArticleOptions();
+  renderArticleRows();
   renderReleaseRows();
 }
 
@@ -87,6 +91,10 @@ function renderCategoryOptions() {
   byId("softwareCategory").innerHTML = options;
   byId("releaseSoftware").innerHTML = catalog.software.map(item => `<option value="${escapeAttr(item.id)}">${escapeHtml(item.name)}</option>`).join("");
   byId("releaseStorage").innerHTML = `<option value="default">默认 R2：dy-ldms-downloads</option>${(catalog.storageAccounts || []).filter(item => item.status !== "disabled").map(item => `<option value="${escapeAttr(item.id)}">${escapeHtml(item.name)} / ${escapeHtml(item.bucket)}</option>`).join("")}`;
+}
+
+function renderArticleOptions() {
+  byId("articleSoftware").innerHTML = catalog.software.map(item => `<option value="${escapeAttr(item.id)}">${escapeHtml(item.name)}</option>`).join("");
 }
 
 function renderSoftwareRows() {
@@ -143,6 +151,21 @@ function renderNavigationRows() {
   }
 }
 
+function renderArticleRows() {
+  const rows = byId("articleRows");
+  rows.innerHTML = "";
+  for (const item of catalog.articles || []) {
+    const related = (item.softwareIds || []).map(id => catalog.software.find(software => software.id === id)?.name).filter(Boolean).join("、") || "-";
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td><strong>${escapeHtml(item.title)}</strong><br><small>${escapeHtml(item.slug)}</small></td><td>${escapeHtml(related)}</td><td class="status-${item.status === "published" ? "active" : "disabled"}">${item.status === "published" ? "发布" : item.status === "draft" ? "草稿" : "隐藏"}</td><td>${formatDateTime(item.updatedAt)}</td><td class="row-actions"></td>`;
+    const edit = actionButton("编辑", () => fillArticleForm(item));
+    const view = actionButton("预览", () => window.open(`/article.html?slug=${encodeURIComponent(item.slug)}`, "_blank"));
+    const remove = actionButton("删除", () => deleteArticle(item.id), "danger");
+    tr.lastElementChild.append(edit, view, remove);
+    rows.append(tr);
+  }
+}
+
 function renderReleaseRows() {
   const rows = byId("releaseRows");
   rows.innerHTML = "";
@@ -171,6 +194,15 @@ async function saveNavigation(event) {
   resetNavigationForm();
   render(result.catalog);
   toast("导航已保存");
+}
+
+async function saveArticle(event) {
+  event.preventDefault();
+  const result = await api("/api/admin/articles", articlePayload());
+  if (!result.success) return toast(result.msg || "保存失败", true);
+  resetArticleForm();
+  render(result.catalog);
+  toast("文章已保存");
 }
 
 async function testStorage() {
@@ -271,6 +303,13 @@ async function deleteNavigation(id) {
   render(result.catalog);
 }
 
+async function deleteArticle(id) {
+  if (!confirm("确定删除这篇文章吗？")) return;
+  const result = await api("/api/admin/articles/delete", { id });
+  if (!result.success) return toast(result.msg || "删除失败", true);
+  render(result.catalog);
+}
+
 function fillSoftwareForm(item) {
   showPanel("softwarePanel");
   byId("softwareId").value = item.id;
@@ -316,6 +355,20 @@ function fillNavigationForm(item) {
   byId("navigationExternal").checked = Boolean(item.external);
 }
 
+function fillArticleForm(item) {
+  showPanel("articlePanel");
+  byId("articleId").value = item.id;
+  byId("articleTitle").value = item.title;
+  byId("articleSlug").value = item.slug;
+  byId("articleSummary").value = item.summary || "";
+  byId("articleCover").value = item.coverUrl || "";
+  byId("articleContent").value = item.content || "";
+  byId("articleSort").value = item.sortOrder || 0;
+  byId("articleStatus").value = item.status || "draft";
+  const selected = new Set(item.softwareIds || []);
+  Array.from(byId("articleSoftware").options).forEach(option => option.selected = selected.has(option.value));
+}
+
 function storagePayload() {
   return {
     id: byId("storageId").value,
@@ -342,6 +395,20 @@ function navigationPayload() {
   };
 }
 
+function articlePayload() {
+  return {
+    id: byId("articleId").value,
+    title: byId("articleTitle").value.trim(),
+    slug: byId("articleSlug").value.trim(),
+    summary: byId("articleSummary").value.trim(),
+    coverUrl: byId("articleCover").value.trim(),
+    content: byId("articleContent").value.trim(),
+    softwareIds: Array.from(byId("articleSoftware").selectedOptions).map(option => option.value),
+    sortOrder: Number(byId("articleSort").value || 0),
+    status: byId("articleStatus").value
+  };
+}
+
 function resetSoftwareForm() {
   byId("softwareForm").reset();
   byId("softwareId").value = "";
@@ -364,6 +431,12 @@ function resetNavigationForm() {
   byId("navigationForm").reset();
   byId("navigationId").value = "";
   byId("navigationSort").value = "10";
+}
+
+function resetArticleForm() {
+  byId("articleForm").reset();
+  byId("articleId").value = "";
+  byId("articleSort").value = "10";
 }
 
 function showPanel(id) {
@@ -399,6 +472,11 @@ function toast(message, isError = false) {
   toastEl.style.background = isError ? "#ef4444" : "#6366f1";
   toastEl.classList.add("is-visible");
   window.setTimeout(() => toastEl.classList.remove("is-visible"), 2600);
+}
+
+function formatDateTime(timestamp) {
+  if (!timestamp) return "-";
+  return new Date(timestamp).toLocaleString("zh-CN", { hour12: false });
 }
 
 function escapeHtml(value) {

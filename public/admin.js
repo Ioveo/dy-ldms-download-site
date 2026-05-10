@@ -1,5 +1,7 @@
 let password = sessionStorage.getItem("downloadAdminPassword") || "";
 let catalog = null;
+let articleSoftwareCategory = "all";
+let articleSoftwareSelection = new Set();
 
 const loginView = byId("loginView");
 const appView = byId("appView");
@@ -27,6 +29,14 @@ byId("articleTitle").addEventListener("input", updateArticleEditorMeta);
 byId("articleSummary").addEventListener("input", updateArticleEditorMeta);
 byId("articleContent").addEventListener("input", updateArticleEditorMeta);
 byId("articleCover").addEventListener("input", updateArticleEditorMeta);
+byId("articleSoftwareCategory").addEventListener("change", event => {
+  articleSoftwareCategory = event.target.value;
+  renderArticleOptions();
+});
+byId("clearArticleSoftware").addEventListener("click", () => {
+  articleSoftwareSelection.clear();
+  renderArticleOptions();
+});
 
 document.querySelectorAll(".sidebar nav button").forEach(button => {
   button.addEventListener("click", () => showPanel(button.dataset.panel));
@@ -101,9 +111,42 @@ function renderCategoryOptions() {
 
 function renderArticleOptions() {
   const root = byId("articleSoftware");
-  root.innerHTML = catalog.software.length
-    ? catalog.software.map(item => `<label><input type="checkbox" value="${escapeAttr(item.id)}"> <span>${escapeHtml(item.name)}</span></label>`).join("")
-    : `<p class="muted">还没有上传软件，先到“软件管理”添加软件。</p>`;
+  const categorySelect = byId("articleSoftwareCategory");
+  const existingIds = new Set((catalog.software || []).map(item => item.id));
+  articleSoftwareSelection = new Set(Array.from(articleSoftwareSelection).filter(id => existingIds.has(id)));
+
+  const categories = [{ id: "all", name: "全部分类", count: catalog.software.length }, ...(catalog.categories || []).map(category => ({
+    ...category,
+    count: (catalog.software || []).filter(item => item.categoryId === category.id).length
+  }))];
+  if (!categories.some(category => category.id === articleSoftwareCategory)) articleSoftwareCategory = "all";
+  categorySelect.innerHTML = categories.map(category => `<option value="${escapeAttr(category.id)}">${escapeHtml(category.name)}（${category.count || 0}）</option>`).join("");
+  categorySelect.value = articleSoftwareCategory;
+
+  const software = (catalog.software || []).filter(item => articleSoftwareCategory === "all" || item.categoryId === articleSoftwareCategory);
+  if (!catalog.software.length) {
+    root.innerHTML = `<p class="muted">还没有上传软件，先到“软件管理”添加软件。文章可以不关联软件直接保存。</p>`;
+    updateArticleSoftwareHint();
+    return;
+  }
+  if (!software.length) {
+    root.innerHTML = `<p class="muted">当前分类没有软件，可以切换分类或不关联软件。</p>`;
+    updateArticleSoftwareHint();
+    return;
+  }
+  root.innerHTML = software.map(item => {
+    const category = catalog.categories.find(entry => entry.id === item.categoryId);
+    const checked = articleSoftwareSelection.has(item.id) ? "checked" : "";
+    return `<label class="software-choice"><input type="checkbox" value="${escapeAttr(item.id)}" ${checked}> <span><strong>${escapeHtml(item.name)}</strong><small>${escapeHtml(category?.name || "未分类")}${item.status === "disabled" ? " · 已下架" : ""}</small></span></label>`;
+  }).join("");
+  Array.from(root.querySelectorAll("input[type='checkbox']")).forEach(input => {
+    input.addEventListener("change", () => {
+      if (input.checked) articleSoftwareSelection.add(input.value);
+      else articleSoftwareSelection.delete(input.value);
+      updateArticleSoftwareHint();
+    });
+  });
+  updateArticleSoftwareHint();
 }
 
 function renderSoftwareRows() {
@@ -403,8 +446,8 @@ function fillArticleForm(item) {
   byId("articleContent").value = item.content || "";
   byId("articleSort").value = item.sortOrder || 0;
   byId("articleStatus").value = item.status || "draft";
-  const selected = new Set(item.softwareIds || []);
-  Array.from(byId("articleSoftware").querySelectorAll("input[type='checkbox']")).forEach(input => input.checked = selected.has(input.value));
+  articleSoftwareSelection = new Set(item.softwareIds || []);
+  renderArticleOptions();
   updateArticleEditorMeta();
   renderArticleRows();
   byId("articleTitle").focus();
@@ -444,7 +487,7 @@ function articlePayload() {
     summary: byId("articleSummary").value.trim(),
     coverUrl: byId("articleCover").value.trim(),
     content: byId("articleContent").value.trim(),
-    softwareIds: Array.from(byId("articleSoftware").querySelectorAll("input[type='checkbox']:checked")).map(input => input.value),
+    softwareIds: Array.from(articleSoftwareSelection),
     sortOrder: Number(byId("articleSort").value || 0),
     status: byId("articleStatus").value
   };
@@ -478,9 +521,17 @@ function resetArticleForm() {
   byId("articleForm").reset();
   byId("articleId").value = "";
   byId("articleSort").value = "10";
-  Array.from(byId("articleSoftware").querySelectorAll("input[type='checkbox']")).forEach(input => input.checked = false);
+  articleSoftwareCategory = "all";
+  articleSoftwareSelection.clear();
+  renderArticleOptions();
   updateArticleEditorMeta();
   renderArticleRows();
+}
+
+function updateArticleSoftwareHint() {
+  const hint = byId("articleSoftwareHint");
+  const count = articleSoftwareSelection.size;
+  hint.textContent = count ? `已关联 ${count} 个软件。可以继续按分类选择，或点击“不关联软件”清空。` : "可以按分类选择相关软件，也可以不选。";
 }
 
 function updateArticleEditorMeta() {

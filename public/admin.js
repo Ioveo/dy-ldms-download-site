@@ -264,14 +264,21 @@ function renderReleaseRows() {
   rows.innerHTML = "";
   for (const item of catalog.software) {
     for (const release of item.releases) {
-    const tr = document.createElement("tr");
+      const tr = document.createElement("tr");
       tr.innerHTML = `<td>${escapeHtml(item.name)}</td><td>${escapeHtml(release.version)}<br><small class="status-${release.status === "disabled" ? "disabled" : "active"}">${release.status === "disabled" ? "已隐藏" : "已发布"}</small></td><td class="code">${escapeHtml(release.fileName || "-")}<br><small>${escapeHtml(release.storageId || "default")}</small></td><td>${escapeHtml(release.size || "-")}</td><td>${release.isLatest ? "是" : "否"}</td><td>${release.downloadCount || 0}</td><td class="row-actions"></td>`;
       const link = `/download/${encodeURIComponent(release.id)}`;
+      const replaceInput = document.createElement("input");
+      replaceInput.type = "file";
+      replaceInput.accept = ".zip,.7z,.exe,.msi";
+      replaceInput.hidden = true;
+      replaceInput.addEventListener("change", () => replaceReleaseFile(release.id, replaceInput));
       tr.lastElementChild.append(
         actionButton("设最新", () => updateRelease(release.id, "latest")),
         actionButton(release.status === "disabled" ? "恢复" : "隐藏", () => updateRelease(release.id, "toggle")),
+        actionButton("替换文件", () => replaceInput.click()),
         actionButton("复制链接", () => copyText(link)),
-        actionButton("删除", () => deleteRelease(release.id), "danger")
+        actionButton("删除", () => deleteRelease(release.id), "danger"),
+        replaceInput
       );
       rows.append(tr);
     }
@@ -603,6 +610,26 @@ async function updateRelease(releaseId, action) {
   if (!result.success) return toast(result.msg || "操作失败", true);
   render(result.catalog);
   toast("版本已更新");
+}
+
+async function replaceReleaseFile(releaseId, input) {
+  const file = input.files?.[0];
+  input.value = "";
+  if (!file) return;
+  if (!allowedPackageFile(file)) return toast("安装包格式不支持，请上传 zip、7z、exe 或 msi 文件", true);
+  if (file.size > 1024 * 1024 * 1024) return toast("安装包不能超过 1GB", true);
+  if (!confirm(`确定用 ${file.name} 覆盖这个版本的安装包吗？版本号和下载链接会保持不变。`)) return;
+
+  const form = new FormData();
+  form.append("token", token);
+  form.append("releaseId", releaseId);
+  form.append("file", file);
+
+  toast("正在替换安装包，请稍候");
+  const result = await uploadMultipart("/api/admin/releases/replace", form);
+  if (!result.success) return toast(result.msg || "替换失败", true);
+  render(result.catalog);
+  toast("安装包已替换");
 }
 
 async function deleteRelease(releaseId) {

@@ -584,25 +584,55 @@ async function uploadRelease(event) {
   form.append("isLatest", byId("releaseLatest").checked ? "1" : "0");
   form.append("file", file);
 
-  toast("正在上传，请稍候");
-  const result = await uploadMultipart("/api/admin/releases", form);
+  const result = await uploadMultipart("/api/admin/releases", form, { title: "正在发布版本", fileName: file.name });
   if (!result.success) return toast(result.msg || "上传失败", true);
   byId("releaseForm").reset();
   byId("releaseLatest").checked = true;
   render(result.catalog);
-  toast("版本已发布");
+  toast("版本已发布，列表已刷新");
 }
 
-async function uploadMultipart(url, form) {
-  try {
-    const response = await fetch(url, { method: "POST", body: form });
-    const text = await response.text();
-    const result = parseUploadResponse(text);
-    if (!response.ok) return { success: false, msg: result.msg || `上传失败：HTTP ${response.status}` };
-    return result;
-  } catch (error) {
-    return { success: false, msg: `上传失败：${error.message || "网络或接口异常"}` };
-  }
+function uploadMultipart(url, form, progress = {}) {
+  showUploadProgress(progress.title || "正在上传", progress.fileName || "");
+  return new Promise(resolve => {
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", url);
+
+    xhr.upload.onprogress = event => {
+      if (!event.lengthComputable) {
+        updateUploadProgress(0, "正在上传，等待服务器接收文件...");
+        return;
+      }
+
+      const percent = Math.max(1, Math.min(99, Math.round((event.loaded / event.total) * 100)));
+      updateUploadProgress(percent, `${formatBytes(event.loaded)} / ${formatBytes(event.total)}`);
+    };
+
+    xhr.onload = () => {
+      const result = parseUploadResponse(xhr.responseText);
+      if (xhr.status >= 200 && xhr.status < 300) {
+        updateUploadProgress(100, "上传完成，正在刷新列表...");
+        setTimeout(() => hideUploadProgress(), 500);
+        resolve(result);
+        return;
+      }
+
+      hideUploadProgress();
+      resolve({ success: false, msg: result.msg || `上传失败：HTTP ${xhr.status}` });
+    };
+
+    xhr.onerror = () => {
+      hideUploadProgress();
+      resolve({ success: false, msg: "上传失败：网络或接口异常" });
+    };
+
+    xhr.onabort = () => {
+      hideUploadProgress();
+      resolve({ success: false, msg: "上传已取消" });
+    };
+
+    xhr.send(form);
+  });
 }
 
 async function updateRelease(releaseId, action) {
@@ -625,11 +655,10 @@ async function replaceReleaseFile(releaseId, input) {
   form.append("releaseId", releaseId);
   form.append("file", file);
 
-  toast("正在替换安装包，请稍候");
-  const result = await uploadMultipart("/api/admin/releases/replace", form);
+  const result = await uploadMultipart("/api/admin/releases/replace", form, { title: "正在替换安装包", fileName: file.name });
   if (!result.success) return toast(result.msg || "替换失败", true);
   render(result.catalog);
-  toast("安装包已替换");
+  toast("安装包已替换，列表已刷新");
 }
 
 async function deleteRelease(releaseId) {
@@ -1139,6 +1168,24 @@ function toast(message, isError = false) {
   toastEl.style.background = isError ? "#ef4444" : "#6366f1";
   toastEl.classList.add("is-visible");
   window.setTimeout(() => toastEl.classList.remove("is-visible"), 2600);
+}
+
+function showUploadProgress(title, fileName) {
+  byId("uploadProgressTitle").textContent = title;
+  byId("uploadProgressPercent").textContent = "0%";
+  byId("uploadProgressBar").style.width = "0%";
+  byId("uploadProgressText").textContent = fileName ? `正在上传：${fileName}` : "请保持页面打开，上传完成后会自动刷新。";
+  byId("uploadProgress").hidden = false;
+}
+
+function updateUploadProgress(percent, text) {
+  byId("uploadProgressPercent").textContent = `${percent}%`;
+  byId("uploadProgressBar").style.width = `${percent}%`;
+  if (text) byId("uploadProgressText").textContent = text;
+}
+
+function hideUploadProgress() {
+  byId("uploadProgress").hidden = true;
 }
 
 function formatDateTime(timestamp) {

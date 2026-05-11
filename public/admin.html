@@ -9,6 +9,16 @@
   </head>
   <body>
     <div class="toast" id="toast"></div>
+    <div class="upload-progress" id="uploadProgress" hidden>
+      <div class="upload-progress__card">
+        <div class="upload-progress__head">
+          <strong id="uploadProgressTitle">正在上传</strong>
+          <span id="uploadProgressPercent">0%</span>
+        </div>
+        <div class="upload-progress__bar"><span id="uploadProgressBar"></span></div>
+        <p id="uploadProgressText">请保持页面打开，上传完成后会自动刷新。</p>
+      </div>
+    </div>
 
     <main class="login" id="loginView">
       <section class="panel login__panel">

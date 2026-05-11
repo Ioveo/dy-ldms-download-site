@@ -4,7 +4,7 @@ export async function onRequest({ request, env, params }) {
   if (request.method !== "GET" && request.method !== "HEAD") return text("Method Not Allowed", 405);
   if (!env.SOFTWARE_BUCKET?.get) return text("R2 binding SOFTWARE_BUCKET is not configured", 500);
   const key = decodeURIComponent(params.key || "");
-  if (!key.startsWith("article-image-") && !key.startsWith("article-audio-")) return text("Media not found", 404);
+  if (!isPublicMediaKey(key)) return text("Media not found", 404);
   const rangeHeader = request.headers.get("Range");
   const range = parseRange(rangeHeader);
   const object = await env.SOFTWARE_BUCKET.get(key, range ? { range } : undefined);
@@ -25,6 +25,14 @@ export async function onRequest({ request, env, params }) {
 
   headers.set("Content-Length", String(object.size));
   return new Response(request.method === "HEAD" ? null : object.body, { headers });
+}
+
+function isPublicMediaKey(key) {
+  return key.startsWith("article-image-")
+    || key.startsWith("article-audio-")
+    || key.startsWith("media/images/")
+    || key.startsWith("media/audio/")
+    || key.startsWith("site/");
 }
 
 function parseRange(value) {

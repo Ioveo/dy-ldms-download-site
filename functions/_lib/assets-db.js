@@ -50,6 +50,16 @@ export async function listAssets(env, { kind = "all", search = "", status = "act
   return { assets: (result.results || []).map(rowToAsset), total: Number(count?.total || 0), page: Number(page) || 1, pageSize: limit };
 }
 
+export function inferAssetKind(key = "", mimeType = "") {
+  const lowerKey = String(key || "").toLowerCase();
+  const type = String(mimeType || "").toLowerCase();
+  if (lowerKey.startsWith("software/") || /\.(zip|7z|exe|msi)$/i.test(lowerKey)) return "software";
+  if (lowerKey.startsWith("site/") || lowerKey.includes("logo") || lowerKey.includes("qr") || lowerKey.includes("qrcode") || lowerKey.includes("pay-qr")) return "site";
+  if (type.startsWith("audio/") || lowerKey.startsWith("article-audio-") || lowerKey.startsWith("media/audio/") || /\.(mp3|m4a|aac|wav|ogg|oga|webm|flac)$/i.test(lowerKey)) return "audio";
+  if (type.startsWith("image/") || lowerKey.startsWith("article-image-") || lowerKey.startsWith("media/images/") || /\.(png|jpe?g|gif|webp|avif|ico)$/i.test(lowerKey)) return "image";
+  return "other";
+}
+
 export async function getAsset(env, assetId) {
   if (!(await ensureAssetsTable(env))) return null;
   const row = await env.DB.prepare("SELECT * FROM r2_assets WHERE id = ? OR key = ? LIMIT 1").bind(assetId, assetId).first();

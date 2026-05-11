@@ -6,12 +6,17 @@ import { requireAdmin } from "../_lib.js";
 export async function onRequestPost({ request, env }) {
   const auth = await requireAdmin(request, env);
   if (!auth.ok) return auth.response;
-  const asset = await getAsset(env, String(auth.body?.assetId || auth.body?.key || ""));
-  if (!asset) return json({ success: false, msg: "资源不存在" }, 404);
+  const requested = String(auth.body?.assetId || auth.body?.key || "");
+  let asset = await getAsset(env, requested);
+  if (!asset && requested) {
+    const key = requested.startsWith("r2:") ? requested.slice(3) : requested;
+    asset = { id: `r2:${key}`, storageId: "default", key, kind: "other", publicUrl: "", url: `/media/${encodeURIComponent(key)}` };
+  }
+  if (!asset?.key) return json({ success: false, msg: "资源不存在" }, 404);
   const references = await findReferences(env, asset);
   if (references.length && !auth.body?.force) return json({ success: false, msg: "资源正在被使用，不能删除", references }, 400);
   if (asset.storageId === "default" && env.SOFTWARE_BUCKET?.delete) await env.SOFTWARE_BUCKET.delete(asset.key);
-  await markAssetDeleted(env, asset.id);
+  if (!asset.id.startsWith("r2:")) await markAssetDeleted(env, asset.id);
   return json({ success: true });
 }
 

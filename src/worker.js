@@ -202,7 +202,7 @@ function base64ToBytes(value) {
 async function serveMedia(request, env, key) {
   if (request.method !== "GET" && request.method !== "HEAD") return text("Method Not Allowed", 405);
   if (!env.SOFTWARE_BUCKET?.get) return text("R2 binding SOFTWARE_BUCKET is not configured", 500);
-  if (!key.startsWith("article-image-") && !key.startsWith("article-audio-")) return text("Media not found", 404);
+  if (!isPublicMediaKey(key)) return text("Media not found", 404);
   const range = parseRange(request.headers.get("Range"));
   const object = await env.SOFTWARE_BUCKET.get(key, range ? { range } : undefined);
   if (!object) return text("Media not found", 404);
@@ -223,6 +223,14 @@ async function serveMedia(request, env, key) {
 
   headers.set("Content-Length", String(object.size));
   return new Response(request.method === "HEAD" ? null : object.body, { headers });
+}
+
+function isPublicMediaKey(key) {
+  return key.startsWith("article-image-")
+    || key.startsWith("article-audio-")
+    || key.startsWith("media/images/")
+    || key.startsWith("media/audio/")
+    || key.startsWith("site/");
 }
 
 async function loadManifest(env) {

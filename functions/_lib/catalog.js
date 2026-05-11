@@ -146,8 +146,15 @@ export function findRelease(catalog, releaseId) {
 export function findLatestRelease(catalog, softwareSlug) {
   const item = catalog.software?.find(entry => entry.slug === softwareSlug || entry.id === softwareSlug);
   if (!item) return null;
-  const releases = (item.releases || []).filter(release => release.status !== "disabled");
+  const releases = (item.releases || []).filter(isDownloadableRelease);
   return { software: item, release: releases.find(release => release.isLatest) || releases[0] || null };
+}
+
+export function isDownloadableRelease(release) {
+  if (!release || release.status !== "published") return false;
+  if (!release.fileKey && !release.publicUrl) return false;
+  if (release.version === "待上传") return false;
+  return Number(release.fileSize || 0) > 0 || Boolean(release.assetId || release.publicUrl);
 }
 
 export function publicCatalog(catalog) {

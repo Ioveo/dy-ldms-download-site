@@ -1,11 +1,11 @@
-import { findLatestRelease, loadCatalog } from "../../_lib/catalog.js";
+import { findLatestRelease, isDownloadableRelease, loadCatalog } from "../../_lib/catalog.js";
 import { incrementReleaseDownload } from "../../_lib/download-stats.js";
 import { serveRelease, text } from "../../_lib/releases.js";
 
 export async function onRequestGet({ env, params }) {
   const catalog = await loadCatalog(env);
   const match = findLatestRelease(catalog, params.software);
-  if (!match?.release?.fileKey || match.release.status !== "published") return text("Release not found", 404);
+  if (!match?.release?.fileKey || !isDownloadableRelease(match.release)) return text("Release not found", 404);
   await incrementReleaseDownload(env, match.release.id);
   if (match.release.storageId !== "default" && match.release.publicUrl) {
     return Response.redirect(match.release.publicUrl, 302);

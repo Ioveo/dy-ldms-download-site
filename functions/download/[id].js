@@ -1,5 +1,5 @@
 import { findLatestRelease, loadManifest, serveRelease, text } from "../_lib/releases.js";
-import { findLatestRelease as findLatestCatalogRelease, findRelease, loadCatalog } from "../_lib/catalog.js";
+import { findLatestRelease as findLatestCatalogRelease, findRelease, isDownloadableRelease, loadCatalog } from "../_lib/catalog.js";
 import { incrementReleaseDownload } from "../_lib/download-stats.js";
 
 export async function onRequestGet({ env, params }) {
@@ -10,7 +10,11 @@ export async function onRequestGet({ env, params }) {
   const catalogMatch = releaseId === "latest"
     ? findLatestCatalogRelease(catalog, "datacenter") || findLatestCatalogRelease(catalog, catalog.software?.[0]?.slug)
     : findRelease(catalog, releaseId);
-  if (catalogMatch?.release?.fileKey && catalogMatch.release.status === "published") {
+  if (catalogMatch?.release && !isDownloadableRelease(catalogMatch.release)) {
+    return text("Release file has not been uploaded yet", 404);
+  }
+
+  if (catalogMatch?.release?.fileKey) {
     await incrementReleaseDownload(env, catalogMatch.release.id);
     if (catalogMatch.release.storageId !== "default" && catalogMatch.release.publicUrl) {
       return Response.redirect(catalogMatch.release.publicUrl, 302);

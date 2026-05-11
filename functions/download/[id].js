@@ -10,7 +10,7 @@ export async function onRequestGet({ env, params }) {
   const catalogMatch = releaseId === "latest"
     ? findLatestCatalogRelease(catalog, "datacenter") || findLatestCatalogRelease(catalog, catalog.software?.[0]?.slug)
     : findRelease(catalog, releaseId);
-  if (catalogMatch?.release?.fileKey) {
+  if (catalogMatch?.release?.fileKey && catalogMatch.release.status === "published") {
     await incrementReleaseDownload(env, catalogMatch.release.id);
     if (catalogMatch.release.storageId !== "default" && catalogMatch.release.publicUrl) {
       return Response.redirect(catalogMatch.release.publicUrl, 302);

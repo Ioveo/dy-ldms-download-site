@@ -99,7 +99,7 @@ function renderSoftwareGrid(catalog) {
     const inCategory = activeCategory === "all" || item.categoryId === activeCategory;
     if (!inCategory) return false;
     if (!softwareSearch) return true;
-    const latest = (item.releases || []).find(release => release.isLatest) || item.releases?.[0];
+    const latest = latestDownloadableRelease(item);
     const haystack = [item.name, item.slug, item.description, latest?.version, latest?.changelog].filter(Boolean).join(" ").toLowerCase();
     return haystack.includes(softwareSearch.toLowerCase());
   }));
@@ -236,7 +236,7 @@ function renderDownloadRank(catalog) {
   const ranked = (catalog.software || [])
     .map(item => ({
       ...item,
-      latest: (item.releases || []).find(release => release.isLatest) || item.releases?.[0],
+      latest: latestDownloadableRelease(item),
       downloads: (item.releases || []).reduce((sum, release) => sum + Number(release.downloadCount || 0), 0)
     }))
     .filter(item => item.status !== "disabled")
@@ -261,6 +261,18 @@ function renderDownloadRank(catalog) {
 
 function relatedSoftware(catalog, item) {
   return (catalog.software || []).filter(entry => entry.id !== item.id && entry.status !== "disabled" && entry.categoryId === item.categoryId);
+}
+
+function latestDownloadableRelease(item) {
+  const releases = (item.releases || []).filter(isDownloadableRelease);
+  return releases.find(release => release.isLatest) || releases[0] || null;
+}
+
+function isDownloadableRelease(release) {
+  if (!release || release.status !== "published") return false;
+  if (!release.fileKey && !release.publicUrl) return false;
+  if (release.version === "待上传") return false;
+  return Number(release.fileSize || 0) > 0 || Boolean(release.assetId || release.publicUrl);
 }
 
 function renderLegacyGrid(manifest) {

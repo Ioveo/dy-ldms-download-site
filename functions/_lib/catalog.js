@@ -110,9 +110,12 @@ export function normalizeSoftware(item, index = 0, now = Date.now()) {
 
 export function normalizeRelease(release, softwareSlug) {
   const id = String(release.id || `${softwareSlug}-${release.version || Date.now()}`).replace(/[^a-zA-Z0-9._-]/g, "-");
+  const version = String(release.version || "待上传");
+  const fileSize = Number(release.fileSize || release.file_size || 0);
+  const isPlaceholder = version === "待上传" && fileSize <= 0 && !release.assetId && !release.asset_id;
   return {
     id,
-    version: String(release.version || "待上传"),
+    version,
     title: String(release.title || release.name || ""),
     description: String(release.description || ""),
     changelog: Array.isArray(release.notes) ? release.notes.join("\n") : String(release.changelog || ""),
@@ -121,11 +124,11 @@ export function normalizeRelease(release, softwareSlug) {
     storageId: String(release.storageId || release.storage_id || "default"),
     publicUrl: String(release.publicUrl || release.public_url || ""),
     fileName: String(release.fileName || release.file_name || release.key?.split("/").pop() || ""),
-    fileSize: Number(release.fileSize || release.file_size || 0),
-    size: String(release.size || formatBytes(Number(release.fileSize || release.file_size || 0))),
+    fileSize,
+    size: String(release.size || formatBytes(fileSize)),
     sha256: String(release.sha256 || ""),
     isLatest: release.isLatest !== false,
-    status: release.status || "published",
+    status: release.status || (isPlaceholder ? "draft" : "published"),
     downloadCount: Number(release.downloadCount || release.download_count || 0),
     createdAt: Number(release.createdAt || parseDate(release.date) || Date.now()),
     updatedAt: Number(release.updatedAt || Date.now())

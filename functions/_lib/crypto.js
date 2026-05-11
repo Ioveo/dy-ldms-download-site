@@ -21,7 +21,8 @@ export async function decryptSecret(env, encrypted) {
 }
 
 async function encryptionKey(env) {
-  const secret = env.STORAGE_SECRET || env.ADMIN_PASSWORD || "download-admin-secret";
+  const secret = env.STORAGE_SECRET;
+  if (!secret) throw new Error("STORAGE_SECRET is required for storage credential encryption");
   const digest = await crypto.subtle.digest("SHA-256", TEXT_ENCODER.encode(secret));
   return crypto.subtle.importKey("raw", digest, { name: "AES-GCM" }, false, ["encrypt", "decrypt"]);
 }

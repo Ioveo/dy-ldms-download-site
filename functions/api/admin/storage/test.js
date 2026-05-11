@@ -7,6 +7,7 @@ import { requireAdmin } from "../_lib.js";
 export async function onRequestPost({ request, env }) {
   const auth = await requireAdmin(request, env);
   if (!auth.ok) return auth.response;
+  if (!env.STORAGE_SECRET && auth.body?.id && !auth.body?.secretAccessKey) return json({ success: false, msg: "请先配置 STORAGE_SECRET，或输入 Secret 后再测试" }, 500);
   const body = auth.body || {};
   let account = {
     id: body.id || "test",

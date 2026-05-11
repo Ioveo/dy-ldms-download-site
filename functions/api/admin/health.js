@@ -15,6 +15,7 @@ export async function onRequestPost({ request, env }) {
   let articles = null;
 
   checks.push({ name: "ADMIN_PASSWORD", ok: Boolean(env.ADMIN_PASSWORD), detail: env.ADMIN_PASSWORD ? "已配置" : "未配置" });
+  checks.push({ name: "STORAGE_SECRET", ok: Boolean(env.STORAGE_SECRET), detail: env.STORAGE_SECRET ? "已配置" : "未配置，不能保存外部存储授权" });
   checks.push({ name: "SOFTWARE_BUCKET", ok: bucketReady, detail: bucketReady ? "R2 绑定可用" : "R2 绑定缺失" });
   checks.push({ name: "DB", ok: dbReady, detail: dbReady ? "D1 已绑定" : "未绑定，文章会回退到 R2 catalog" });
 

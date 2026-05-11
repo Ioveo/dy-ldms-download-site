@@ -202,6 +202,7 @@ function base64ToBytes(value) {
 async function serveMedia(request, env, key) {
   if (request.method !== "GET" && request.method !== "HEAD") return text("Method Not Allowed", 405);
   if (!env.SOFTWARE_BUCKET?.get) return text("R2 binding SOFTWARE_BUCKET is not configured", 500);
+  if (!key.startsWith("article-image-") && !key.startsWith("article-audio-")) return text("Media not found", 404);
   const range = parseRange(request.headers.get("Range"));
   const object = await env.SOFTWARE_BUCKET.get(key, range ? { range } : undefined);
   if (!object) return text("Media not found", 404);
@@ -293,7 +294,6 @@ function inferredContentType(name) {
     gif: "image/gif",
     webp: "image/webp",
     avif: "image/avif",
-    svg: "image/svg+xml",
     mp3: "audio/mpeg",
     m4a: "audio/mp4",
     aac: "audio/aac",

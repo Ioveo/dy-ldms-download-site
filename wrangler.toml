@@ -20,3 +20,4 @@ preview_bucket_name = "dy-ldms-downloads-dev"
 [vars]
 PRODUCT_NAME = "天才猫直播数据管理"
 MANIFEST_KEY = "releases/manifest.json"
+# Set ADMIN_PASSWORD, ADMIN_TOKEN_SECRET and STORAGE_SECRET as Cloudflare secrets.

@@ -4,6 +4,7 @@ export async function onRequest({ request, env, params }) {
   if (request.method !== "GET" && request.method !== "HEAD") return text("Method Not Allowed", 405);
   if (!env.SOFTWARE_BUCKET?.get) return text("R2 binding SOFTWARE_BUCKET is not configured", 500);
   const key = decodeURIComponent(params.key || "");
+  if (!key.startsWith("article-image-") && !key.startsWith("article-audio-")) return text("Media not found", 404);
   const rangeHeader = request.headers.get("Range");
   const range = parseRange(rangeHeader);
   const object = await env.SOFTWARE_BUCKET.get(key, range ? { range } : undefined);

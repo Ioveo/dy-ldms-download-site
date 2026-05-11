@@ -23,8 +23,15 @@ export async function onRequestPost({ request, env }) {
   if (!software) return json({ success: false, msg: "软件不存在" }, 404);
 
   const fileName = sanitizeFileName(file.name || `${software.slug}-${version}.zip`);
+  if (!isAllowedPackage(fileName, file.type)) {
+    return json({ success: false, msg: "安装包格式不支持，请上传 zip、7z、exe 或 msi 文件" }, 400);
+  }
+  if (file.size > 1024 * 1024 * 1024) {
+    return json({ success: false, msg: "安装包不能超过 1GB" }, 400);
+  }
   const fileKey = `software/${software.slug}/${slugify(version)}/${Date.now()}-${fileName}`;
   const bytes = await file.arrayBuffer();
+  const sha256 = await sha256Hex(bytes);
   let publicUrl = "";
   if (storageId === "default") {
     await env.SOFTWARE_BUCKET.put(fileKey, bytes, {
@@ -53,6 +60,7 @@ export async function onRequestPost({ request, env }) {
     fileName,
     fileSize: file.size || bytes.byteLength,
     size: formatBytes(file.size || bytes.byteLength),
+    sha256,
     isLatest,
     status: "published",
     createdAt: Date.now(),
@@ -65,4 +73,14 @@ export async function onRequestPost({ request, env }) {
 
 function sanitizeFileName(value) {
   return String(value || "download.bin").replace(/["\\\r\n]/g, "");
+}
+
+function isAllowedPackage(fileName, contentType) {
+  const ext = String(fileName || "").toLowerCase().split(".").pop();
+  return ["zip", "7z", "exe", "msi"].includes(ext);
+}
+
+async function sha256Hex(value) {
+  const digest = await crypto.subtle.digest("SHA-256", value);
+  return Array.from(new Uint8Array(digest)).map(byte => byte.toString(16).padStart(2, "0")).join("");
 }

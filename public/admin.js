@@ -1,7 +1,9 @@
-let password = sessionStorage.getItem("downloadAdminPassword") || "";
+let token = sessionStorage.getItem("downloadAdminToken") || "";
 let catalog = null;
 let articleSoftwareCategory = "all";
 let articleSoftwareSelection = new Set();
+const ARTICLE_DRAFT_KEY = "downloadAdminArticleDraft";
+let articleDraftTimer = null;
 
 const loginView = byId("loginView");
 const appView = byId("appView");
@@ -22,6 +24,8 @@ byId("resetCategory").addEventListener("click", resetCategoryForm);
 byId("resetStorage").addEventListener("click", resetStorageForm);
 byId("resetNavigation").addEventListener("click", resetNavigationForm);
 byId("resetArticle").addEventListener("click", resetArticleForm);
+byId("restoreArticleDraft").addEventListener("click", restoreArticleDraft);
+byId("clearArticleDraft").addEventListener("click", clearArticleDraft);
 byId("testStorage").addEventListener("click", testStorage);
 byId("runHealthCheck").addEventListener("click", loadHealth);
 byId("loadMediaAll").addEventListener("click", () => loadMedia("all"));
@@ -39,6 +43,7 @@ byId("articleTitle").addEventListener("input", updateArticleEditorMeta);
 byId("articleSummary").addEventListener("input", updateArticleEditorMeta);
 byId("articleContent").addEventListener("input", updateArticleEditorMeta);
 byId("articleCover").addEventListener("input", updateArticleEditorMeta);
+byId("articleForm").addEventListener("input", scheduleArticleDraftSave);
 byId("articleSoftwareCategory").addEventListener("change", event => {
   articleSoftwareCategory = event.target.value;
   renderArticleOptions();
@@ -52,24 +57,25 @@ document.querySelectorAll(".sidebar nav button").forEach(button => {
   button.addEventListener("click", () => showPanel(button.dataset.panel));
 });
 
-if (password) loadCatalog();
+if (token) loadCatalog();
+updateArticleDraftStatus();
 
 async function login() {
-  password = byId("adminPassword").value.trim();
+  const password = byId("adminPassword").value.trim();
   if (!password) return toast("请输入管理员密码", true);
-  const result = await api("/api/admin/catalog");
+  const result = await loginApi(password);
   if (!result.success) {
-    password = "";
+    token = "";
     return toast(result.msg || "登录失败", true);
   }
-  sessionStorage.setItem("downloadAdminPassword", password);
-  showApp();
-  render(result.catalog);
+  token = result.token || "";
+  sessionStorage.setItem("downloadAdminToken", token);
+  await loadCatalog();
   toast("登录成功");
 }
 
 function logout() {
-  sessionStorage.removeItem("downloadAdminPassword");
+  sessionStorage.removeItem("downloadAdminToken");
   location.reload();
 }
 
@@ -86,8 +92,8 @@ async function loadCatalog() {
     showApp();
     render(result.catalog);
   } else {
-    password = "";
-    sessionStorage.removeItem("downloadAdminPassword");
+    token = "";
+    sessionStorage.removeItem("downloadAdminToken");
     hideApp();
     toast(result.msg || "读取失败", true);
   }
@@ -329,6 +335,7 @@ async function saveArticle(event) {
   event.preventDefault();
   const result = await api("/api/admin/articles", articlePayload());
   if (!result.success) return toast(result.msg || "保存失败", true);
+  clearArticleDraft(false);
   resetArticleForm();
   render(result.catalog);
   toast("文章已保存");
@@ -340,6 +347,7 @@ async function uploadArticleImage(target) {
   const isAudioTarget = target === "audio";
   const isImageTarget = target === "cover" || target === "content";
   const mediaType = mediaTypeFor(file);
+  if (mediaType === "svg") return toast("不支持上传 SVG，请改用 PNG/JPG/WebP", true);
   if (isAudioTarget && mediaType !== "audio") return toast("请选择音频文件后再插入音频", true);
   if (isImageTarget && mediaType !== "image") return toast("请选择图片文件后再上传图片", true);
   if (mediaType === "image" && file.size > 8 * 1024 * 1024) return toast("图片不能超过 8MB，请压缩后再上传", true);
@@ -363,9 +371,9 @@ async function uploadArticleMedia(file, kind) {
     const data = await fileToBase64(file);
     const response = await fetch("/api/admin/article-image", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
       body: JSON.stringify({
-        password,
+        token,
         kind,
         fileName: file.name || "article-media.bin",
         contentType: file.type || "",
@@ -400,12 +408,17 @@ function parseUploadResponse(text) {
 
 function mediaTypeFor(file) {
   const type = String(file?.type || "").toLowerCase();
+  const name = String(file?.name || "").toLowerCase();
+  if (type === "image/svg+xml" || /\.svg$/i.test(name)) return "svg";
   if (type.startsWith("image/")) return "image";
   if (type.startsWith("audio/")) return "audio";
-  const name = String(file?.name || "").toLowerCase();
-  if (/\.(png|jpe?g|gif|webp|avif|svg)$/i.test(name)) return "image";
+  if (/\.(png|jpe?g|gif|webp|avif)$/i.test(name)) return "image";
   if (/\.(mp3|m4a|aac|wav|ogg|oga|webm|flac)$/i.test(name)) return "audio";
   return "";
+}
+
+function allowedPackageFile(file) {
+  return /\.(zip|7z|exe|msi)$/i.test(String(file?.name || ""));
 }
 
 function insertArticleTable() {
@@ -478,12 +491,14 @@ async function uploadRelease(event) {
   event.preventDefault();
   const file = byId("releaseFile").files[0];
   if (!file) return toast("请选择安装包", true);
+  if (!allowedPackageFile(file)) return toast("安装包格式不支持，请上传 zip、7z、exe 或 msi 文件", true);
+  if (file.size > 1024 * 1024 * 1024) return toast("安装包不能超过 1GB", true);
   const softwareId = byId("releaseSoftware").value;
   const version = byId("releaseVersion").value.trim();
   if (!softwareId || !version) return toast("请选择软件并填写版本号", true);
 
   const form = new FormData();
-  form.append("password", password);
+  form.append("token", token);
   form.append("softwareId", softwareId);
   form.append("storageId", byId("releaseStorage").value);
   form.append("version", version);
@@ -643,6 +658,7 @@ function fillNavigationForm(item) {
 
 function fillArticleForm(item) {
   showPanel("articlePanel");
+  if (hasArticleDraft() && !confirm("本地有未清除的草稿。继续编辑线上文章会覆盖当前表单，是否继续？")) return;
   byId("articleId").value = item.id;
   byId("articleTitle").value = item.title;
   byId("articleSlug").value = item.slug;
@@ -733,6 +749,7 @@ function resetNavigationForm() {
 }
 
 function resetArticleForm() {
+  if (hasArticleDraft() && !confirm("本地有未清除的草稿。新建文章会清空当前表单，是否继续？")) return;
   byId("articleForm").reset();
   byId("articleId").value = "";
   byId("articleSort").value = "10";
@@ -741,6 +758,75 @@ function resetArticleForm() {
   renderArticleOptions();
   updateArticleEditorMeta();
   renderArticleRows();
+}
+
+function scheduleArticleDraftSave() {
+  window.clearTimeout(articleDraftTimer);
+  articleDraftTimer = window.setTimeout(saveArticleDraft, 350);
+}
+
+function saveArticleDraft() {
+  const payload = articlePayload();
+  const hasContent = [payload.title, payload.slug, payload.summary, payload.coverUrl, payload.content, payload.category, payload.seoTitle, payload.seoDescription].some(Boolean) || payload.tags.length || payload.softwareIds.length;
+  if (!hasContent) {
+    updateArticleDraftStatus();
+    return;
+  }
+  localStorage.setItem(ARTICLE_DRAFT_KEY, JSON.stringify({ savedAt: Date.now(), payload }));
+  updateArticleDraftStatus();
+}
+
+function restoreArticleDraft() {
+  const draft = readArticleDraft();
+  if (!draft) return toast("没有可恢复的本地草稿", true);
+  if (!confirm(`恢复 ${formatDateTime(draft.savedAt)} 保存的本地草稿？当前表单内容会被覆盖。`)) return;
+  fillArticleDraft(draft.payload || {});
+  toast("本地草稿已恢复");
+}
+
+function clearArticleDraft(showToast = true) {
+  localStorage.removeItem(ARTICLE_DRAFT_KEY);
+  updateArticleDraftStatus();
+  if (showToast) toast("本地草稿已清除");
+}
+
+function fillArticleDraft(item) {
+  byId("articleId").value = item.id || "";
+  byId("articleTitle").value = item.title || "";
+  byId("articleSlug").value = item.slug || "";
+  byId("articleSummary").value = item.summary || "";
+  byId("articleCover").value = item.coverUrl || "";
+  byId("articleContent").value = item.content || "";
+  byId("articleCategory").value = item.category || "";
+  byId("articleTags").value = (item.tags || []).join("，");
+  byId("articleSeoTitle").value = item.seoTitle || "";
+  byId("articleSeoDescription").value = item.seoDescription || "";
+  byId("articleFeatured").checked = Boolean(item.featured);
+  byId("articleSort").value = item.sortOrder || 10;
+  byId("articleStatus").value = item.status || "draft";
+  articleSoftwareSelection = new Set(item.softwareIds || []);
+  renderArticleOptions();
+  updateArticleEditorMeta();
+}
+
+function hasArticleDraft() {
+  return Boolean(readArticleDraft());
+}
+
+function readArticleDraft() {
+  try {
+    const draft = JSON.parse(localStorage.getItem(ARTICLE_DRAFT_KEY) || "null");
+    return draft?.payload ? draft : null;
+  } catch {
+    return null;
+  }
+}
+
+function updateArticleDraftStatus() {
+  const status = byId("articleDraftStatus");
+  if (!status) return;
+  const draft = readArticleDraft();
+  status.textContent = draft ? `本地草稿：${formatDateTime(draft.savedAt)} 已自动保存` : "本地草稿：暂无";
 }
 
 function updateArticleSoftwareHint() {
@@ -772,8 +858,52 @@ function countWords(value) {
 function renderArticleContent(content) {
   const value = String(content || "").trim();
   if (!value) return "<p>正文预览会显示在这里。</p>";
-  if (/<[a-z][\s\S]*>/i.test(value)) return value;
+  if (/<[a-z][\s\S]*>/i.test(value)) return sanitizeArticleHtml(value);
   return markdownToHtml(value);
+}
+
+function sanitizeArticleHtml(html) {
+  const template = document.createElement("template");
+  template.innerHTML = String(html || "");
+  const allowedTags = new Set(["A", "P", "BR", "STRONG", "B", "EM", "I", "UL", "OL", "LI", "BLOCKQUOTE", "H2", "H3", "IMG", "FIGURE", "FIGCAPTION", "AUDIO", "SOURCE", "TABLE", "THEAD", "TBODY", "TR", "TH", "TD", "PRE", "CODE"]);
+  const allowedAttrs = {
+    A: new Set(["href", "target", "rel"]),
+    IMG: new Set(["src", "alt", "loading"]),
+    AUDIO: new Set(["src", "controls", "preload"]),
+    SOURCE: new Set(["src", "type"]),
+    FIGURE: new Set(["class"]),
+    CODE: new Set(["class"]),
+    PRE: new Set(["class"]),
+    TABLE: new Set(["class"])
+  };
+
+  const cleanNode = node => {
+    if (node.nodeType === Node.COMMENT_NODE) {
+      node.remove();
+      return;
+    }
+    if (node.nodeType !== Node.ELEMENT_NODE) return;
+    if (!allowedTags.has(node.tagName)) {
+      node.replaceWith(...Array.from(node.childNodes));
+      return;
+    }
+    for (const attr of Array.from(node.attributes)) {
+      const allowed = allowedAttrs[node.tagName]?.has(attr.name);
+      if (!allowed || attr.name.startsWith("on") || attr.value.startsWith("javascript:")) node.removeAttribute(attr.name);
+    }
+    if (node.tagName === "A") {
+      const href = node.getAttribute("href") || "";
+      if (!/^(https?:\/\/|\/)/.test(href)) node.removeAttribute("href");
+      node.setAttribute("rel", "noopener");
+      if (/^https?:\/\//.test(href)) node.setAttribute("target", "_blank");
+    }
+    if ((node.tagName === "IMG" || node.tagName === "AUDIO" || node.tagName === "SOURCE") && !/^(https?:\/\/|\/)/.test(node.getAttribute("src") || "")) {
+      node.removeAttribute("src");
+    }
+    for (const child of Array.from(node.childNodes)) cleanNode(child);
+  };
+  for (const child of Array.from(template.content.childNodes)) cleanNode(child);
+  return template.innerHTML;
 }
 
 function markdownToHtml(value) {
@@ -869,8 +999,17 @@ function showPanel(id) {
 async function api(url, payload = {}) {
   const response = await fetch(url, {
     method: "POST",
+    headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+    body: JSON.stringify(payload)
+  });
+  return response.json();
+}
+
+async function loginApi(password) {
+  const response = await fetch("/api/admin/login", {
+    method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ password, ...payload })
+    body: JSON.stringify({ password })
   });
   return response.json();
 }

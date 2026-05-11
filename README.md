@@ -64,6 +64,8 @@ Cloudflare Pages 需要配置以下变量和绑定。
 | `SOFTWARE_BUCKET` | R2 bucket binding | 是 | 存放安装包、manifest、catalog、文章图片。 |
 | `DB` | D1 database binding | 推荐 | 文章系统数据库绑定；不绑定时文章会回退到 R2 catalog。 |
 | `ADMIN_PASSWORD` | Environment variable | 是 | 后台管理密码。 |
+| `ADMIN_TOKEN_SECRET` | Secret / Environment variable | 推荐 | 后台登录 token 签名密钥；不填时回退使用 `ADMIN_PASSWORD`。 |
+| `STORAGE_SECRET` | Secret / Environment variable | 是 | 外部 R2 存储授权加密密钥；未配置时不能保存或读取外部存储 Secret。 |
 | `MANIFEST_KEY` | Environment variable | 是 | manifest 文件路径，默认 `releases/manifest.json`。 |
 | `PRODUCT_NAME` | Environment variable | 可选 | 产品名称，当前为 `天才猫直播数据管理`。 |
 
@@ -73,6 +75,8 @@ Cloudflare Pages 需要配置以下变量和绑定。
 SOFTWARE_BUCKET = dy-ldms-downloads
 DB = dy-ldms-download-db
 ADMIN_PASSWORD = 自己设置一个强密码
+ADMIN_TOKEN_SECRET = 自己设置一个长随机字符串
+STORAGE_SECRET = 自己设置另一个长随机字符串
 MANIFEST_KEY = releases/manifest.json
 PRODUCT_NAME = 天才猫直播数据管理
 ```

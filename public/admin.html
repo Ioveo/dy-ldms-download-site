@@ -178,10 +178,13 @@
                   <strong id="articleEditorMode">新建文章</strong>
                 </div>
                 <div class="editor-toolbar__actions">
+                  <button class="ghost" type="button" id="restoreArticleDraft">恢复草稿</button>
+                  <button class="ghost" type="button" id="clearArticleDraft">清除本地草稿</button>
                   <button type="submit">保存文章</button>
                   <button class="ghost" type="button" id="resetArticle">新建</button>
                 </div>
               </div>
+              <p class="draft-status" id="articleDraftStatus">本地草稿：未检测</p>
               <label class="editor-title">文章标题<input id="articleTitle" required placeholder="例如：数据中心版使用介绍" /></label>
               <div class="editor-grid">
                 <label>文章标识<input id="articleSlug" placeholder="datacenter-guide" /></label>
@@ -253,6 +256,6 @@
       </section>
     </main>
 
-    <script src="/admin.js?v=20260511-ops" type="module"></script>
+    <script src="/admin.js?v=20260511-auth" type="module"></script>
   </body>
 </html>

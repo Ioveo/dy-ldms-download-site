@@ -6,6 +6,7 @@ import { requireAdmin } from "./_lib.js";
 export async function onRequestPost({ request, env }) {
   const auth = await requireAdmin(request, env);
   if (!auth.ok) return auth.response;
+  if (!env.STORAGE_SECRET) return json({ success: false, msg: "请先配置 STORAGE_SECRET 后再保存存储授权" }, 500);
   const body = auth.body || {};
   if (!body.name || !body.accountId || !body.bucket || !body.accessKeyId) {
     return json({ success: false, msg: "请填写名称、Account ID、Bucket 和 Access Key" }, 400);

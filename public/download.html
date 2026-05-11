@@ -7,7 +7,7 @@
     <meta name="description" content="天才猫软件官方下载中心，按分类选择数据中心版、DY辅助工具和其他工具版本。" />
     <link rel="icon" type="image/png" href="/logo.png?v=20260509" />
     <link rel="apple-touch-icon" href="/logo.png?v=20260509" />
-    <link rel="stylesheet" href="/styles.css?v=20260510-download-redesign" />
+    <link rel="stylesheet" href="/styles.css?v=20260511-download-premium" />
   </head>
   <body class="download-page">
     <header class="topbar">
@@ -30,10 +30,19 @@
           <p class="eyebrow">TianCaiMao Downloads</p>
           <h1>稳定交付每一个工具版本。</h1>
           <p>面向直播团队的软件交付中心。版本、说明、安装包统一维护，客户打开页面就能清楚知道该下载什么。</p>
+          <div class="download-hero__actions">
+            <a class="button button--primary" href="#softwareGrid">浏览全部软件 <i>↓</i></a>
+            <a class="button button--ghost" href="https://mk.nsy.me/buy" target="_blank" rel="noopener">购买授权</a>
+          </div>
           <div class="download-hero__meta">
             <span><i>✦</i> 官方发布</span>
             <span><i>⬢</i> R2 稳定托管</span>
             <span><i>◆</i> 后台版本维护</span>
+          </div>
+          <div class="download-hero__numbers" aria-label="下载中心能力">
+            <strong><b>24h</b><span>版本交付</span></strong>
+            <strong><b>R2</b><span>云端托管</span></strong>
+            <strong><b>Win</b><span>桌面软件</span></strong>
           </div>
         </div>
         <aside class="download-hero__panel" aria-label="下载中心状态">
@@ -62,7 +71,7 @@
           <label>排序<select id="softwareSortMode"><option value="updated">最近更新</option><option value="downloads">下载最多</option><option value="name">名称 A-Z</option></select></label>
           <button class="ghost" type="button" id="clearSoftwareSearch">清空</button>
         </div>
-        <div class="download-layout">
+        <div class="download-layout download-layout--premium">
           <div class="download-main">
             <div class="category-tabs" id="categoryTabs" aria-label="软件分类"></div>
             <div class="product-grid" id="softwareGrid" aria-live="polite"></div>

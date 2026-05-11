@@ -32,6 +32,7 @@
           <button data-panel="categoryPanel">分类管理</button>
           <button data-panel="releasePanel">版本上传</button>
           <button data-panel="storagePanel">存储授权</button>
+          <button data-panel="assetPanel">资源管理</button>
           <button data-panel="mediaPanel">媒体库</button>
           <button data-panel="navigationPanel">导航设置</button>
           <button data-panel="articlePanel">文章管理</button>
@@ -145,6 +146,28 @@
             <div class="form-actions span-2"><button type="submit">保存导航</button><button class="ghost" type="button" id="resetNavigation">清空</button></div>
           </form>
           <div class="table-wrap"><table><thead><tr><th>名称</th><th>链接</th><th>排序</th><th>打开方式</th><th>状态</th><th>操作</th></tr></thead><tbody id="navigationRows"></tbody></table></div>
+        </section>
+
+        <section class="panel tab-panel" id="assetPanel" hidden>
+          <div class="panel__head">
+            <div>
+              <h2>资源管理</h2>
+              <p>统一管理默认 R2 中的软件包、图片、音频和站点资源。</p>
+            </div>
+            <button class="ghost" type="button" id="refreshAssets">刷新</button>
+          </div>
+          <form class="form-grid" id="assetUploadForm">
+            <label>资源类型<select id="assetKind"><option value="image">图片</option><option value="audio">音频</option><option value="software">软件包</option><option value="site">站点资源</option><option value="other">其他</option></select></label>
+            <label>目录用途<input id="assetFolder" placeholder="例如 logo / qrcode / article" /></label>
+            <label class="span-2">选择文件<input id="assetFile" type="file" /></label>
+            <div class="form-actions span-2"><button type="submit">上传资源</button></div>
+          </form>
+          <div class="asset-toolbar">
+            <select id="assetKindFilter"><option value="all">全部类型</option><option value="software">软件包</option><option value="image">图片</option><option value="audio">音频</option><option value="site">站点资源</option><option value="other">其他</option></select>
+            <select id="assetStatusFilter"><option value="active">正常</option><option value="all">全部状态</option><option value="deleted">已删除</option></select>
+            <input id="assetSearch" placeholder="搜索文件名 / key / 引用 ID" />
+          </div>
+          <div class="asset-grid" id="assetRows"></div>
         </section>
 
         <section class="panel tab-panel" id="mediaPanel" hidden>

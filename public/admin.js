@@ -31,6 +31,11 @@ byId("runHealthCheck").addEventListener("click", loadHealth);
 byId("loadMediaAll").addEventListener("click", () => loadMedia("all"));
 byId("loadMediaImage").addEventListener("click", () => loadMedia("image"));
 byId("loadMediaAudio").addEventListener("click", () => loadMedia("audio"));
+byId("refreshAssets").addEventListener("click", loadAssets);
+byId("assetUploadForm").addEventListener("submit", uploadAsset);
+byId("assetKindFilter").addEventListener("change", loadAssets);
+byId("assetStatusFilter").addEventListener("change", loadAssets);
+byId("assetSearch").addEventListener("input", debounce(loadAssets, 250));
 byId("insertArticleH2").addEventListener("click", () => insertArticleSnippet("\n## 小标题\n\n这里填写正文。\n"));
 byId("insertArticleList").addEventListener("click", () => insertArticleSnippet("\n- 要点一\n- 要点二\n- 要点三\n"));
 byId("insertArticleCode").addEventListener("click", () => insertArticleSnippet("\n```text\n这里粘贴代码或日志\n```\n"));
@@ -311,6 +316,72 @@ async function loadMedia(type = "all") {
     );
     root.append(card);
   }
+}
+
+async function loadAssets() {
+  const root = byId("assetRows");
+  root.innerHTML = `<article class="admin-info-card"><h4>正在读取资源...</h4></article>`;
+  const result = await api("/api/admin/assets/list", {
+    kind: byId("assetKindFilter").value,
+    status: byId("assetStatusFilter").value,
+    search: byId("assetSearch").value.trim(),
+    pageSize: 80
+  });
+  if (!result.success) {
+    root.innerHTML = `<article class="admin-info-card admin-info-card--bad"><h4>读取失败</h4><p>${escapeHtml(result.msg || "资源管理不可用")}</p></article>`;
+    return;
+  }
+  if (!result.assets.length) {
+    root.innerHTML = `<article class="admin-info-card"><h4>暂无资源</h4><p>上传资源后会显示在这里。</p></article>`;
+    return;
+  }
+  root.replaceChildren();
+  for (const asset of result.assets) {
+    const card = document.createElement("article");
+    card.className = "asset-card";
+    const preview = asset.kind === "image" || asset.kind === "site"
+      ? `<img src="${escapeAttr(asset.url)}" alt="" loading="lazy">`
+      : asset.kind === "audio"
+        ? `<audio controls src="${escapeAttr(asset.url)}"></audio>`
+        : `<div class="asset-file-icon">${escapeHtml(asset.kind)}</div>`;
+    card.innerHTML = `${preview}<div><strong>${escapeHtml(asset.fileName || asset.key)}</strong><small>${escapeHtml(asset.kind)} · ${formatBytes(asset.fileSize)} · ${formatDateTime(asset.updatedAt)}</small><code>${escapeHtml(asset.key)}</code><div class="row-actions"></div></div>`;
+    card.querySelector(".row-actions").append(
+      actionButton("复制链接", () => copyText(asset.url)),
+      actionButton("复制Key", () => copyText(asset.key)),
+      actionButton("删除", () => deleteAsset(asset.id), "danger")
+    );
+    root.append(card);
+  }
+}
+
+async function uploadAsset(event) {
+  event.preventDefault();
+  const file = byId("assetFile").files[0];
+  if (!file) return toast("请选择资源文件", true);
+  const form = new FormData();
+  form.append("token", token);
+  form.append("kind", byId("assetKind").value);
+  form.append("folder", byId("assetFolder").value.trim());
+  form.append("file", file);
+  toast("正在上传资源");
+  const result = await uploadMultipart("/api/admin/assets/upload", form);
+  if (!result.success) return toast(result.msg || "上传失败", true);
+  byId("assetUploadForm").reset();
+  await loadAssets();
+  toast("资源已上传");
+}
+
+async function deleteAsset(assetId, force = false) {
+  if (!confirm(force ? "确定强制删除这个资源和 R2 文件吗？" : "确定删除这个资源吗？")) return;
+  const result = await api("/api/admin/assets/delete", { assetId, force });
+  if (!result.success && result.references?.length) {
+    const refs = result.references.map(ref => `${ref.type}: ${ref.title || ref.id}`).join("\n");
+    if (confirm(`资源正在被使用：\n${refs}\n\n是否仍然强制删除？`)) return deleteAsset(assetId, true);
+    return;
+  }
+  if (!result.success) return toast(result.msg || "删除失败", true);
+  await loadAssets();
+  toast("资源已删除");
 }
 
 async function saveStorage(event) {
@@ -1021,6 +1092,14 @@ function actionButton(text, handler, className = "ghost") {
   button.textContent = text;
   button.addEventListener("click", handler);
   return button;
+}
+
+function debounce(fn, delay) {
+  let timer = null;
+  return (...args) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => fn(...args), delay);
+  };
 }
 
 function byId(id) {

@@ -116,6 +116,7 @@ export function normalizeRelease(release, softwareSlug) {
     title: String(release.title || release.name || ""),
     description: String(release.description || ""),
     changelog: Array.isArray(release.notes) ? release.notes.join("\n") : String(release.changelog || ""),
+    assetId: String(release.assetId || release.asset_id || ""),
     fileKey: String(release.fileKey || release.key || ""),
     storageId: String(release.storageId || release.storage_id || "default"),
     publicUrl: String(release.publicUrl || release.public_url || ""),

@@ -30,10 +30,16 @@
           </div>
           <p id="articleListMeta">正在读取文章...</p>
         </div>
+        <div class="article-controls" role="search">
+          <label>搜索文章<input id="articleSearch" type="search" placeholder="输入标题、摘要、分类或标签" autocomplete="off" /></label>
+          <label>分类<select id="articleCategoryFilter"><option value="all">全部分类</option></select></label>
+          <label>标签<select id="articleTagFilter"><option value="all">全部标签</option></select></label>
+          <button class="ghost" type="button" id="clearArticleFilters">清空</button>
+        </div>
         <div class="article-grid" id="articleGrid"></div>
       </section>
     </main>
     <footer><span>天才猫软件中心</span><span>Articles</span></footer>
-    <script src="/articles.js?v=20260510-articles-pro" type="module"></script>
+    <script src="/articles.js?v=20260511-article-filters" type="module"></script>
   </body>
 </html>

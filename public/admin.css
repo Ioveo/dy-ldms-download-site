@@ -248,6 +248,12 @@ td small { color: var(--muted); }
   font-weight: 850;
 }
 
+.draft-status {
+  margin: -4px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+
 .editor-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 160px 120px;
@@ -469,14 +475,16 @@ td small { color: var(--muted); }
 }
 
 .health-grid,
-.media-grid {
+.media-grid,
+.asset-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   gap: 14px;
 }
 
 .admin-info-card,
-.media-card {
+.media-card,
+.asset-card {
   border: 1px solid var(--line);
   border-radius: 16px;
   padding: 14px;
@@ -525,6 +533,56 @@ td small { color: var(--muted); }
 .media-card small {
   margin: 5px 0 10px;
   color: var(--muted);
+}
+
+.asset-toolbar {
+  display: grid;
+  grid-template-columns: 180px 160px minmax(0, 1fr);
+  gap: 10px;
+  margin: 0 0 16px;
+}
+
+.asset-card {
+  display: grid;
+  gap: 12px;
+}
+
+.asset-card img,
+.asset-card audio,
+.asset-file-icon {
+  width: 100%;
+  height: 150px;
+  border-radius: 12px;
+  object-fit: cover;
+  background: var(--panel-soft);
+}
+
+.asset-file-icon {
+  display: grid;
+  place-items: center;
+  color: var(--primary-hover);
+  font-weight: 950;
+  text-transform: uppercase;
+}
+
+.asset-card strong,
+.asset-card small,
+.asset-card code {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.asset-card small {
+  margin: 5px 0;
+  color: var(--muted);
+}
+
+.asset-card code {
+  margin-bottom: 10px;
+  color: #a5b4fc;
+  font-size: 11px;
 }
 
 .toast {

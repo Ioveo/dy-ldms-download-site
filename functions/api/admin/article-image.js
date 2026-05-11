@@ -1,4 +1,5 @@
 import { id } from "../../_lib/catalog.js";
+import { saveAsset } from "../../_lib/assets-db.js";
 import { json } from "../../_lib/releases.js";
 import { requireAdmin } from "./_lib.js";
 
@@ -36,6 +37,17 @@ export async function onRequestPost({ request, env }) {
     await env.SOFTWARE_BUCKET.put(key, await file.arrayBuffer(), {
       httpMetadata: { contentType: type || "application/octet-stream" }
     });
+    await saveAsset(env, {
+      storageId: "default",
+      key,
+      kind: mediaKind,
+      mimeType: type || "application/octet-stream",
+      fileName,
+      fileSize: file.size || 0,
+      source: "article-upload",
+      refType: "article",
+      refId: String(formData.get("articleId") || "")
+    });
   } catch (error) {
     return json({ success: false, msg: `上传到 R2 失败：${error.message || "未知错误"}` }, 500);
   }
@@ -66,6 +78,17 @@ async function uploadJsonMedia(request, env) {
   try {
     await env.SOFTWARE_BUCKET.put(key, base64ToBytes(String(body.data || "")), {
       httpMetadata: { contentType: type || "application/octet-stream" }
+    });
+    await saveAsset(env, {
+      storageId: "default",
+      key,
+      kind: mediaKind,
+      mimeType: type || "application/octet-stream",
+      fileName,
+      fileSize: approxSize,
+      source: "article-upload",
+      refType: "article",
+      refId: String(body.articleId || "")
     });
   } catch (error) {
     return json({ success: false, msg: `上传到 R2 失败：${error.message || "未知错误"}` }, 500);

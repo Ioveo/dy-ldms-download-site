@@ -21,7 +21,10 @@ function renderSoftware(root, software, category, articles) {
   const releases = (software.releases || []).filter(item => item.status !== "disabled");
   const latest = releases.find(item => item.isLatest) || releases[0];
   document.title = `${software.name} - 天才猫软件中心`;
-  setMetaDescription(software.description || `${software.name} 官方下载、更新日志和使用教程。`);
+  const description = software.description || `${software.name} 官方下载、更新日志和使用教程。`;
+  setMetaDescription(description);
+  setSocialMeta({ title: software.name, description, image: software.coverUrl, type: "website" });
+  setJsonLd(softwareJsonLd(software, latest));
 
   root.innerHTML = `
     <section class="software-hero">
@@ -95,6 +98,72 @@ function setMetaDescription(value) {
     document.head.append(meta);
   }
   meta.content = String(value || "").slice(0, 160);
+}
+
+function setSocialMeta({ title, description, image, type = "website" }) {
+  const fullTitle = `${title} - 天才猫软件中心`;
+  setMetaProperty("og:type", type);
+  setMetaProperty("og:title", fullTitle);
+  setMetaProperty("og:description", description);
+  setMetaProperty("og:url", location.href);
+  if (image) setMetaProperty("og:image", absoluteUrl(image));
+  setMetaName("twitter:card", image ? "summary_large_image" : "summary");
+  setMetaName("twitter:title", fullTitle);
+  setMetaName("twitter:description", description);
+  if (image) setMetaName("twitter:image", absoluteUrl(image));
+}
+
+function setJsonLd(data) {
+  let script = document.getElementById("structuredData");
+  if (!script) {
+    script = document.createElement("script");
+    script.type = "application/ld+json";
+    script.id = "structuredData";
+    document.head.append(script);
+  }
+  script.textContent = JSON.stringify(data);
+}
+
+function softwareJsonLd(software, latest) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    name: software.name,
+    description: software.description || latest?.description || `${software.name} 官方下载`,
+    image: software.coverUrl ? absoluteUrl(software.coverUrl) : undefined,
+    applicationCategory: "BusinessApplication",
+    operatingSystem: "Windows",
+    softwareVersion: latest?.version || undefined,
+    downloadUrl: latest ? absoluteUrl(`/download/${encodeURIComponent(latest.id)}`) : undefined,
+    publisher: { "@type": "Organization", name: "天才猫软件中心", logo: { "@type": "ImageObject", url: absoluteUrl("/logo.png") } },
+    offers: { "@type": "Offer", url: "https://mk.nsy.me/buy", priceCurrency: "CNY" }
+  };
+}
+
+function setMetaProperty(property, content) {
+  if (!content) return;
+  let meta = document.querySelector(`meta[property='${property}']`);
+  if (!meta) {
+    meta = document.createElement("meta");
+    meta.setAttribute("property", property);
+    document.head.append(meta);
+  }
+  meta.content = content;
+}
+
+function setMetaName(name, content) {
+  if (!content) return;
+  let meta = document.querySelector(`meta[name='${name}']`);
+  if (!meta) {
+    meta = document.createElement("meta");
+    meta.name = name;
+    document.head.append(meta);
+  }
+  meta.content = content;
+}
+
+function absoluteUrl(value) {
+  return new URL(value || "/", location.origin).href;
 }
 
 function renderNavigation(items) {

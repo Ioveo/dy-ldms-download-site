@@ -1,5 +1,6 @@
 import { loadCatalog } from "../../_lib/catalog.js";
 import { hasDb, listArticles } from "../../_lib/articles-db.js";
+import { ensureDownloadStatsTable } from "../../_lib/download-stats.js";
 import { json } from "../../_lib/releases.js";
 import { requireAdmin } from "./_lib.js";
 
@@ -31,6 +32,13 @@ export async function onRequestPost({ request, env }) {
     checks.push({ name: "articles", ok: true, detail: articles ? `D1 文章 ${articles.length} 篇` : `R2 文章 ${catalog?.articles?.length || 0} 篇` });
   } catch (error) {
     checks.push({ name: "articles", ok: false, detail: error?.message || "读取失败" });
+  }
+
+  try {
+    const statsReady = await ensureDownloadStatsTable(env);
+    checks.push({ name: "download stats", ok: statsReady, detail: statsReady ? "D1 下载统计表可用" : "未绑定 D1，下载次数不会写回 catalog" });
+  } catch (error) {
+    checks.push({ name: "download stats", ok: false, detail: error?.message || "统计表检查失败" });
   }
 
   if (bucketReady) {

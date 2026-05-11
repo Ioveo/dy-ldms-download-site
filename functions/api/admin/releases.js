@@ -1,4 +1,5 @@
 import { formatBytes, id, loadCatalog, normalizeRelease, saveCatalog, slugify } from "../../_lib/catalog.js";
+import { saveAsset } from "../../_lib/assets-db.js";
 import { decryptSecret } from "../../_lib/crypto.js";
 import { publicUrlFor, putExternalR2 } from "../../_lib/r2-s3.js";
 import { json } from "../../_lib/releases.js";
@@ -50,10 +51,26 @@ export async function onRequestPost({ request, env }) {
     for (const release of software.releases) release.isLatest = false;
   }
 
+  const releaseId = id("rel");
+  const asset = await saveAsset(env, {
+    storageId,
+    key: fileKey,
+    kind: "software",
+    mimeType: file.type || "application/octet-stream",
+    fileName,
+    fileSize: file.size || bytes.byteLength,
+    sha256,
+    publicUrl,
+    source: "release-upload",
+    refType: "release",
+    refId: releaseId
+  });
+
   software.releases.unshift(normalizeRelease({
-    id: id("rel"),
+    id: releaseId,
     version,
     changelog: String(formData.get("changelog") || ""),
+    assetId: asset?.id || "",
     fileKey,
     storageId,
     publicUrl,

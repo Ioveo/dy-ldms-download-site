@@ -1,5 +1,5 @@
 import { findLatestRelease, loadManifest, serveRelease, text } from "../_lib/releases.js";
-import { findLatestRelease as findLatestCatalogRelease, findRelease, loadCatalog } from "../_lib/catalog.js";
+import { findLatestRelease as findLatestCatalogRelease, findRelease, loadCatalog, saveCatalog } from "../_lib/catalog.js";
 
 export async function onRequestGet({ env, params }) {
   const catalog = await loadCatalog(env);
@@ -10,6 +10,7 @@ export async function onRequestGet({ env, params }) {
     ? findLatestCatalogRelease(catalog, "datacenter") || findLatestCatalogRelease(catalog, catalog.software?.[0]?.slug)
     : findRelease(catalog, releaseId);
   if (catalogMatch?.release?.fileKey) {
+    await incrementDownload(env, catalog, catalogMatch.release.id);
     if (catalogMatch.release.storageId !== "default" && catalogMatch.release.publicUrl) {
       return Response.redirect(catalogMatch.release.publicUrl, 302);
     }
@@ -30,4 +31,16 @@ export async function onRequestGet({ env, params }) {
   }
 
   return serveRelease(env, release);
+}
+
+async function incrementDownload(env, catalog, releaseId) {
+  for (const software of catalog.software || []) {
+    const release = software.releases?.find(item => item.id === releaseId);
+    if (release) {
+      release.downloadCount = Number(release.downloadCount || 0) + 1;
+      release.updatedAt = Date.now();
+      await saveCatalog(env, catalog);
+      return;
+    }
+  }
 }

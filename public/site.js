@@ -28,7 +28,10 @@ async function loadCatalog() {
 function renderHomeArticles(catalog) {
   const grid = byId("homeArticleGrid");
   if (!grid) return;
-  const articles = (catalog.articles || []).filter(item => item.status === "published").slice(0, 3);
+  const articles = (catalog.articles || [])
+    .filter(item => item.status === "published")
+    .sort((a, b) => Number(Boolean(b.featured)) - Number(Boolean(a.featured)) || (Number(b.publishedAt || b.createdAt || 0) - Number(a.publishedAt || a.createdAt || 0)))
+    .slice(0, 3);
   grid.replaceChildren();
 
   if (!articles.length) {

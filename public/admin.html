@@ -32,8 +32,10 @@
           <button data-panel="categoryPanel">分类管理</button>
           <button data-panel="releasePanel">版本上传</button>
           <button data-panel="storagePanel">存储授权</button>
+          <button data-panel="mediaPanel">媒体库</button>
           <button data-panel="navigationPanel">导航设置</button>
           <button data-panel="articlePanel">文章管理</button>
+          <button data-panel="healthPanel">系统状态</button>
         </nav>
         <a class="site-link" href="/" target="_blank" rel="noopener">打开前台</a>
       </aside>
@@ -100,7 +102,7 @@
             <label><input id="releaseLatest" type="checkbox" checked /> 设为最新版</label>
             <div class="form-actions span-2"><button type="submit">上传并发布</button></div>
           </form>
-          <div class="table-wrap"><table><thead><tr><th>软件</th><th>版本</th><th>文件</th><th>大小</th><th>最新</th><th>下载</th></tr></thead><tbody id="releaseRows"></tbody></table></div>
+          <div class="table-wrap"><table><thead><tr><th>软件</th><th>版本</th><th>文件</th><th>大小</th><th>最新</th><th>下载</th><th>操作</th></tr></thead><tbody id="releaseRows"></tbody></table></div>
         </section>
 
         <section class="panel tab-panel" id="storagePanel" hidden>
@@ -145,6 +147,21 @@
           <div class="table-wrap"><table><thead><tr><th>名称</th><th>链接</th><th>排序</th><th>打开方式</th><th>状态</th><th>操作</th></tr></thead><tbody id="navigationRows"></tbody></table></div>
         </section>
 
+        <section class="panel tab-panel" id="mediaPanel" hidden>
+          <div class="panel__head">
+            <div>
+              <h2>媒体库</h2>
+              <p>管理文章图片和音频，可复制链接、插入正文或设为封面。</p>
+            </div>
+            <div class="row-actions">
+              <button class="ghost" type="button" id="loadMediaImage">图片</button>
+              <button class="ghost" type="button" id="loadMediaAudio">音频</button>
+              <button class="ghost" type="button" id="loadMediaAll">全部</button>
+            </div>
+          </div>
+          <div class="media-grid" id="mediaRows"></div>
+        </section>
+
         <section class="panel tab-panel" id="articlePanel" hidden>
           <div class="panel__head">
             <div>
@@ -174,6 +191,13 @@
               <label>摘要<textarea id="articleSummary" rows="3" maxlength="180" placeholder="显示在文章列表中的简短说明，建议 60-120 字。"></textarea></label>
               <div class="editor-meta"><span id="articleWordCount">0 字</span><span id="articleSummaryCount">摘要 0/180</span></div>
               <label>封面图地址<input id="articleCover" placeholder="/datacenter-preview.jpg 或图片 URL" /></label>
+              <div class="editor-grid">
+                <label>文章分类<input id="articleCategory" placeholder="教程 / 更新 / 产品介绍" /></label>
+                <label>标签<input id="articleTags" placeholder="多个标签用逗号分隔" /></label>
+                <label><input id="articleFeatured" type="checkbox" /> 首页精选</label>
+              </div>
+              <label>SEO 标题<input id="articleSeoTitle" placeholder="留空使用文章标题" /></label>
+              <label>SEO 描述<textarea id="articleSeoDescription" rows="2" maxlength="180" placeholder="搜索引擎摘要，建议 80-150 字。"></textarea></label>
               <div class="article-cover-preview" id="articleCoverPreview"><span>封面预览</span></div>
               <label>上传本地媒体<input id="articleImageFile" type="file" accept="image/*,audio/*" /></label>
               <div class="article-editor-tools" aria-label="文章编辑工具">
@@ -205,9 +229,20 @@
             </div>
           </div>
         </section>
+
+        <section class="panel tab-panel" id="healthPanel" hidden>
+          <div class="panel__head">
+            <div>
+              <h2>系统状态</h2>
+              <p>检查 R2、D1、catalog 和后台配置，便于排查线上问题。</p>
+            </div>
+            <button class="ghost" type="button" id="runHealthCheck">一键检测</button>
+          </div>
+          <div class="health-grid" id="healthRows"></div>
+        </section>
       </section>
     </main>
 
-    <script src="/admin.js?v=20260510-json-upload" type="module"></script>
+    <script src="/admin.js?v=20260511-ops" type="module"></script>
   </body>
 </html>

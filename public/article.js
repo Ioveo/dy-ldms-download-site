@@ -14,13 +14,25 @@ async function loadArticle() {
   }
   const data = await response.json();
   renderNavigation(data.navigation || []);
-  document.title = `${data.article.title} - 天才猫软件中心`;
+  document.title = `${data.article.seoTitle || data.article.title} - 天才猫软件中心`;
+  setMetaDescription(data.article.seoDescription || data.article.summary || data.article.title);
   renderArticle(data.article, data.relatedSoftware || []);
 }
 
 function renderArticle(article, software) {
   const root = document.getElementById("articleDetail");
-  root.innerHTML = `<section class="article-cover article-cover--pro">${article.coverUrl ? `<img src="${escapeAttr(article.coverUrl)}" alt="">` : ""}<div><p class="eyebrow">Article</p><h1>${escapeHtml(article.title)}</h1><p>${escapeHtml(article.summary || "")}</p><div class="article-meta"><span>${formatDate(article.publishedAt || article.createdAt)}</span><span>${countWords(article.content)} 字阅读</span></div></div></section><section class="article-body article-body--pro"><article>${renderContent(article.content)}</article>${renderRelated(software)}</section>`;
+  const tags = (article.tags || []).map(tag => `<span>${escapeHtml(tag)}</span>`).join("");
+  root.innerHTML = `<section class="article-cover article-cover--pro">${article.coverUrl ? `<img src="${escapeAttr(article.coverUrl)}" alt="">` : ""}<div><p class="eyebrow">${escapeHtml(article.category || "Article")}</p><h1>${escapeHtml(article.title)}</h1><p>${escapeHtml(article.summary || "")}</p><div class="article-meta"><span>${formatDate(article.publishedAt || article.createdAt)}</span><span>${countWords(article.content)} 字阅读</span>${tags}</div></div></section><section class="article-body article-body--pro"><article>${renderContent(article.content)}</article>${renderRelated(software)}</section>`;
+}
+
+function setMetaDescription(value) {
+  let meta = document.querySelector("meta[name='description']");
+  if (!meta) {
+    meta = document.createElement("meta");
+    meta.name = "description";
+    document.head.append(meta);
+  }
+  meta.content = String(value || "").slice(0, 160);
 }
 
 function renderRelated(software) {

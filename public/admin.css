@@ -406,6 +406,65 @@ td small { color: var(--muted); }
   width: auto;
 }
 
+.health-grid,
+.media-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 14px;
+}
+
+.admin-info-card,
+.media-card {
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 14px;
+  background: #09090b;
+}
+
+.admin-info-card--bad {
+  border-color: rgba(239, 68, 68, 0.55);
+}
+
+.admin-info-card h4,
+.media-card h4 {
+  margin: 0 0 8px;
+}
+
+.admin-info-card p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.media-card {
+  display: grid;
+  gap: 12px;
+}
+
+.media-card img,
+.media-card audio {
+  width: 100%;
+}
+
+.media-card img {
+  height: 150px;
+  border-radius: 12px;
+  object-fit: cover;
+}
+
+.media-card strong,
+.media-card small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.media-card small {
+  margin: 5px 0 10px;
+  color: var(--muted);
+}
+
 .toast {
   position: fixed;
   z-index: 99;

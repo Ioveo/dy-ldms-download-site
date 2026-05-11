@@ -23,6 +23,10 @@ byId("resetStorage").addEventListener("click", resetStorageForm);
 byId("resetNavigation").addEventListener("click", resetNavigationForm);
 byId("resetArticle").addEventListener("click", resetArticleForm);
 byId("testStorage").addEventListener("click", testStorage);
+byId("runHealthCheck").addEventListener("click", loadHealth);
+byId("loadMediaAll").addEventListener("click", () => loadMedia("all"));
+byId("loadMediaImage").addEventListener("click", () => loadMedia("image"));
+byId("loadMediaAudio").addEventListener("click", () => loadMedia("audio"));
 byId("uploadArticleImage").addEventListener("click", () => uploadArticleImage("cover"));
 byId("insertArticleImage").addEventListener("click", () => uploadArticleImage("content"));
 byId("insertArticleAudio").addEventListener("click", () => uploadArticleImage("audio"));
@@ -247,9 +251,56 @@ function renderReleaseRows() {
   for (const item of catalog.software) {
     for (const release of item.releases) {
     const tr = document.createElement("tr");
-      tr.innerHTML = `<td>${escapeHtml(item.name)}</td><td>${escapeHtml(release.version)}</td><td class="code">${escapeHtml(release.fileName || "-")}<br><small>${escapeHtml(release.storageId || "default")}</small></td><td>${escapeHtml(release.size || "-")}</td><td>${release.isLatest ? "是" : "否"}</td><td>${release.downloadCount || 0}</td>`;
+      tr.innerHTML = `<td>${escapeHtml(item.name)}</td><td>${escapeHtml(release.version)}<br><small class="status-${release.status === "disabled" ? "disabled" : "active"}">${release.status === "disabled" ? "已隐藏" : "已发布"}</small></td><td class="code">${escapeHtml(release.fileName || "-")}<br><small>${escapeHtml(release.storageId || "default")}</small></td><td>${escapeHtml(release.size || "-")}</td><td>${release.isLatest ? "是" : "否"}</td><td>${release.downloadCount || 0}</td><td class="row-actions"></td>`;
+      const link = `/download/${encodeURIComponent(release.id)}`;
+      tr.lastElementChild.append(
+        actionButton("设最新", () => updateRelease(release.id, "latest")),
+        actionButton(release.status === "disabled" ? "恢复" : "隐藏", () => updateRelease(release.id, "toggle")),
+        actionButton("复制链接", () => copyText(link)),
+        actionButton("删除", () => deleteRelease(release.id), "danger")
+      );
       rows.append(tr);
     }
+  }
+}
+
+async function loadHealth() {
+  const root = byId("healthRows");
+  root.innerHTML = `<article class="admin-info-card"><h4>正在检测...</h4><p>请稍候</p></article>`;
+  const result = await api("/api/admin/health");
+  if (!result.success) {
+    root.innerHTML = `<article class="admin-info-card admin-info-card--bad"><h4>检测失败</h4><p>${escapeHtml(result.msg || "未知错误")}</p></article>`;
+    return;
+  }
+  const health = result.health;
+  root.innerHTML = `<article class="admin-info-card"><h4>${escapeHtml(health.product)}</h4><p>${escapeHtml(health.mode)} · ${formatDateTime(health.checkedAt)} · ${health.elapsedMs}ms</p></article>${health.checks.map(check => `<article class="admin-info-card ${check.ok ? "" : "admin-info-card--bad"}"><h4>${check.ok ? "正常" : "异常"} · ${escapeHtml(check.name)}</h4><p>${escapeHtml(check.detail)}</p></article>`).join("")}`;
+}
+
+async function loadMedia(type = "all") {
+  const root = byId("mediaRows");
+  root.innerHTML = `<article class="admin-info-card"><h4>正在读取媒体...</h4></article>`;
+  const result = await api("/api/admin/media/list", { type });
+  if (!result.success) {
+    root.innerHTML = `<article class="admin-info-card admin-info-card--bad"><h4>读取失败</h4><p>${escapeHtml(result.msg || "媒体库不可用")}</p></article>`;
+    return;
+  }
+  if (!result.media.length) {
+    root.innerHTML = `<article class="admin-info-card"><h4>暂无媒体</h4><p>上传文章图片或音频后会显示在这里。</p></article>`;
+    return;
+  }
+  root.replaceChildren();
+  for (const item of result.media) {
+    const card = document.createElement("article");
+    card.className = "media-card";
+    card.innerHTML = `${item.type === "audio" ? `<audio controls src="${escapeAttr(item.url)}"></audio>` : `<img src="${escapeAttr(item.url)}" alt="" loading="lazy">`}<div><strong>${escapeHtml(item.key)}</strong><small>${formatBytes(item.size)} · ${formatDateTime(item.uploaded)}</small><div class="row-actions"></div></div>`;
+    const actions = card.querySelector(".row-actions");
+    actions.append(
+      actionButton("复制", () => copyText(item.url)),
+      actionButton("设封面", () => setArticleCoverFromMedia(item.url)),
+      actionButton("插入正文", () => insertMediaIntoArticle(item)),
+      actionButton("删除", () => deleteMedia(item.key), "danger")
+    );
+    root.append(card);
   }
 }
 
@@ -288,6 +339,8 @@ async function uploadArticleImage(target) {
   const mediaType = mediaTypeFor(file);
   if (isAudioTarget && mediaType !== "audio") return toast("请选择音频文件后再插入音频", true);
   if (isImageTarget && mediaType !== "image") return toast("请选择图片文件后再上传图片", true);
+  if (mediaType === "image" && file.size > 8 * 1024 * 1024) return toast("图片不能超过 8MB，请压缩后再上传", true);
+  if (mediaType === "audio" && file.size > 30 * 1024 * 1024) return toast("音频不能超过 30MB，请压缩后再上传", true);
   toast("正在上传媒体");
   const result = await uploadArticleMedia(file, isAudioTarget ? "audio" : "image");
   if (!result.success) return toast(result.msg || "媒体上传失败", true);
@@ -431,13 +484,73 @@ async function uploadRelease(event) {
   form.append("file", file);
 
   toast("正在上传，请稍候");
-  const response = await fetch("/api/admin/releases", { method: "POST", body: form });
-  const result = await response.json();
+  const result = await uploadMultipart("/api/admin/releases", form);
   if (!result.success) return toast(result.msg || "上传失败", true);
   byId("releaseForm").reset();
   byId("releaseLatest").checked = true;
   render(result.catalog);
   toast("版本已发布");
+}
+
+async function uploadMultipart(url, form) {
+  try {
+    const response = await fetch(url, { method: "POST", body: form });
+    const text = await response.text();
+    const result = parseUploadResponse(text);
+    if (!response.ok) return { success: false, msg: result.msg || `上传失败：HTTP ${response.status}` };
+    return result;
+  } catch (error) {
+    return { success: false, msg: `上传失败：${error.message || "网络或接口异常"}` };
+  }
+}
+
+async function updateRelease(releaseId, action) {
+  const result = await api("/api/admin/releases/update", { releaseId, action });
+  if (!result.success) return toast(result.msg || "操作失败", true);
+  render(result.catalog);
+  toast("版本已更新");
+}
+
+async function deleteRelease(releaseId) {
+  if (!confirm("确定删除这个版本记录吗？R2 文件不会自动删除。")) return;
+  const result = await api("/api/admin/releases/delete", { releaseId });
+  if (!result.success) return toast(result.msg || "删除失败", true);
+  render(result.catalog);
+  toast("版本已删除");
+}
+
+async function deleteMedia(key) {
+  if (!confirm("确定删除这个媒体文件吗？文章中已使用的图片/音频会失效。")) return;
+  const result = await api("/api/admin/media/delete", { key });
+  if (!result.success) return toast(result.msg || "删除失败", true);
+  await loadMedia("all");
+  toast("媒体已删除");
+}
+
+function setArticleCoverFromMedia(url) {
+  byId("articleCover").value = url;
+  updateArticleEditorMeta();
+  showPanel("articlePanel");
+  toast("已设为文章封面");
+}
+
+function insertMediaIntoArticle(item) {
+  const snippet = item.type === "audio"
+    ? `\n<figure class="article-audio"><audio controls preload="metadata" src="${item.url}"></audio></figure>\n`
+    : `\n<figure><img src="${item.url}" alt=""><figcaption>图片说明</figcaption></figure>\n`;
+  insertAtCursor(byId("articleContent"), snippet);
+  updateArticleEditorMeta();
+  showPanel("articlePanel");
+  toast("媒体已插入正文");
+}
+
+async function copyText(value) {
+  try {
+    await navigator.clipboard.writeText(value);
+    toast("已复制链接");
+  } catch {
+    toast(value, true);
+  }
 }
 
 async function deleteSoftware(id) {
@@ -528,6 +641,11 @@ function fillArticleForm(item) {
   byId("articleSummary").value = item.summary || "";
   byId("articleCover").value = item.coverUrl || "";
   byId("articleContent").value = item.content || "";
+  byId("articleCategory").value = item.category || "";
+  byId("articleTags").value = (item.tags || []).join("，");
+  byId("articleSeoTitle").value = item.seoTitle || "";
+  byId("articleSeoDescription").value = item.seoDescription || "";
+  byId("articleFeatured").checked = Boolean(item.featured);
   byId("articleSort").value = item.sortOrder || 0;
   byId("articleStatus").value = item.status || "draft";
   articleSoftwareSelection = new Set(item.softwareIds || []);
@@ -571,6 +689,11 @@ function articlePayload() {
     summary: byId("articleSummary").value.trim(),
     coverUrl: byId("articleCover").value.trim(),
     content: byId("articleContent").value.trim(),
+    category: byId("articleCategory").value.trim(),
+    tags: byId("articleTags").value.split(/[,，\n]/).map(item => item.trim()).filter(Boolean),
+    seoTitle: byId("articleSeoTitle").value.trim(),
+    seoDescription: byId("articleSeoDescription").value.trim(),
+    featured: byId("articleFeatured").checked,
     softwareIds: Array.from(articleSoftwareSelection),
     sortOrder: Number(byId("articleSort").value || 0),
     status: byId("articleStatus").value
@@ -682,6 +805,19 @@ function toast(message, isError = false) {
 function formatDateTime(timestamp) {
   if (!timestamp) return "-";
   return new Date(timestamp).toLocaleString("zh-CN", { hour12: false });
+}
+
+function formatBytes(bytes) {
+  const value = Number(bytes || 0);
+  if (!value) return "0 B";
+  const units = ["B", "KB", "MB", "GB"];
+  let size = value;
+  let index = 0;
+  while (size >= 1024 && index < units.length - 1) {
+    size /= 1024;
+    index += 1;
+  }
+  return `${size.toFixed(size >= 10 || index === 0 ? 0 : 1)} ${units[index]}`;
 }
 
 function escapeHtml(value) {

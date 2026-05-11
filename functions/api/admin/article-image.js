@@ -24,6 +24,8 @@ export async function onRequestPost({ request, env }) {
   const type = String(file.type || inferredContentType(file.name) || "");
   const mediaKind = type.startsWith("audio/") ? "audio" : type.startsWith("image/") ? "image" : "";
   if (!mediaKind) return json({ success: false, msg: "只能上传图片或音频文件" }, 400);
+  if (mediaKind === "image" && file.size > 8 * 1024 * 1024) return json({ success: false, msg: "图片不能超过 8MB" }, 400);
+  if (mediaKind === "audio" && file.size > 30 * 1024 * 1024) return json({ success: false, msg: "音频不能超过 30MB" }, 400);
   if (kind === "image" && mediaKind !== "image") return json({ success: false, msg: "请选择图片文件" }, 400);
   if (kind === "audio" && mediaKind !== "audio") return json({ success: false, msg: "请选择音频文件" }, 400);
 
@@ -62,6 +64,9 @@ async function uploadJsonMedia(request, env) {
   if (kind === "image" && mediaKind !== "image") return json({ success: false, msg: "请选择图片文件" }, 400);
   if (kind === "audio" && mediaKind !== "audio") return json({ success: false, msg: "请选择音频文件" }, 400);
   if (!body.data) return json({ success: false, msg: "上传数据为空" }, 400);
+  const approxSize = Math.floor(String(body.data).length * 0.75);
+  if (mediaKind === "image" && approxSize > 8 * 1024 * 1024) return json({ success: false, msg: "图片不能超过 8MB" }, 400);
+  if (mediaKind === "audio" && approxSize > 30 * 1024 * 1024) return json({ success: false, msg: "音频不能超过 30MB" }, 400);
 
   const folder = mediaKind === "audio" ? "article-audio" : "article-image";
   const key = `${id(folder)}-${fileName}`;

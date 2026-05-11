@@ -57,6 +57,11 @@
           </div>
           <p>卡片展示软件截图、当前版本、更新说明和下载按钮。没有关联版本的软件会显示为待发布。</p>
         </div>
+        <div class="download-controls" role="search">
+          <label>搜索软件<input id="softwareSearch" type="search" placeholder="输入软件名称、简介或版本号" autocomplete="off" /></label>
+          <label>排序<select id="softwareSortMode"><option value="updated">最近更新</option><option value="downloads">下载最多</option><option value="name">名称 A-Z</option></select></label>
+          <button class="ghost" type="button" id="clearSoftwareSearch">清空</button>
+        </div>
         <div class="download-layout">
           <div class="download-main">
             <div class="category-tabs" id="categoryTabs" aria-label="软件分类"></div>

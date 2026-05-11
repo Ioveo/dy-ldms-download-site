@@ -47,6 +47,14 @@ export default {
       return json(await loadManifest(env));
     }
 
+    if (url.pathname === "/robots.txt") {
+      return robots(url.origin);
+    }
+
+    if (url.pathname === "/sitemap.xml") {
+      return sitemap(env, url.origin);
+    }
+
     if (url.pathname === "/api/admin/article-image") {
       return uploadArticleMedia(request, env);
     }
@@ -78,6 +86,29 @@ export default {
     return text("Static assets binding is not configured", 500);
   }
 };
+
+function robots(origin) {
+  return new Response(["User-agent: *", "Allow: /", "Disallow: /admin.html", "Disallow: /lvtuang", "Disallow: /api/admin/", `Sitemap: ${origin}/sitemap.xml`, ""].join("\n"), {
+    headers: { "Content-Type": "text/plain; charset=utf-8", "Cache-Control": "public, max-age=3600" }
+  });
+}
+
+async function sitemap(env, origin) {
+  const manifest = await loadManifest(env);
+  const software = (manifest.releases || []).map(release => {
+    const isAssistant = /assistant|辅助|live/i.test([release.id, release.name, release.category].filter(Boolean).join(" "));
+    return isAssistant ? "dy-assistant" : "datacenter";
+  }).filter((slug, index, array) => array.indexOf(slug) === index);
+  const urls = [
+    { loc: `${origin}/`, priority: "1.0" },
+    { loc: `${origin}/download.html`, priority: "0.9" },
+    { loc: `${origin}/articles.html`, priority: "0.8" },
+    { loc: `${origin}/license.html`, priority: "0.7" },
+    ...software.map(slug => ({ loc: `${origin}/software.html?slug=${encodeURIComponent(slug)}`, priority: "0.8" }))
+  ];
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map(item => `  <url>\n    <loc>${escapeXml(item.loc)}</loc>\n    <priority>${item.priority}</priority>\n  </url>`).join("\n")}\n</urlset>`;
+  return new Response(xml, { headers: { "Content-Type": "application/xml; charset=utf-8", "Cache-Control": "public, max-age=3600" } });
+}
 
 async function uploadArticleMedia(request, env) {
   if (request.method !== "POST") return text("Method Not Allowed", 405);

@@ -1,8 +1,11 @@
 let activeCategory = "all";
 let currentCatalog = null;
+let softwareSearch = "";
+let softwareSortMode = "updated";
 
 loadCatalog();
 initShowcase();
+initDownloadControls();
 
 async function loadCatalog() {
   if (!byId("softwareGrid") && !byId("homeArticleGrid")) return;
@@ -92,13 +95,20 @@ function renderNavigation(catalog) {
 function renderSoftwareGrid(catalog) {
   const grid = byId("softwareGrid");
   if (!grid) return;
-  const software = (catalog.software || []).filter(item => activeCategory === "all" || item.categoryId === activeCategory);
+  const software = sortedSoftware((catalog.software || []).filter(item => {
+    const inCategory = activeCategory === "all" || item.categoryId === activeCategory;
+    if (!inCategory) return false;
+    if (!softwareSearch) return true;
+    const latest = (item.releases || []).find(release => release.isLatest) || item.releases?.[0];
+    const haystack = [item.name, item.slug, item.description, latest?.version, latest?.changelog].filter(Boolean).join(" ").toLowerCase();
+    return haystack.includes(softwareSearch.toLowerCase());
+  }));
   grid.replaceChildren();
 
   if (!software.length) {
     const empty = document.createElement("article");
     empty.className = "product-card";
-    empty.innerHTML = "<h3>暂无软件</h3><p>当前分类还没有上架软件。</p>";
+    empty.innerHTML = `<h3>暂无软件</h3><p>${softwareSearch ? "没有匹配当前搜索条件的软件。" : "当前分类还没有上架软件。"}</p>`;
     grid.append(empty);
     return;
   }
@@ -152,10 +162,14 @@ function renderSoftwareGrid(catalog) {
     link.className = latest ? "button button--primary" : "button button--disabled";
     link.href = latest ? `/download/${encodeURIComponent(latest.id)}` : "#download";
     link.innerHTML = latest ? `<span>点击下载</span><i>↓</i>` : "待发布";
+    const detailLink = document.createElement("a");
+    detailLink.className = "button button--ghost";
+    detailLink.href = `/software.html?slug=${encodeURIComponent(item.slug || item.id)}`;
+    detailLink.textContent = "查看详情";
     const helper = document.createElement("span");
     helper.className = "product-card__helper";
     helper.textContent = latest ? "官方发布包，点击后开始下载" : "上传版本后自动开放下载";
-    footer.append(meta, link, helper);
+    footer.append(meta, link, detailLink, helper);
 
     const status = document.createElement("div");
     status.className = "product-card__status";
@@ -169,13 +183,51 @@ function renderSoftwareGrid(catalog) {
     if (recommendations.length) {
       const related = document.createElement("div");
       related.className = "product-card__related";
-      related.innerHTML = `<span>相关推荐</span>${recommendations.map(entry => `<a href="/download/latest/${encodeURIComponent(entry.slug || entry.id)}">${escapeHtml(entry.name)}</a>`).join("")}`;
+      related.innerHTML = `<span>相关推荐</span>${recommendations.map(entry => `<a href="/software.html?slug=${encodeURIComponent(entry.slug || entry.id)}">${escapeHtml(entry.name)}</a>`).join("")}`;
       content.append(related);
     }
 
     card.append(media, content);
     grid.append(card);
   }
+}
+
+function sortedSoftware(items) {
+  return [...items].sort((a, b) => {
+    const latestA = (a.releases || []).find(release => release.isLatest) || a.releases?.[0];
+    const latestB = (b.releases || []).find(release => release.isLatest) || b.releases?.[0];
+    if (softwareSortMode === "downloads") {
+      return totalDownloads(b) - totalDownloads(a) || String(a.name).localeCompare(String(b.name), "zh-CN");
+    }
+    if (softwareSortMode === "name") {
+      return String(a.name).localeCompare(String(b.name), "zh-CN");
+    }
+    return Number(latestB?.createdAt || b.updatedAt || 0) - Number(latestA?.createdAt || a.updatedAt || 0);
+  });
+}
+
+function totalDownloads(item) {
+  return (item.releases || []).reduce((sum, release) => sum + Number(release.downloadCount || 0), 0);
+}
+
+function initDownloadControls() {
+  const search = byId("softwareSearch");
+  const sort = byId("softwareSortMode");
+  const clear = byId("clearSoftwareSearch");
+  if (!search || !sort || !clear) return;
+  search.addEventListener("input", event => {
+    softwareSearch = event.target.value.trim();
+    if (currentCatalog) renderSoftwareGrid(currentCatalog);
+  });
+  sort.addEventListener("change", event => {
+    softwareSortMode = event.target.value;
+    if (currentCatalog) renderSoftwareGrid(currentCatalog);
+  });
+  clear.addEventListener("click", () => {
+    softwareSearch = "";
+    search.value = "";
+    if (currentCatalog) renderSoftwareGrid(currentCatalog);
+  });
 }
 
 function renderDownloadRank(catalog) {

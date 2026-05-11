@@ -6,11 +6,17 @@ export async function onRequestGet({ request, env }) {
   const catalog = publicCatalog(await loadCatalog(env));
   const dbArticles = await listArticles(env, { publicOnly: true });
   const articles = dbArticles || catalog.articles || [];
+  const software = catalog.software || [];
   const urls = [
     { loc: `${origin}/`, priority: "1.0" },
     { loc: `${origin}/download.html`, priority: "0.9" },
     { loc: `${origin}/articles.html`, priority: "0.8" },
     { loc: `${origin}/license.html`, priority: "0.7" },
+    ...software.map(item => ({
+      loc: `${origin}/software.html?slug=${encodeURIComponent(item.slug || item.id)}`,
+      lastmod: item.updatedAt ? new Date(item.updatedAt).toISOString() : "",
+      priority: "0.8"
+    })),
     ...articles.map(article => ({
       loc: `${origin}/article.html?slug=${encodeURIComponent(article.slug)}`,
       lastmod: article.updatedAt ? new Date(article.updatedAt).toISOString() : "",

@@ -27,6 +27,9 @@ byId("runHealthCheck").addEventListener("click", loadHealth);
 byId("loadMediaAll").addEventListener("click", () => loadMedia("all"));
 byId("loadMediaImage").addEventListener("click", () => loadMedia("image"));
 byId("loadMediaAudio").addEventListener("click", () => loadMedia("audio"));
+byId("insertArticleH2").addEventListener("click", () => insertArticleSnippet("\n## 小标题\n\n这里填写正文。\n"));
+byId("insertArticleList").addEventListener("click", () => insertArticleSnippet("\n- 要点一\n- 要点二\n- 要点三\n"));
+byId("insertArticleCode").addEventListener("click", () => insertArticleSnippet("\n```text\n这里粘贴代码或日志\n```\n"));
 byId("uploadArticleImage").addEventListener("click", () => uploadArticleImage("cover"));
 byId("insertArticleImage").addEventListener("click", () => uploadArticleImage("content"));
 byId("insertArticleAudio").addEventListener("click", () => uploadArticleImage("audio"));
@@ -415,6 +418,11 @@ function insertArticleQuote() {
   updateArticleEditorMeta();
 }
 
+function insertArticleSnippet(snippet) {
+  insertAtCursor(byId("articleContent"), snippet);
+  updateArticleEditorMeta();
+}
+
 function insertAtCursor(textarea, snippet) {
   const start = textarea.selectionStart ?? textarea.value.length;
   const end = textarea.selectionEnd ?? start;
@@ -752,11 +760,97 @@ function updateArticleEditorMeta() {
   byId("articleSummaryCount").textContent = `摘要 ${summary.length}/180`;
   const preview = byId("articleCoverPreview");
   preview.innerHTML = cover ? `<img src="${escapeAttr(cover)}" alt=""><span>封面预览</span>` : "<span>封面预览</span>";
+  const articlePreview = byId("articlePreview");
+  if (articlePreview) articlePreview.innerHTML = renderArticleContent(content);
 }
 
 function countWords(value) {
   const text = String(value || "").replace(/<[^>]+>/g, " ").trim();
   return text ? text.length : 0;
+}
+
+function renderArticleContent(content) {
+  const value = String(content || "").trim();
+  if (!value) return "<p>正文预览会显示在这里。</p>";
+  if (/<[a-z][\s\S]*>/i.test(value)) return value;
+  return markdownToHtml(value);
+}
+
+function markdownToHtml(value) {
+  const blocks = [];
+  const lines = String(value || "").replace(/\r\n/g, "\n").split("\n");
+  let paragraph = [];
+  let list = [];
+  let code = [];
+  let inCode = false;
+
+  const flushParagraph = () => {
+    if (!paragraph.length) return;
+    blocks.push(`<p>${inlineMarkdown(paragraph.join("\n")).replace(/\n/g, "<br>")}</p>`);
+    paragraph = [];
+  };
+  const flushList = () => {
+    if (!list.length) return;
+    blocks.push(`<ul>${list.map(item => `<li>${inlineMarkdown(item)}</li>`).join("")}</ul>`);
+    list = [];
+  };
+
+  for (const line of lines) {
+    if (/^```/.test(line.trim())) {
+      if (inCode) {
+        blocks.push(`<pre><code>${escapeHtml(code.join("\n"))}</code></pre>`);
+        code = [];
+        inCode = false;
+      } else {
+        flushParagraph();
+        flushList();
+        inCode = true;
+      }
+      continue;
+    }
+    if (inCode) {
+      code.push(line);
+      continue;
+    }
+    if (!line.trim()) {
+      flushParagraph();
+      flushList();
+      continue;
+    }
+    const heading = /^(#{2,3})\s+(.+)$/.exec(line);
+    if (heading) {
+      flushParagraph();
+      flushList();
+      const level = heading[1].length;
+      blocks.push(`<h${level}>${inlineMarkdown(heading[2])}</h${level}>`);
+      continue;
+    }
+    const quote = /^>\s+(.+)$/.exec(line);
+    if (quote) {
+      flushParagraph();
+      flushList();
+      blocks.push(`<blockquote>${inlineMarkdown(quote[1])}</blockquote>`);
+      continue;
+    }
+    const bullet = /^[-*]\s+(.+)$/.exec(line);
+    if (bullet) {
+      flushParagraph();
+      list.push(bullet[1]);
+      continue;
+    }
+    paragraph.push(line);
+  }
+  flushParagraph();
+  flushList();
+  if (inCode) blocks.push(`<pre><code>${escapeHtml(code.join("\n"))}</code></pre>`);
+  return blocks.join("");
+}
+
+function inlineMarkdown(value) {
+  return escapeHtml(value)
+    .replace(/`([^`]+)`/g, "<code>$1</code>")
+    .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
+    .replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+|\/[^\s)]+)\)/g, `<a href="$2" target="_blank" rel="noopener">$1</a>`);
 }
 
 function articleStatusLabel(status) {

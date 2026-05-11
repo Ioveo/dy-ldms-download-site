@@ -201,6 +201,9 @@
               <div class="article-cover-preview" id="articleCoverPreview"><span>封面预览</span></div>
               <label>上传本地媒体<input id="articleImageFile" type="file" accept="image/*,audio/*" /></label>
               <div class="article-editor-tools" aria-label="文章编辑工具">
+                <button class="ghost" type="button" id="insertArticleH2">二级标题</button>
+                <button class="ghost" type="button" id="insertArticleList">列表</button>
+                <button class="ghost" type="button" id="insertArticleCode">代码块</button>
                 <button class="ghost" type="button" id="uploadArticleImage">上传并设为封面</button>
                 <button class="ghost" type="button" id="insertArticleImage">插入图片</button>
                 <button class="ghost" type="button" id="insertArticleAudio">插入音频</button>
@@ -216,6 +219,13 @@
                 <div class="check-grid" id="articleSoftware"></div>
               </div>
               <label>正文<textarea id="articleContent" rows="18" placeholder="支持普通文本和简单 HTML。普通文本会自动按段落排版；也可以插入 h2、h3、ul、blockquote、img 等 HTML。"></textarea></label>
+              <div class="article-preview-card">
+                <div class="article-preview-card__head">
+                  <strong>实时预览</strong>
+                  <span>支持 Markdown 和简单 HTML</span>
+                </div>
+                <article class="article-preview" id="articlePreview"><p>正文预览会显示在这里。</p></article>
+              </div>
             </form>
             <div class="article-manager">
               <div class="article-manager__head">

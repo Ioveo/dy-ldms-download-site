@@ -75,7 +75,10 @@
             <label>软件名称<input id="softwareName" required placeholder="例如：数据中心版" /></label>
             <label>软件标识<input id="softwareSlug" required placeholder="例如：datacenter" /></label>
             <label>分类<select id="softwareCategory"></select></label>
-            <label>封面地址<input id="softwareCover" placeholder="/datacenter-preview.jpg" /></label>
+            <label>封面地址<input id="softwareCover" placeholder="/datacenter-preview.jpg 或 https://..." /></label>
+            <label>R2 封面图<select id="softwareCoverAsset"><option value="">选择 R2 图片</option></select></label>
+            <label>本地封面<input id="softwareCoverFile" type="file" accept="image/png,image/jpeg,image/webp,image/gif,image/avif" /></label>
+            <div class="form-actions"><button class="ghost" type="button" id="useSoftwareCoverAsset">使用 R2 图片</button><button class="ghost" type="button" id="uploadSoftwareCover">上传封面</button></div>
             <label class="span-2">简介<textarea id="softwareDescription" rows="3" placeholder="软件说明"></textarea></label>
             <label>排序<input id="softwareSort" type="number" value="10" /></label>
             <label>状态<select id="softwareStatus"><option value="active">上架</option><option value="disabled">下架</option></select></label>

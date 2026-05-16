@@ -24,6 +24,8 @@ byId("navigationForm").addEventListener("submit", saveNavigation);
 byId("articleForm").addEventListener("submit", saveArticle);
 byId("releaseForm").addEventListener("submit", uploadRelease);
 byId("releaseRegisterForm").addEventListener("submit", registerUploadedRelease);
+byId("uploadSoftwareCover").addEventListener("click", uploadSoftwareCover);
+byId("useSoftwareCoverAsset").addEventListener("click", useSoftwareCoverAsset);
 byId("resetSoftware").addEventListener("click", resetSoftwareForm);
 byId("resetCategory").addEventListener("click", resetCategoryForm);
 byId("resetStorage").addEventListener("click", resetStorageForm);
@@ -146,6 +148,7 @@ function renderCategoryOptions() {
   byId("releaseSoftware").innerHTML = catalog.software.map(item => `<option value="${escapeAttr(item.id)}">${escapeHtml(item.name)}</option>`).join("");
   byId("registerSoftware").innerHTML = byId("releaseSoftware").innerHTML;
   byId("releaseStorage").innerHTML = `<option value="default">默认 R2：dy-ldms-downloads</option>${(catalog.storageAccounts || []).filter(item => item.status !== "disabled").map(item => `<option value="${escapeAttr(item.id)}">${escapeHtml(item.name)} / ${escapeHtml(item.bucket)}</option>`).join("")}`;
+  loadSoftwareCoverAssets();
 }
 
 function renderArticleOptions() {
@@ -365,6 +368,50 @@ async function loadAssets() {
     );
     root.append(card);
   }
+}
+
+async function loadSoftwareCoverAssets() {
+  const select = byId("softwareCoverAsset");
+  if (!select) return;
+  select.innerHTML = `<option value="">选择 R2 图片</option>`;
+  const results = await Promise.all([
+    api("/api/admin/assets/list", { kind: "image", status: "active", pageSize: 100 }),
+    api("/api/admin/assets/list", { kind: "site", status: "active", pageSize: 100 })
+  ]);
+  const assets = results
+    .filter(result => result.success)
+    .flatMap(result => result.assets || [])
+    .filter(asset => asset.kind === "image" || asset.kind === "site");
+  for (const asset of assets) {
+    const option = document.createElement("option");
+    option.value = asset.url || `/media/${encodeURIComponent(asset.key)}`;
+    option.textContent = `${asset.fileName || asset.key} (${formatBytes(asset.fileSize)})`;
+    select.append(option);
+  }
+}
+
+function useSoftwareCoverAsset() {
+  const value = byId("softwareCoverAsset").value;
+  if (!value) return toast("请先选择一张 R2 图片", true);
+  byId("softwareCover").value = value;
+  toast("已使用选中的 R2 图片");
+}
+
+async function uploadSoftwareCover() {
+  const file = byId("softwareCoverFile").files[0];
+  if (!file) return toast("请选择本地封面图片", true);
+  const mediaType = mediaTypeFor(file);
+  if (mediaType === "svg") return toast("不支持上传 SVG，请使用 PNG/JPG/WebP", true);
+  if (mediaType !== "image") return toast("请选择图片文件", true);
+  if (file.size > 8 * 1024 * 1024) return toast("封面图片不能超过 8MB", true);
+
+  toast("正在上传封面");
+  const result = await uploadArticleMedia(file, "image");
+  if (!result.success) return toast(result.msg || "封面上传失败", true);
+  byId("softwareCover").value = result.url;
+  byId("softwareCoverFile").value = "";
+  await loadSoftwareCoverAssets();
+  toast("封面已上传并填入地址");
 }
 
 async function uploadAsset(event) {

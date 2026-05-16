@@ -1,8 +1,7 @@
 const ENCODER = new TextEncoder();
 
 export async function putExternalR2(account, secretAccessKey, key, body, contentType = "application/octet-stream") {
-  const endpoint = endpointFor(account);
-  const url = new URL(`/${encodePath(key)}`, endpoint);
+  const url = objectUrlFor(account, key);
   const now = new Date();
   const amzDate = toAmzDate(now);
   const dateStamp = amzDate.slice(0, 8);
@@ -56,7 +55,19 @@ export function publicUrlFor(account, key) {
 
 function endpointFor(account) {
   if (account.endpoint) return account.endpoint.replace(/\/+$/, "");
-  return `https://${account.accountId}.r2.cloudflarestorage.com/${account.bucket}`;
+  return `https://${account.accountId}.r2.cloudflarestorage.com`;
+}
+
+function objectUrlFor(account, key) {
+  const url = new URL(endpointFor(account));
+  const pathParts = url.pathname.split("/").filter(Boolean).map(decodeURIComponent);
+  if (pathParts[pathParts.length - 1] !== account.bucket) {
+    pathParts.push(account.bucket);
+  }
+  pathParts.push(...String(key).split("/").filter(Boolean));
+  url.pathname = `/${pathParts.map(encodeURIComponent).join("/")}`;
+  url.search = "";
+  return url;
 }
 
 function encodePath(path) {

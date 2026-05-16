@@ -3,6 +3,10 @@ let catalog = null;
 let articleSoftwareCategory = "all";
 let articleSoftwareSelection = new Set();
 const ARTICLE_DRAFT_KEY = "downloadAdminArticleDraft";
+const DIRECT_UPLOAD_LIMIT = 95 * 1024 * 1024;
+const CHUNK_SIZE = 10 * 1024 * 1024;
+const CHUNK_UPLOAD_THRESHOLD = 10 * 1024 * 1024;
+const MAX_CHUNKED_SIZE = 5 * 1024 * 1024 * 1024;
 let articleDraftTimer = null;
 
 const loginView = byId("loginView");
@@ -19,6 +23,7 @@ byId("storageForm").addEventListener("submit", saveStorage);
 byId("navigationForm").addEventListener("submit", saveNavigation);
 byId("articleForm").addEventListener("submit", saveArticle);
 byId("releaseForm").addEventListener("submit", uploadRelease);
+byId("releaseRegisterForm").addEventListener("submit", registerUploadedRelease);
 byId("resetSoftware").addEventListener("click", resetSoftwareForm);
 byId("resetCategory").addEventListener("click", resetCategoryForm);
 byId("resetStorage").addEventListener("click", resetStorageForm);
@@ -139,6 +144,7 @@ function renderCategoryOptions() {
   const options = catalog.categories.map(category => `<option value="${escapeAttr(category.id)}">${escapeHtml(category.name)}</option>`).join("");
   byId("softwareCategory").innerHTML = options;
   byId("releaseSoftware").innerHTML = catalog.software.map(item => `<option value="${escapeAttr(item.id)}">${escapeHtml(item.name)}</option>`).join("");
+  byId("registerSoftware").innerHTML = byId("releaseSoftware").innerHTML;
   byId("releaseStorage").innerHTML = `<option value="default">默认 R2：dy-ldms-downloads</option>${(catalog.storageAccounts || []).filter(item => item.status !== "disabled").map(item => `<option value="${escapeAttr(item.id)}">${escapeHtml(item.name)} / ${escapeHtml(item.bucket)}</option>`).join("")}`;
 }
 
@@ -570,26 +576,60 @@ async function uploadRelease(event) {
   const file = byId("releaseFile").files[0];
   if (!file) return toast("请选择安装包", true);
   if (!allowedPackageFile(file)) return toast("安装包格式不支持，请上传 zip、7z、exe 或 msi 文件", true);
-  if (file.size > 1024 * 1024 * 1024) return toast("安装包不能超过 1GB", true);
+  if (file.size > MAX_CHUNKED_SIZE) return toast("安装包不能超过 5GB", true);
+
   const softwareId = byId("releaseSoftware").value;
   const version = byId("releaseVersion").value.trim();
   if (!softwareId || !version) return toast("请选择软件并填写版本号", true);
 
-  const form = new FormData();
-  form.append("token", token);
-  form.append("softwareId", softwareId);
-  form.append("storageId", byId("releaseStorage").value);
-  form.append("version", version);
-  form.append("changelog", byId("releaseChangelog").value.trim());
-  form.append("isLatest", byId("releaseLatest").checked ? "1" : "0");
-  form.append("file", file);
+  const storageId = byId("releaseStorage").value;
+  const changelog = byId("releaseChangelog").value.trim();
+  const isLatest = byId("releaseLatest").checked;
+  let result;
 
-  const result = await uploadMultipart("/api/admin/releases", form, { title: "正在发布版本", fileName: file.name });
+  if (file.size > CHUNK_UPLOAD_THRESHOLD && storageId === "default") {
+    result = await uploadChunked(file, { softwareId, version, changelog, isLatest });
+  } else if (file.size > DIRECT_UPLOAD_LIMIT) {
+    return toast("文件超过 95MB 且使用外部存储，请先上传到 R2 再用登记功能发布。", true);
+  } else {
+    const form = new FormData();
+    form.append("token", token);
+    form.append("softwareId", softwareId);
+    form.append("storageId", storageId);
+    form.append("version", version);
+    form.append("changelog", changelog);
+    form.append("isLatest", isLatest ? "1" : "0");
+    form.append("file", file);
+    result = await uploadMultipart("/api/admin/releases", form, { title: "正在发布版本", fileName: file.name });
+  }
+
   if (!result.success) return toast(result.msg || "上传失败", true);
   byId("releaseForm").reset();
   byId("releaseLatest").checked = true;
   render(result.catalog);
   toast("版本已发布，列表已刷新");
+}
+
+async function registerUploadedRelease(event) {
+  event.preventDefault();
+  const payload = {
+    softwareId: byId("registerSoftware").value,
+    version: byId("registerVersion").value.trim(),
+    fileKey: byId("registerFileKey").value.trim(),
+    fileName: byId("registerFileName").value.trim(),
+    sha256: byId("registerSha256").value.trim(),
+    changelog: byId("registerChangelog").value.trim(),
+    isLatest: byId("registerLatest").checked ? "1" : "0"
+  };
+  if (!payload.softwareId || !payload.version || !payload.fileKey) {
+    return toast("请填写软件、版本号和 R2 文件路径", true);
+  }
+  const result = await api("/api/admin/releases/register", payload);
+  if (!result.success) return toast(result.msg || "登记失败", true);
+  byId("releaseRegisterForm").reset();
+  byId("registerLatest").checked = true;
+  render(result.catalog);
+  toast("已登记 R2 文件并发布版本");
 }
 
 function uploadMultipart(url, form, progress = {}) {
@@ -647,8 +687,12 @@ async function replaceReleaseFile(releaseId, input) {
   input.value = "";
   if (!file) return;
   if (!allowedPackageFile(file)) return toast("安装包格式不支持，请上传 zip、7z、exe 或 msi 文件", true);
-  if (file.size > 1024 * 1024 * 1024) return toast("安装包不能超过 1GB", true);
+  if (file.size > MAX_CHUNKED_SIZE) return toast("安装包不能超过 5GB", true);
   if (!confirm(`确定用 ${file.name} 覆盖这个版本的安装包吗？版本号和下载链接会保持不变。`)) return;
+
+  if (file.size > DIRECT_UPLOAD_LIMIT) {
+    return toast("替换功能暂不支持大文件分片上传。请删除旧版本后重新发布。", true);
+  }
 
   const form = new FormData();
   form.append("token", token);
@@ -1212,4 +1256,105 @@ function escapeHtml(value) {
 
 function escapeAttr(value) {
   return escapeHtml(value).replace(/`/g, "&#96;");
+}
+
+
+async function uploadChunked(file, options) {
+  const { softwareId, version, changelog, isLatest } = options;
+  showUploadProgress("正在初始化分片上传", file.name);
+
+  const presignResult = await api("/api/admin/releases/presign", {
+    softwareId,
+    version,
+    fileName: file.name,
+    fileSize: file.size
+  });
+
+  if (!presignResult.success) {
+    hideUploadProgress();
+    return presignResult;
+  }
+
+  const { uploadId, fileKey } = presignResult;
+  const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
+  const parts = [];
+  const uploadStart = Date.now();
+  let uploadedBytes = 0;
+
+  for (let i = 0; i < totalChunks; i++) {
+    const start = i * CHUNK_SIZE;
+    const end = Math.min(start + CHUNK_SIZE, file.size);
+    const chunk = file.slice(start, end);
+    const partNumber = i + 1;
+    const percent = Math.max(1, Math.min(95, Math.round((i / totalChunks) * 95)));
+    const elapsed = (Date.now() - uploadStart) / 1000;
+    const speed = elapsed > 0 ? uploadedBytes / elapsed : 0;
+    const eta = speed > 0 ? Math.round((file.size - uploadedBytes) / speed) : 0;
+    const etaText = eta > 60 ? `${Math.floor(eta / 60)}分${eta % 60}秒` : `${eta}秒`;
+    updateUploadProgress(percent, `分片 ${partNumber}/${totalChunks} · ${formatBytes(uploadedBytes)} / ${formatBytes(file.size)} · ${formatBytes(speed)}/s · 预计 ${etaText}`);
+
+    let retries = 3;
+    let partResult = null;
+
+    while (retries > 0) {
+      try {
+        const response = await fetch("/api/admin/releases/upload-part", {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/octet-stream",
+            "X-Upload-Id": uploadId,
+            "X-File-Key": fileKey,
+            "X-Part-Number": String(partNumber)
+          },
+          body: chunk
+        });
+        partResult = await response.json();
+        if (partResult.success) break;
+      } catch (error) {
+        partResult = { success: false, msg: error.message || "网络异常" };
+      }
+      retries--;
+      if (retries > 0) {
+        updateUploadProgress(percent, `分片 ${partNumber} 失败，${retries} 次重试中...`);
+        await sleep(1500);
+      }
+    }
+
+    if (!partResult?.success) {
+      await api("/api/admin/releases/abort-upload", { uploadId, fileKey }).catch(() => {});
+      hideUploadProgress();
+      return { success: false, msg: partResult?.msg || `分片 ${partNumber} 上传失败` };
+    }
+
+    parts.push({ partNumber, etag: partResult.etag });
+    uploadedBytes += (end - start);
+  }
+
+  updateUploadProgress(97, "正在完成上传并发布版本...");
+
+  const completeResult = await api("/api/admin/releases/complete-upload", {
+    uploadId,
+    fileKey,
+    parts,
+    softwareId,
+    version,
+    fileName: file.name,
+    fileSize: file.size,
+    changelog,
+    isLatest
+  });
+
+  if (completeResult.success) {
+    updateUploadProgress(100, "上传完成，版本已发布");
+    setTimeout(() => hideUploadProgress(), 800);
+  } else {
+    hideUploadProgress();
+  }
+
+  return completeResult;
+}
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
 }

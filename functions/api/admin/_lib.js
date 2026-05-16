@@ -39,6 +39,13 @@ export async function loginAdmin(request, env) {
   return json({ success: true, token: await createAdminToken(env), expiresIn: TOKEN_TTL_MS });
 }
 
+export async function requireAdminToken(request, env) {
+  const token = request.headers.get("Authorization")?.replace(/^Bearer\s+/i, "") || "";
+  if (!token) return { ok: false, response: json({ success: false, msg: "未授权" }, 403) };
+  if (await verifyAdminToken(env, token)) return { ok: true };
+  return { ok: false, response: json({ success: false, msg: "登录已过期，请重新登录" }, 403) };
+}
+
 export function success(catalog, extra = {}) {
   return json({ success: true, catalog, ...extra });
 }

@@ -71,7 +71,9 @@ export function manifestToCatalog(manifest) {
 export function normalizeCatalog(catalog) {
   const now = Date.now();
   const categories = Array.isArray(catalog?.categories) && catalog.categories.length ? catalog.categories : DEFAULT_CATEGORIES;
-  const software = Array.isArray(catalog?.software) ? catalog.software : [];
+  const software = Array.isArray(catalog?.software) && catalog.software.length
+    ? catalog.software
+    : manifestToCatalog(DEFAULT_MANIFEST).software;
 
   return {
     product: catalog?.product || "天才猫软件中心",

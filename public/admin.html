@@ -104,6 +104,9 @@
               <p>文件会上传到 R2，并自动写入软件目录。</p>
             </div>
           </div>
+          <div class="form-grid">
+            <p class="span-2">大于 95MB 的安装包不要使用下面的网页直传。请先上传到 R2，然后使用下方“登记已上传 R2 文件”。</p>
+          </div>
           <form class="form-grid" id="releaseForm">
             <label>所属软件<select id="releaseSoftware"></select></label>
             <label>存储位置<select id="releaseStorage"></select></label>
@@ -112,6 +115,16 @@
             <label class="span-2">更新说明<textarea id="releaseChangelog" rows="4" placeholder="每行一条更新内容"></textarea></label>
             <label><input id="releaseLatest" type="checkbox" checked /> 设为最新版</label>
             <div class="form-actions span-2"><button type="submit">上传并发布</button></div>
+          </form>
+          <form class="form-grid" id="releaseRegisterForm">
+            <label>已传文件所属软件<select id="registerSoftware"></select></label>
+            <label>版本号<input id="registerVersion" required placeholder="1.0.0" /></label>
+            <label class="span-2">R2 文件路径<input id="registerFileKey" required placeholder="software/datacenter/1.0.0/TianCaiMao-DataCenter-1.0.0.zip" /></label>
+            <label>文件名 选填<input id="registerFileName" placeholder="TianCaiMao-DataCenter-1.0.0.zip" /></label>
+            <label>SHA256 选填<input id="registerSha256" placeholder="可留空" /></label>
+            <label class="span-2">更新说明<textarea id="registerChangelog" rows="3" placeholder="每行一条更新内容"></textarea></label>
+            <label><input id="registerLatest" type="checkbox" checked /> 设为最新版</label>
+            <div class="form-actions span-2"><button class="ghost" type="submit">登记已上传 R2 文件</button></div>
           </form>
           <div class="table-wrap"><table><thead><tr><th>软件</th><th>版本</th><th>文件</th><th>大小</th><th>最新</th><th>下载</th><th>操作</th></tr></thead><tbody id="releaseRows"></tbody></table></div>
         </section>

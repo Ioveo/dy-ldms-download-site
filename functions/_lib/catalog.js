@@ -87,6 +87,7 @@ export function normalizeCatalog(catalog) {
     navigation: normalizeNavigation(catalog?.navigation || []),
     software: software.map((item, index) => normalizeSoftware(item, index, now)).sort(bySortOrder),
     articles: normalizeArticles(catalog?.articles || []),
+    music: normalizeMusic(catalog?.music || catalog?.tracks || []),
     storageAccounts: normalizeStorageAccounts(catalog?.storageAccounts || catalog?.storage_accounts || []),
     updatedAt: Number(catalog?.updatedAt || now)
   };
@@ -171,6 +172,7 @@ export function publicCatalog(catalog) {
         releases: (item.releases || []).filter(release => release.status !== "disabled")
       })),
     articles: (catalog.articles || []).filter(item => item.status === "published"),
+    music: (catalog.music || []).filter(item => item.status === "published"),
     storageAccounts: (catalog.storageAccounts || []).map(publicStorageAccount),
     updatedAt: catalog.updatedAt
   };
@@ -197,9 +199,32 @@ export function normalizeArticles(articles) {
   })).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0)) : [];
 }
 
+export function normalizeMusic(items) {
+  return Array.isArray(items) ? items.map((track, index) => ({
+    id: String(track.id || `music-${index + 1}`),
+    title: String(track.title || track.name || "未命名音乐"),
+    artist: String(track.artist || "未知歌手"),
+    album: String(track.album || ""),
+    neteaseId: String(track.neteaseId || track.netease_id || ""),
+    audioUrl: String(track.audioUrl || track.audio_url || track.url || ""),
+    coverUrl: String(track.coverUrl || track.cover_url || ""),
+    lyric: String(track.lyric || ""),
+    tags: Array.isArray(track.tags) ? track.tags.map(String) : String(track.tags || "").split(/[,，\n]/).map(item => item.trim()).filter(Boolean),
+    status: track.status || "draft",
+    featured: Boolean(track.featured),
+    sortOrder: Number(track.sortOrder ?? track.sort_order ?? index),
+    playCount: Number(track.playCount || track.play_count || 0),
+    createdAt: Number(track.createdAt || Date.now()),
+    updatedAt: Number(track.updatedAt || Date.now())
+  })).sort((a, b) => Number(Boolean(b.featured)) - Number(Boolean(a.featured)) || (a.sortOrder || 0) - (b.sortOrder || 0) || (b.updatedAt || 0) - (a.updatedAt || 0)) : [];
+}
+
 export function normalizeNavigation(items) {
   const source = Array.isArray(items) && items.length ? items : DEFAULT_NAVIGATION;
-  return source.map((item, index) => ({
+  const withMusic = source.some(item => item.id === "music" || item.href === "/music.html")
+    ? source
+    : [...source, { id: "music", label: "音乐", href: "/music.html", sortOrder: 35, status: "active", external: false }];
+  return withMusic.map((item, index) => ({
     id: String(item.id || `nav-${index + 1}`),
     label: String(item.label || item.name || "导航"),
     href: String(item.href || "/"),

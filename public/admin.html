@@ -44,6 +44,7 @@
           <button data-panel="storagePanel">存储授权</button>
           <button data-panel="assetPanel">资源管理</button>
           <button data-panel="mediaPanel">媒体库</button>
+          <button data-panel="musicPanel">音乐管理</button>
           <button data-panel="navigationPanel">导航设置</button>
           <button data-panel="articlePanel">文章管理</button>
           <button data-panel="healthPanel">系统状态</button>
@@ -153,6 +154,36 @@
             <div class="form-actions span-2"><button type="submit">保存存储授权</button><button class="ghost" type="button" id="testStorage">测试连接</button><button class="ghost" type="button" id="resetStorage">清空</button></div>
           </form>
           <div class="table-wrap"><table><thead><tr><th>名称</th><th>Account</th><th>Bucket</th><th>Secret</th><th>状态</th><th>操作</th></tr></thead><tbody id="storageRows"></tbody></table></div>
+        </section>
+
+        <section class="panel tab-panel" id="musicPanel" hidden>
+          <div class="panel__head">
+            <div>
+              <h2>音乐管理</h2>
+              <p>维护音乐频道、网易云 ID、R2 音频、封面、标签和试听状态。</p>
+            </div>
+          </div>
+          <form class="form-grid" id="musicForm">
+            <input type="hidden" id="musicId" />
+            <label>歌曲名<input id="musicTitle" required placeholder="例如：夜航频道" /></label>
+            <label>歌手<input id="musicArtist" required placeholder="例如：天才猫" /></label>
+            <label>专辑<input id="musicAlbum" placeholder="选填" /></label>
+            <label>网易云音乐 ID<input id="musicNeteaseId" placeholder="例如：2058263035" /></label>
+            <label class="span-2">音频地址<input id="musicAudioUrl" placeholder="/media/music-audio-xxx.mp3 或 https://..." /></label>
+            <label>本地音频<input id="musicAudioFile" type="file" accept="audio/mpeg,audio/mp4,audio/aac,audio/wav,audio/ogg,audio/webm,audio/flac" /></label>
+            <div class="form-actions"><button class="ghost" type="button" id="uploadMusicAudio">上传音频</button><button class="ghost" type="button" id="previewMusic">试听</button></div>
+            <label class="span-2">封面地址<input id="musicCoverUrl" placeholder="/media/article-image-xxx.webp 或 https://..." /></label>
+            <label>R2 封面图<select id="musicCoverAsset"><option value="">选择 R2 图片</option></select></label>
+            <label>本地封面<input id="musicCoverFile" type="file" accept="image/png,image/jpeg,image/webp,image/gif,image/avif" /></label>
+            <div class="form-actions span-2"><button class="ghost" type="button" id="useMusicCoverAsset">使用 R2 封面</button><button class="ghost" type="button" id="uploadMusicCover">上传封面</button></div>
+            <label>标签<input id="musicTags" placeholder="电子, 直播间, 放松" /></label>
+            <label>排序<input id="musicSort" type="number" value="10" /></label>
+            <label><input id="musicFeatured" type="checkbox" /> 推荐到音乐首页</label>
+            <label>状态<select id="musicStatus"><option value="published">发布</option><option value="draft">草稿</option><option value="disabled">隐藏</option></select></label>
+            <label class="span-2">歌词/备注<textarea id="musicLyric" rows="4" placeholder="可填写歌词、版权备注或使用说明"></textarea></label>
+            <div class="form-actions span-2"><button type="submit">保存音乐</button><button class="ghost" type="button" id="resetMusic">清空</button></div>
+          </form>
+          <div class="table-wrap"><table><thead><tr><th>歌曲</th><th>来源</th><th>封面</th><th>状态</th><th>操作</th></tr></thead><tbody id="musicRows"></tbody></table></div>
         </section>
 
         <section class="panel tab-panel" id="navigationPanel" hidden>

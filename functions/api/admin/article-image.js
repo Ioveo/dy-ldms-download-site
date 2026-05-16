@@ -22,6 +22,7 @@ export async function onRequestPost({ request, env }) {
   const file = formData.get("file");
   if (!file?.arrayBuffer) return json({ success: false, msg: "请选择媒体文件" }, 400);
   const kind = String(formData.get("kind") || "");
+  const fileName = sanitizeFileName(file.name || "article-media.bin");
   const type = String(file.type || inferredContentType(file.name) || "");
   const mediaKind = mediaKindFor(type, fileName);
   if (!mediaKind) return json({ success: false, msg: "只能上传图片或音频文件" }, 400);
@@ -30,7 +31,6 @@ export async function onRequestPost({ request, env }) {
   if (kind === "image" && mediaKind !== "image") return json({ success: false, msg: "请选择图片文件" }, 400);
   if (kind === "audio" && mediaKind !== "audio") return json({ success: false, msg: "请选择音频文件" }, 400);
 
-  const fileName = sanitizeFileName(file.name || "article-media.bin");
   const folder = mediaKind === "audio" ? "article-audio" : "article-image";
   const key = `${id(folder)}-${fileName}`;
   try {

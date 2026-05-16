@@ -22,11 +22,17 @@ byId("categoryForm").addEventListener("submit", saveCategory);
 byId("storageForm").addEventListener("submit", saveStorage);
 byId("navigationForm").addEventListener("submit", saveNavigation);
 byId("articleForm").addEventListener("submit", saveArticle);
+byId("musicForm").addEventListener("submit", saveMusic);
 byId("releaseForm").addEventListener("submit", uploadRelease);
 byId("releaseRegisterForm").addEventListener("submit", registerUploadedRelease);
 byId("uploadSoftwareCover").addEventListener("click", uploadSoftwareCover);
 byId("useSoftwareCoverAsset").addEventListener("click", useSoftwareCoverAsset);
+byId("uploadMusicAudio").addEventListener("click", uploadMusicAudio);
+byId("uploadMusicCover").addEventListener("click", uploadMusicCover);
+byId("useMusicCoverAsset").addEventListener("click", useMusicCoverAsset);
+byId("previewMusic").addEventListener("click", previewMusicFromForm);
 byId("resetSoftware").addEventListener("click", resetSoftwareForm);
+byId("resetMusic").addEventListener("click", resetMusicForm);
 byId("resetCategory").addEventListener("click", resetCategoryForm);
 byId("resetStorage").addEventListener("click", resetStorageForm);
 byId("resetNavigation").addEventListener("click", resetNavigationForm);
@@ -127,6 +133,7 @@ function render(nextCatalog) {
   renderNavigationRows();
   renderArticleOptions();
   renderArticleRows();
+  renderMusicRows();
   renderReleaseRows();
 }
 
@@ -149,6 +156,7 @@ function renderCategoryOptions() {
   byId("registerSoftware").innerHTML = byId("releaseSoftware").innerHTML;
   byId("releaseStorage").innerHTML = `<option value="default">默认 R2：dy-ldms-downloads</option>${(catalog.storageAccounts || []).filter(item => item.status !== "disabled").map(item => `<option value="${escapeAttr(item.id)}">${escapeHtml(item.name)} / ${escapeHtml(item.bucket)}</option>`).join("")}`;
   loadSoftwareCoverAssets();
+  loadMusicCoverAssets();
 }
 
 function renderArticleOptions() {
@@ -216,6 +224,23 @@ function renderCategoryRows() {
     const edit = actionButton("编辑", () => fillCategoryForm(item));
     const remove = actionButton("删除", () => deleteCategory(item.id), "danger");
     tr.lastElementChild.append(edit, remove);
+    rows.append(tr);
+  }
+}
+
+function renderMusicRows() {
+  const rows = byId("musicRows");
+  if (!rows) return;
+  rows.innerHTML = "";
+  for (const item of catalog.music || []) {
+    const tr = document.createElement("tr");
+    const source = item.audioUrl ? "R2/链接" : item.neteaseId ? `网易云 ${item.neteaseId}` : "-";
+    tr.innerHTML = `<td><strong>${escapeHtml(item.title)}</strong><br><small>${escapeHtml(item.artist)}${item.album ? ` · ${escapeHtml(item.album)}` : ""}</small></td><td class="code">${escapeHtml(source)}</td><td>${item.coverUrl ? `<img class="thumb" src="${escapeAttr(item.coverUrl)}" alt="">` : "-"}</td><td class="status-${item.status === "published" ? "active" : "disabled"}">${item.status === "published" ? "已发布" : item.status === "disabled" ? "隐藏" : "草稿"}</td><td class="row-actions"></td>`;
+    tr.lastElementChild.append(
+      actionButton("试听", () => previewMusic(item)),
+      actionButton("编辑", () => fillMusicForm(item)),
+      actionButton("删除", () => deleteMusic(item.id), "danger")
+    );
     rows.append(tr);
   }
 }
@@ -414,6 +439,61 @@ async function uploadSoftwareCover() {
   toast("封面已上传并填入地址");
 }
 
+async function loadMusicCoverAssets() {
+  const select = byId("musicCoverAsset");
+  if (!select) return;
+  select.innerHTML = `<option value="">选择 R2 图片</option>`;
+  const results = await Promise.all([
+    api("/api/admin/assets/list", { kind: "image", status: "active", pageSize: 100 }),
+    api("/api/admin/assets/list", { kind: "site", status: "active", pageSize: 100 })
+  ]);
+  const assets = results.filter(result => result.success).flatMap(result => result.assets || []);
+  for (const asset of assets) {
+    const option = document.createElement("option");
+    option.value = asset.url || `/media/${encodeURIComponent(asset.key)}`;
+    option.textContent = `${asset.fileName || asset.key} (${formatBytes(asset.fileSize)})`;
+    select.append(option);
+  }
+}
+
+function useMusicCoverAsset() {
+  const value = byId("musicCoverAsset").value;
+  if (!value) return toast("请先选择一张 R2 图片", true);
+  byId("musicCoverUrl").value = value;
+  toast("已使用选中的 R2 封面");
+}
+
+async function uploadMusicCover() {
+  const file = byId("musicCoverFile").files[0];
+  if (!file) return toast("请选择本地封面图片", true);
+  const mediaType = mediaTypeFor(file);
+  if (mediaType === "svg") return toast("不支持上传 SVG，请使用 PNG/JPG/WebP", true);
+  if (mediaType !== "image") return toast("请选择图片文件", true);
+  if (file.size > 8 * 1024 * 1024) return toast("封面图片不能超过 8MB", true);
+  toast("正在上传音乐封面");
+  const result = await uploadArticleMedia(file, "image");
+  if (!result.success) return toast(result.msg || "封面上传失败", true);
+  byId("musicCoverUrl").value = result.url;
+  byId("musicCoverFile").value = "";
+  await loadMusicCoverAssets();
+  toast("音乐封面已上传");
+}
+
+async function uploadMusicAudio() {
+  const file = byId("musicAudioFile").files[0];
+  if (!file) return toast("请选择本地音频", true);
+  const mediaType = mediaTypeFor(file);
+  if (mediaType !== "audio") return toast("请选择音频文件", true);
+  if (file.size > 30 * 1024 * 1024) return toast("音频不能超过 30MB，请先压缩或使用外链", true);
+  toast("正在上传音乐音频");
+  const result = await uploadArticleMedia(file, "audio");
+  if (!result.success) return toast(result.msg || "音频上传失败", true);
+  byId("musicAudioUrl").value = result.url;
+  byId("musicAudioFile").value = "";
+  previewMusic({ title: byId("musicTitle").value || file.name, artist: byId("musicArtist").value || "试听", audioUrl: result.url, coverUrl: byId("musicCoverUrl").value });
+  toast("音频已上传，可试听");
+}
+
 async function uploadAsset(event) {
   event.preventDefault();
   const file = byId("assetFile").files[0];
@@ -600,6 +680,37 @@ async function saveSoftware(event) {
   resetSoftwareForm();
   render(result.catalog);
   toast("软件已保存");
+}
+
+async function saveMusic(event) {
+  event.preventDefault();
+  const payload = {
+    id: byId("musicId").value,
+    title: byId("musicTitle").value.trim(),
+    artist: byId("musicArtist").value.trim(),
+    album: byId("musicAlbum").value.trim(),
+    neteaseId: byId("musicNeteaseId").value.trim(),
+    audioUrl: byId("musicAudioUrl").value.trim(),
+    coverUrl: byId("musicCoverUrl").value.trim(),
+    lyric: byId("musicLyric").value.trim(),
+    tags: byId("musicTags").value.split(/[,，\n]/).map(item => item.trim()).filter(Boolean),
+    featured: byId("musicFeatured").checked,
+    sortOrder: Number(byId("musicSort").value || 0),
+    status: byId("musicStatus").value
+  };
+  const result = await api("/api/admin/music", payload);
+  if (!result.success) return toast(result.msg || "保存失败", true);
+  resetMusicForm();
+  render(result.catalog);
+  toast("音乐已保存");
+}
+
+async function deleteMusic(id) {
+  if (!confirm("确定删除这首音乐吗？R2 文件不会自动删除。")) return;
+  const result = await api("/api/admin/music", { action: "delete", id });
+  if (!result.success) return toast(result.msg || "删除失败", true);
+  render(result.catalog);
+  toast("音乐已删除");
 }
 
 async function saveCategory(event) {
@@ -794,6 +905,31 @@ async function copyText(value) {
   }
 }
 
+let adminMusicPreview = null;
+
+function previewMusicFromForm() {
+  previewMusic({
+    title: byId("musicTitle").value || "未命名音乐",
+    artist: byId("musicArtist").value || "未知歌手",
+    audioUrl: byId("musicAudioUrl").value,
+    neteaseId: byId("musicNeteaseId").value
+  });
+}
+
+function previewMusic(item) {
+  const url = musicPlayableUrl(item);
+  if (!url) return toast("请先填写音频地址或网易云音乐 ID", true);
+  if (!adminMusicPreview) adminMusicPreview = new Audio();
+  adminMusicPreview.src = url;
+  adminMusicPreview.play().then(() => toast(`正在试听：${item.title || "音乐"}`)).catch(() => toast("浏览器阻止了试听，请再次点击试听", true));
+}
+
+function musicPlayableUrl(item) {
+  if (item.audioUrl) return item.audioUrl;
+  if (item.neteaseId) return `https://music.163.com/song/media/outer/url?id=${encodeURIComponent(item.neteaseId)}.mp3`;
+  return "";
+}
+
 async function deleteSoftware(id) {
   if (!confirm("确定删除这个软件及其版本记录吗？R2 文件不会自动删除。")) return;
   const result = await api("/api/admin/software/delete", { id });
@@ -848,6 +984,22 @@ function fillCategoryForm(item) {
   byId("categorySlug").value = item.slug;
   byId("categorySort").value = item.sortOrder || 0;
   byId("categoryStatus").value = item.status || "active";
+}
+
+function fillMusicForm(item) {
+  showPanel("musicPanel");
+  byId("musicId").value = item.id;
+  byId("musicTitle").value = item.title || "";
+  byId("musicArtist").value = item.artist || "";
+  byId("musicAlbum").value = item.album || "";
+  byId("musicNeteaseId").value = item.neteaseId || "";
+  byId("musicAudioUrl").value = item.audioUrl || "";
+  byId("musicCoverUrl").value = item.coverUrl || "";
+  byId("musicLyric").value = item.lyric || "";
+  byId("musicTags").value = (item.tags || []).join(", ");
+  byId("musicFeatured").checked = Boolean(item.featured);
+  byId("musicSort").value = item.sortOrder || 0;
+  byId("musicStatus").value = item.status || "draft";
 }
 
 function fillStorageForm(item) {
@@ -952,6 +1104,13 @@ function resetCategoryForm() {
   byId("categoryForm").reset();
   byId("categoryId").value = "";
   byId("categorySort").value = "10";
+}
+
+function resetMusicForm() {
+  byId("musicForm").reset();
+  byId("musicId").value = "";
+  byId("musicSort").value = "10";
+  byId("musicStatus").value = "published";
 }
 
 function resetStorageForm() {

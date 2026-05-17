@@ -57,6 +57,7 @@ const ADMIN_MODULES = {
     items: [
       { panel: "siteHomePanel", label: "首页文案", action: "主页内容" },
       { panel: "galleryPanel", view: "galleryEdit", label: "添加轮播图", action: "AI 轮播图片" },
+      { panel: "galleryPanel", view: "galleryList", label: "轮播图列表", action: "编辑/删除" },
       { panel: "navigationPanel", label: "导航设置", action: "菜单配置" },
       { panel: "healthPanel", label: "系统状态", action: "部署检查" }
     ]
@@ -353,7 +354,7 @@ function renderGalleryRows() {
     tr.innerHTML = `<td>${item.imageUrl ? `<img class="thumb" src="${escapeAttr(item.thumbUrl || item.imageUrl)}" alt="">` : "-"} <strong>${escapeHtml(item.title)}</strong><br><small>${escapeHtml(item.description || "")}</small></td><td class="code">${escapeHtml(source)}<br><small>${escapeHtml(item.assetKey || item.imageUrl)}</small></td><td>${escapeHtml((item.tags || []).join(", "))}</td><td class="status-${item.status === "published" ? "active" : item.status === "draft" ? "draft" : "disabled"}">${item.status === "published" ? "已发布" : item.status === "draft" ? "草稿" : "隐藏"}</td><td class="row-actions"></td>`;
     tr.lastElementChild.append(
       actionButton("预览", () => window.open(item.imageUrl, "_blank")),
-      actionButton("编辑", () => fillGalleryForm(item)),
+      actionButton("编辑", () => fillGalleryForm(item, currentAdminModule())),
       actionButton("删除", () => deleteGallery(item.id), "danger")
     );
     rows.append(tr);
@@ -1003,8 +1004,10 @@ async function saveGallery(event) {
   if (!payload.title || !payload.imageUrl) return toast("请填写标题和图片地址，或选择本地图片后直接保存", true);
   const result = await api("/api/admin/gallery", payload);
   if (!result.success) return toast(result.msg || "保存失败", true);
+  const moduleId = currentAdminModule();
   resetGalleryForm();
   render(result.catalog);
+  showPanel("galleryPanel", { moduleId, view: "galleryList" });
   toast("画廊图片已保存");
 }
 
@@ -1052,7 +1055,11 @@ async function saveGalleryFiles(files) {
   byId("galleryFile").value = "";
   await loadGalleryAssets();
   resetGalleryForm();
-  if (nextCatalog) render(nextCatalog);
+  if (nextCatalog) {
+    const moduleId = currentAdminModule();
+    render(nextCatalog);
+    showPanel("galleryPanel", { moduleId, view: "galleryList" });
+  }
   toast(total > 1 ? `已上传并保存 ${total} 张图片` : "画廊图片已上传并保存");
 }
 
@@ -1379,8 +1386,8 @@ function fillMusicForm(item) {
   byId("musicStatus").value = item.status || "draft";
 }
 
-function fillGalleryForm(item) {
-  showPanel("galleryPanel");
+function fillGalleryForm(item, moduleId = "gallery") {
+  showPanel("galleryPanel", { moduleId, view: "galleryEdit" });
   byId("galleryId").value = item.id;
   byId("galleryTitle").value = item.title || "";
   byId("galleryDescription").value = item.description || "";
@@ -1393,6 +1400,10 @@ function fillGalleryForm(item) {
   byId("gallerySort").value = item.sortOrder || 0;
   byId("galleryStatus").value = item.status || "draft";
   loadGalleryAssets();
+}
+
+function currentAdminModule() {
+  return document.querySelector(".module-sidebar button.is-active")?.dataset.module || "software";
 }
 
 function fillStorageForm(item) {

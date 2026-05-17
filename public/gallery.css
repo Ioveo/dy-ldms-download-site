@@ -190,12 +190,13 @@
 .gallery-masonry {
   column-count: 4;
   column-gap: 0;
+  line-height: 0;
 }
 
 .gallery-tile {
   position: relative;
   width: 100%;
-  display: inline-block;
+  display: block;
   margin: 0;
   padding: 0;
   overflow: hidden;
@@ -205,6 +206,8 @@
   background: linear-gradient(135deg, rgba(207, 188, 255, 0.08), rgba(0, 242, 255, 0.05));
   cursor: zoom-in;
   break-inside: avoid;
+  -webkit-column-break-inside: avoid;
+  page-break-inside: avoid;
   transform: translateY(12px);
   opacity: 0;
   animation: galleryRise 520ms ease both;

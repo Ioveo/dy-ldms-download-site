@@ -155,31 +155,29 @@ function moveViewer(step) {
 }
 
 async function toggleOriginalView() {
-  if (figure.classList.contains("is-original-size")) {
+  if (figure.classList.contains("is-compact-size")) {
     enterScreenFitView();
     return;
   }
 
-  enterOriginalSizeView();
+  enterCompactView();
 }
 
 function enterScreenFitView() {
-  figure.classList.remove("is-original-size");
+  figure.classList.remove("is-compact-size", "is-original-size");
   figure.classList.add("is-screen-fit");
   viewerImage.style.removeProperty("width");
   viewerImage.style.removeProperty("height");
-  byId("galleryFullscreen").textContent = "原图";
+  byId("galleryFullscreen").textContent = "缩小";
   flashViewerMode();
 }
 
-function enterOriginalSizeView() {
+function enterCompactView() {
   figure.classList.remove("is-screen-fit");
-  figure.classList.add("is-original-size");
-  if (viewerImage.naturalWidth > 0) {
-    viewerImage.style.width = `${viewerImage.naturalWidth}px`;
-    viewerImage.style.height = `${viewerImage.naturalHeight}px`;
-  }
-  byId("galleryFullscreen").textContent = "恢复";
+  figure.classList.add("is-compact-size");
+  viewerImage.style.removeProperty("width");
+  viewerImage.style.removeProperty("height");
+  byId("galleryFullscreen").textContent = "放大";
   flashViewerMode();
 }
 
@@ -281,7 +279,7 @@ function closeViewer() {
   viewerImage.classList.remove("is-opening");
   clearOpeningImageStyle();
   viewer.classList.remove("is-loading", "is-ready", "is-entering", "is-zooming");
-  figure.classList.remove("is-mode-changing");
+  figure.classList.remove("is-mode-changing", "is-compact-size", "is-original-size");
   enterScreenFitView();
   document.body.classList.remove("gallery-viewer-open");
 }

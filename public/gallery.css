@@ -310,9 +310,7 @@
   place-items: center;
   padding: 28px;
   overflow: auto;
-  background:
-    radial-gradient(circle at 50% 0%, rgba(207, 188, 255, 0.14), transparent 40%),
-    rgba(0, 0, 0, 0.9);
+  background: rgba(0, 0, 0, 0.42);
   backdrop-filter: blur(22px);
   animation: galleryViewerIn 180ms ease both;
 }
@@ -320,7 +318,7 @@
 .gallery-viewer__backdrop {
   position: fixed;
   inset: -34px;
-  z-index: -1;
+  z-index: 0;
   background-color: #050409;
   background-position: center;
   background-size: cover;
@@ -344,6 +342,8 @@
 }
 
 .gallery-viewer figure {
+  position: relative;
+  z-index: 1;
   max-width: min(1240px, 92vw);
   max-height: 90svh;
   margin: 0;
@@ -364,6 +364,12 @@
   max-height: none;
   gap: 0;
   place-self: start center;
+}
+
+.gallery-viewer figure.is-compact-size {
+  max-width: calc((100vw - 56px) * 0.78);
+  max-height: calc((100svh - 56px) * 0.78);
+  gap: 0;
 }
 
 .gallery-viewer img {
@@ -426,6 +432,13 @@
   cursor: zoom-out;
 }
 
+.gallery-viewer figure.is-compact-size img {
+  max-width: calc((100vw - 56px) * 0.78);
+  max-height: calc((100svh - 56px) * 0.78);
+  border-radius: 0;
+  cursor: zoom-in;
+}
+
 .gallery-viewer figcaption {
   display: flex;
   justify-content: space-between;
@@ -446,6 +459,7 @@
 }
 
 .gallery-viewer figure.is-screen-fit figcaption,
+.gallery-viewer figure.is-compact-size figcaption,
 .gallery-viewer figure.is-original-size figcaption {
   display: none;
 }
@@ -594,6 +608,12 @@
   .gallery-viewer figure.is-screen-fit img {
     max-width: calc(100vw - 24px);
     max-height: calc(100svh - 24px);
+  }
+
+  .gallery-viewer figure.is-compact-size,
+  .gallery-viewer figure.is-compact-size img {
+    max-width: calc((100vw - 24px) * 0.78);
+    max-height: calc((100svh - 24px) * 0.78);
   }
 
   .gallery-viewer figcaption {

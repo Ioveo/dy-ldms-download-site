@@ -232,7 +232,7 @@ function renderCategoryOptions() {
   byId("registerSoftware").innerHTML = byId("releaseSoftware").innerHTML;
   byId("releaseStorage").innerHTML = `<option value="default">默认 R2：dy-ldms-downloads</option>${(catalog.storageAccounts || []).filter(item => item.status !== "disabled").map(item => `<option value="${escapeAttr(item.id)}">${escapeHtml(item.name)} / ${escapeHtml(item.bucket)}</option>`).join("")}`;
   const galleryStorage = byId("galleryStorage");
-  if (galleryStorage) galleryStorage.innerHTML = `<option value="default">默认 R2</option>${(catalog.storageAccounts || []).filter(item => item.status !== "disabled").map(item => `<option value="${escapeAttr(item.id)}">${escapeHtml(item.name)} / ${escapeHtml(item.bucket)}</option>`).join("")}`;
+  if (galleryStorage) galleryStorage.innerHTML = `<option value="default">默认 R2</option><option value="cloudflare-images">Cloudflare Images 图像托管</option>${(catalog.storageAccounts || []).filter(item => item.status !== "disabled").map(item => `<option value="${escapeAttr(item.id)}">${escapeHtml(item.name)} / ${escapeHtml(item.bucket)}</option>`).join("")}`;
   loadSoftwareCoverAssets();
   loadMusicCoverAssets();
   loadGalleryAssets();
@@ -557,6 +557,10 @@ async function loadGalleryAssets() {
   if (!select) return;
   select.innerHTML = `<option value="">选择图片</option>`;
   const storageId = byId("galleryStorage")?.value || "default";
+  if (storageId === "cloudflare-images") {
+    select.innerHTML = `<option value="">Cloudflare Images 请上传或粘贴图片 URL</option>`;
+    return;
+  }
   const result = await api("/api/admin/assets/list", { storageId, kind: "image", status: "active", pageSize: 100 });
   if (!result.success) {
     toast(result.msg || "读取 R2 图片失败", true);
@@ -596,7 +600,10 @@ async function uploadGalleryImage() {
   if (mediaType !== "image") return toast("请选择图片文件", true);
   if (file.size > 8 * 1024 * 1024) return toast("图片不能超过 8MB", true);
   toast("正在上传画廊图片");
-  const result = await uploadAssetMedia(file, "image", "gallery", "gallery", byId("galleryStorage").value);
+  const storageId = byId("galleryStorage").value;
+  const result = storageId === "cloudflare-images"
+    ? await uploadCloudflareImage(file)
+    : await uploadAssetMedia(file, "image", "gallery", "gallery", storageId);
   if (!result.success) return toast(result.msg || "图片上传失败", true);
   if (!result.url) return toast("图片已上传，但没有返回可用地址", true);
   byId("galleryImageUrl").value = result.url;
@@ -605,6 +612,32 @@ async function uploadGalleryImage() {
   byId("galleryFile").value = "";
   await loadGalleryAssets();
   toast("画廊图片已上传");
+}
+
+async function uploadCloudflareImage(file) {
+  try {
+    const ticket = await api("/api/admin/images/direct-upload", {
+      fileName: file.name || "gallery-image",
+      contentType: file.type || ""
+    });
+    if (!ticket.success) return ticket;
+    if (!ticket.uploadURL || !ticket.imageId) return { success: false, msg: "Cloudflare Images 没有返回上传地址" };
+    const form = new FormData();
+    form.append("file", file, file.name || "gallery-image");
+    const response = await fetch(ticket.uploadURL, { method: "POST", body: form });
+    const text = await response.text();
+    const result = parseUploadResponse(text);
+    if (!response.ok || result.success === false) {
+      return { success: false, msg: result.errors?.[0]?.message || result.msg || `Cloudflare Images 上传失败：HTTP ${response.status}` };
+    }
+    return {
+      success: true,
+      url: ticket.url,
+      asset: { key: ticket.imageId, storageId: "cloudflare-images", url: ticket.url }
+    };
+  } catch (error) {
+    return { success: false, msg: `Cloudflare Images 上传失败：${error.message || "网络异常"}` };
+  }
 }
 
 function previewGalleryImage() {
@@ -912,7 +945,7 @@ async function saveGallery(event) {
     thumbUrl: byId("galleryThumbUrl").value.trim() || imageUrl,
     storageId: byId("galleryStorage").value,
     assetKey: byId("galleryAssetKey").value.trim(),
-    source: /^https?:\/\//i.test(imageUrl) && !byId("galleryAssetKey").value.trim() ? "network" : "r2",
+    source: byId("galleryStorage").value === "cloudflare-images" ? "cloudflare-images" : /^https?:\/\//i.test(imageUrl) && !byId("galleryAssetKey").value.trim() ? "network" : "r2",
     tags: byId("galleryTags").value.split(/[,，\n]/).map(item => item.trim()).filter(Boolean),
     featured: byId("galleryFeatured").checked,
     sortOrder: Number(byId("gallerySort").value || 0),

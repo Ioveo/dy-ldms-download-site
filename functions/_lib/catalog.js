@@ -102,6 +102,7 @@ export function normalizeCatalog(catalog) {
     })).sort(bySortOrder),
     navigation: normalizeNavigation(catalog?.navigation || []),
     site: normalizeSite(catalog?.site || catalog?.settings || {}),
+    siteCarousel: normalizeSiteCarousel(catalog?.siteCarousel || catalog?.site_carousel || []),
     software: software.map((item, index) => normalizeSoftware(item, index, now)).sort(bySortOrder),
     articles: normalizeArticles(catalog?.articles || []),
     music: normalizeMusic(catalog?.music || catalog?.tracks || []),
@@ -184,6 +185,7 @@ export function publicCatalog(catalog) {
     categories: catalog.categories.filter(item => item.status !== "disabled"),
     navigation: (catalog.navigation || DEFAULT_NAVIGATION).filter(item => item.status !== "disabled"),
     site: normalizeSite(catalog.site || {}),
+    siteCarousel: (catalog.siteCarousel || []).filter(item => item.status === "published"),
     software: catalog.software
       .filter(item => item.status !== "disabled")
       .map(item => ({
@@ -200,6 +202,21 @@ export function publicCatalog(catalog) {
 
 export function normalizeSite(site) {
   return Object.fromEntries(Object.entries(DEFAULT_SITE).map(([key, fallback]) => [key, String(site?.[key] || fallback)]));
+}
+
+export function normalizeSiteCarousel(items) {
+  return Array.isArray(items) ? items.map((item, index) => ({
+    id: String(item.id || `carousel-${index + 1}`),
+    title: String(item.title || "未命名轮播图"),
+    description: String(item.description || ""),
+    imageUrl: String(item.imageUrl || item.image_url || item.url || ""),
+    thumbUrl: String(item.thumbUrl || item.thumb_url || item.imageUrl || item.image_url || item.url || ""),
+    suggestion: String(item.suggestion || ""),
+    status: item.status || "draft",
+    sortOrder: Number(item.sortOrder ?? item.sort_order ?? index),
+    createdAt: Number(item.createdAt || Date.now()),
+    updatedAt: Number(item.updatedAt || Date.now())
+  })).sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0) || (b.updatedAt || 0) - (a.updatedAt || 0)) : [];
 }
 
 export function normalizeArticles(articles) {

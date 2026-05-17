@@ -201,13 +201,13 @@
           <div class="panel__head">
             <div>
               <h2>画廊管理</h2>
-              <p>维护前台画廊图片。首页 AI 动态轮播也读取这里已发布的图片，保存后可在“轮播图列表”里编辑或删除。</p>
+              <p>维护前台画廊图片。首页轮播图请到“站点 → 添加轮播图”单独管理，不会进入画廊。</p>
             </div>
           </div>
           <form class="form-grid" id="galleryForm">
             <input type="hidden" id="galleryId" />
             <input type="hidden" id="galleryAssetKey" />
-            <label>标题<input id="galleryTitle" placeholder="也会显示在首页 AI 轮播文字里" /></label>
+            <label>标题<input id="galleryTitle" placeholder="批量上传可留空，默认使用文件名" /></label>
             <label>存储位置<select id="galleryStorage"></select></label>
             <label class="span-2">图片地址<input id="galleryImageUrl" placeholder="/media/images/... 或 https://...；选择本地图片后保存会自动上传" /></label>
             <label class="span-2">缩略图地址<input id="galleryThumbUrl" placeholder="可留空，默认使用图片地址" /></label>
@@ -220,10 +220,35 @@
             <label>排序<input id="gallerySort" type="number" value="10" /></label>
             <label><input id="galleryFeatured" type="checkbox" /> 推荐显示</label>
             <label>状态<select id="galleryStatus"><option value="published">发布</option><option value="draft">草稿</option><option value="disabled">隐藏</option></select></label>
-            <label class="span-2">说明<textarea id="galleryDescription" rows="3" placeholder="也会显示在首页 AI 轮播说明里，例如素材用途、场景或运营建议"></textarea></label>
+            <label class="span-2">说明<textarea id="galleryDescription" rows="3" placeholder="图片说明、拍摄地点或备注"></textarea></label>
             <div class="form-actions span-2"><button type="submit">保存图片</button><button class="ghost" type="button" id="resetGallery">清空</button></div>
           </form>
-          <div class="table-wrap"><table><thead><tr><th>轮播图片 / 标题</th><th>来源</th><th>标签</th><th>状态</th><th>操作</th></tr></thead><tbody id="galleryRows"></tbody></table></div>
+          <div class="table-wrap"><table><thead><tr><th>图片</th><th>来源</th><th>标签</th><th>状态</th><th>操作</th></tr></thead><tbody id="galleryRows"></tbody></table></div>
+        </section>
+
+        <section class="panel tab-panel" id="siteCarouselPanel" hidden>
+          <div class="panel__head">
+            <div>
+              <h2>首页轮播图</h2>
+              <p>只控制首页 AI 动态轮播，不会发布到前台画廊。</p>
+            </div>
+          </div>
+          <form class="form-grid" id="siteCarouselForm">
+            <input type="hidden" id="siteCarouselId" />
+            <label>标题<input id="siteCarouselTitle" required placeholder="显示在轮播图上的大字" /></label>
+            <label>排序<input id="siteCarouselSort" type="number" value="10" /></label>
+            <label class="span-2">图片地址<input id="siteCarouselImageUrl" required placeholder="/media/images/... 或 https://..." /></label>
+            <label class="span-2">缩略图地址<input id="siteCarouselThumbUrl" placeholder="可留空，默认使用图片地址" /></label>
+            <label>R2 图片<select id="siteCarouselAsset"><option value="">选择图片</option></select></label>
+            <div class="form-actions"><button class="ghost" type="button" id="loadSiteCarouselAssets">加载图片</button><button class="ghost" type="button" id="useSiteCarouselAsset">使用选中图片</button></div>
+            <label>本地图片<input id="siteCarouselFile" type="file" accept="image/png,image/jpeg,image/webp,image/gif,image/avif" /></label>
+            <div class="form-actions"><button class="ghost" type="button" id="uploadSiteCarouselImage">上传图片</button><button class="ghost" type="button" id="previewSiteCarouselImage">预览</button></div>
+            <label>状态<select id="siteCarouselStatus"><option value="published">发布</option><option value="draft">草稿</option><option value="disabled">隐藏</option></select></label>
+            <label class="span-2">说明<textarea id="siteCarouselDescription" rows="3" placeholder="显示在轮播图说明里"></textarea></label>
+            <label class="span-2">AI 建议<textarea id="siteCarouselSuggestion" rows="3" placeholder="显示在下方 AI Suggestion 里，可留空使用默认建议"></textarea></label>
+            <div class="form-actions span-2"><button type="submit">保存轮播图</button><button class="ghost" type="button" id="resetSiteCarousel">清空</button></div>
+          </form>
+          <div class="table-wrap"><table><thead><tr><th>轮播图</th><th>说明</th><th>排序</th><th>状态</th><th>操作</th></tr></thead><tbody id="siteCarouselRows"></tbody></table></div>
         </section>
 
         <section class="panel tab-panel" id="navigationPanel" hidden>

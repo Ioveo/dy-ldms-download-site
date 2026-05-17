@@ -68,11 +68,11 @@ async function loadAiSlides() {
     if (!response.ok) throw new Error("catalog request failed");
     const catalog = await response.json();
     applySiteText(catalog.site || {});
-    const gallery = (catalog.gallery || [])
+    const carousel = (catalog.siteCarousel || [])
       .filter(item => item.imageUrl)
       .slice(0, 6)
-      .map((item, index) => slideFromGallery(item, index));
-    if (gallery.length) return gallery;
+      .map((item, index) => slideFromCarousel(item, index));
+    if (carousel.length) return carousel;
   } catch {
     // Static slides keep the section useful before images are added in admin.
   }
@@ -86,7 +86,7 @@ function applySiteText(site) {
   }
 }
 
-function slideFromGallery(item, index) {
+function slideFromCarousel(item, index) {
   const templates = [
     { kicker: "素材洞察", suggestion: "这张素材适合作为画廊主推，建议同步放入首页动态区域提高点击率。" },
     { kicker: "直播话术", suggestion: "围绕画面主体生成开场话术，并关联下载中心入口形成转化路径。" },
@@ -98,7 +98,7 @@ function slideFromGallery(item, index) {
     title: item.title || `后台素材 ${index + 1}`,
     description: item.description || (item.tags || []).join(" / ") || "来自后台系统管理的图片素材。",
     kicker: template.kicker,
-    suggestion: template.suggestion
+    suggestion: item.suggestion || template.suggestion
   };
 }
 

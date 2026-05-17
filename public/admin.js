@@ -56,8 +56,8 @@ const ADMIN_MODULES = {
     description: "配置首页文案、AI 轮播入口和前台导航。",
     items: [
       { panel: "siteHomePanel", label: "首页文案", action: "主页内容" },
-      { panel: "galleryPanel", view: "galleryEdit", label: "添加轮播图", action: "AI 轮播图片" },
-      { panel: "galleryPanel", view: "galleryList", label: "轮播图列表", action: "编辑/删除" },
+      { panel: "siteCarouselPanel", view: "siteCarouselEdit", label: "添加轮播图", action: "首页专用" },
+      { panel: "siteCarouselPanel", view: "siteCarouselList", label: "轮播图列表", action: "编辑/删除" },
       { panel: "navigationPanel", label: "导航设置", action: "菜单配置" },
       { panel: "healthPanel", label: "系统状态", action: "部署检查" }
     ]
@@ -105,6 +105,7 @@ byId("categoryForm").addEventListener("submit", saveCategory);
 byId("storageForm").addEventListener("submit", saveStorage);
 byId("navigationForm").addEventListener("submit", saveNavigation);
 byId("siteHomeForm").addEventListener("submit", saveSiteHome);
+byId("siteCarouselForm").addEventListener("submit", saveSiteCarousel);
 byId("articleForm").addEventListener("submit", saveArticle);
 byId("musicForm").addEventListener("submit", saveMusic);
 byId("galleryForm").addEventListener("submit", saveGallery);
@@ -124,6 +125,11 @@ byId("galleryStorage").addEventListener("change", loadGalleryAssets);
 byId("resetSoftware").addEventListener("click", resetSoftwareForm);
 byId("resetMusic").addEventListener("click", resetMusicForm);
 byId("resetGallery").addEventListener("click", resetGalleryForm);
+byId("resetSiteCarousel").addEventListener("click", resetSiteCarouselForm);
+byId("loadSiteCarouselAssets").addEventListener("click", loadSiteCarouselAssets);
+byId("useSiteCarouselAsset").addEventListener("click", useSiteCarouselAsset);
+byId("uploadSiteCarouselImage").addEventListener("click", uploadSiteCarouselImage);
+byId("previewSiteCarouselImage").addEventListener("click", previewSiteCarouselImage);
 byId("resetCategory").addEventListener("click", resetCategoryForm);
 byId("resetStorage").addEventListener("click", resetStorageForm);
 byId("resetNavigation").addEventListener("click", resetNavigationForm);
@@ -230,7 +236,24 @@ function render(nextCatalog) {
   renderArticleRows();
   renderMusicRows();
   renderGalleryRows();
+  renderSiteCarouselRows();
   renderReleaseRows();
+}
+
+function renderSiteCarouselRows() {
+  const rows = byId("siteCarouselRows");
+  if (!rows) return;
+  rows.innerHTML = "";
+  for (const item of catalog.siteCarousel || []) {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td>${item.imageUrl ? `<img class="thumb" src="${escapeAttr(item.thumbUrl || item.imageUrl)}" alt="">` : "-"} <strong>${escapeHtml(item.title)}</strong><br><small>${escapeHtml(item.imageUrl || "")}</small></td><td>${escapeHtml(item.description || "")}</td><td>${item.sortOrder}</td><td class="status-${item.status === "published" ? "active" : item.status === "draft" ? "draft" : "disabled"}">${item.status === "published" ? "已发布" : item.status === "draft" ? "草稿" : "隐藏"}</td><td class="row-actions"></td>`;
+    tr.lastElementChild.append(
+      actionButton("预览", () => window.open(item.imageUrl, "_blank")),
+      actionButton("编辑", () => fillSiteCarouselForm(item)),
+      actionButton("删除", () => deleteSiteCarousel(item.id), "danger")
+    );
+    rows.append(tr);
+  }
 }
 
 function renderStats() {
@@ -256,6 +279,7 @@ function renderCategoryOptions() {
   loadSoftwareCoverAssets();
   loadMusicCoverAssets();
   loadGalleryAssets();
+  loadSiteCarouselAssets();
 }
 
 function renderArticleOptions() {
@@ -612,6 +636,52 @@ function useGalleryAsset() {
   toast("已使用选中的图片");
 }
 
+async function loadSiteCarouselAssets() {
+  const select = byId("siteCarouselAsset");
+  if (!select) return;
+  select.innerHTML = `<option value="">选择图片</option>`;
+  const result = await api("/api/admin/assets/list", { kind: "image", status: "active", pageSize: 100 });
+  if (!result.success) return toast(result.msg || "读取 R2 图片失败", true);
+  for (const asset of result.assets || []) {
+    if (asset.kind !== "image" && asset.kind !== "site") continue;
+    const url = asset.url || asset.publicUrl || (asset.key ? `/media/${encodeURIComponent(asset.key)}` : "");
+    if (!url) continue;
+    const option = document.createElement("option");
+    option.value = url;
+    option.textContent = `${asset.fileName || asset.key} (${formatBytes(asset.fileSize)})`;
+    select.append(option);
+  }
+}
+
+function useSiteCarouselAsset() {
+  const value = byId("siteCarouselAsset").value;
+  if (!value) return toast("请先选择一张 R2 图片", true);
+  byId("siteCarouselImageUrl").value = value;
+  byId("siteCarouselThumbUrl").value = value;
+  toast("已使用选中的轮播图");
+}
+
+async function uploadSiteCarouselImage() {
+  const file = byId("siteCarouselFile").files[0];
+  if (!file) return toast("请选择本地图片", true);
+  const error = validateGalleryFile(file);
+  if (error) return toast(error, true);
+  toast("正在上传首页轮播图");
+  const result = await uploadAssetMedia(file, "image", "site-carousel", "site-carousel");
+  if (!result.success || !result.url) return toast(result.msg || "轮播图上传失败", true);
+  byId("siteCarouselImageUrl").value = result.url;
+  byId("siteCarouselThumbUrl").value = result.url;
+  byId("siteCarouselFile").value = "";
+  await loadSiteCarouselAssets();
+  toast("首页轮播图已上传");
+}
+
+function previewSiteCarouselImage() {
+  const url = byId("siteCarouselImageUrl").value.trim();
+  if (!url) return toast("请先填写或选择图片地址", true);
+  window.open(url, "_blank");
+}
+
 async function uploadGalleryImage() {
   const file = byId("galleryFile").files[0];
   if (!file) return toast("请选择本地图片", true);
@@ -803,6 +873,28 @@ async function saveSiteHome(event) {
   toast("首页文案已保存");
 }
 
+async function saveSiteCarousel(event) {
+  event.preventDefault();
+  const imageUrl = byId("siteCarouselImageUrl").value.trim();
+  const payload = {
+    id: byId("siteCarouselId").value,
+    title: byId("siteCarouselTitle").value.trim(),
+    description: byId("siteCarouselDescription").value.trim(),
+    imageUrl,
+    thumbUrl: byId("siteCarouselThumbUrl").value.trim() || imageUrl,
+    suggestion: byId("siteCarouselSuggestion").value.trim(),
+    sortOrder: Number(byId("siteCarouselSort").value || 0),
+    status: byId("siteCarouselStatus").value
+  };
+  if (!payload.title || !payload.imageUrl) return toast("请填写标题和图片地址", true);
+  const result = await api("/api/admin/site-carousel", payload);
+  if (!result.success) return toast(result.msg || "保存失败", true);
+  resetSiteCarouselForm();
+  render(result.catalog);
+  showPanel("siteCarouselPanel", { moduleId: "site", view: "siteCarouselList" });
+  toast("首页轮播图已保存");
+}
+
 function fillSiteHomeForm(site = {}) {
   for (const key of SITE_HOME_FIELDS) {
     const input = byId(key);
@@ -812,6 +904,15 @@ function fillSiteHomeForm(site = {}) {
 
 function siteHomePayload() {
   return Object.fromEntries(SITE_HOME_FIELDS.map(key => [key, byId(key).value.trim()]));
+}
+
+async function deleteSiteCarousel(id) {
+  if (!confirm("确定删除这张首页轮播图吗？图片文件不会自动删除。")) return;
+  const result = await api("/api/admin/site-carousel", { action: "delete", id });
+  if (!result.success) return toast(result.msg || "删除失败", true);
+  render(result.catalog);
+  showPanel("siteCarouselPanel", { moduleId: "site", view: "siteCarouselList" });
+  toast("首页轮播图已删除");
 }
 
 async function saveArticle(event) {
@@ -1402,6 +1503,19 @@ function fillGalleryForm(item, moduleId = "gallery") {
   loadGalleryAssets();
 }
 
+function fillSiteCarouselForm(item) {
+  showPanel("siteCarouselPanel", { moduleId: "site", view: "siteCarouselEdit" });
+  byId("siteCarouselId").value = item.id;
+  byId("siteCarouselTitle").value = item.title || "";
+  byId("siteCarouselDescription").value = item.description || "";
+  byId("siteCarouselImageUrl").value = item.imageUrl || "";
+  byId("siteCarouselThumbUrl").value = item.thumbUrl || "";
+  byId("siteCarouselSuggestion").value = item.suggestion || "";
+  byId("siteCarouselSort").value = item.sortOrder || 0;
+  byId("siteCarouselStatus").value = item.status || "draft";
+  loadSiteCarouselAssets();
+}
+
 function currentAdminModule() {
   return document.querySelector(".module-sidebar button.is-active")?.dataset.module || "software";
 }
@@ -1525,6 +1639,14 @@ function resetGalleryForm() {
   byId("galleryStatus").value = "published";
   byId("galleryStorage").value = "default";
   loadGalleryAssets();
+}
+
+function resetSiteCarouselForm() {
+  byId("siteCarouselForm").reset();
+  byId("siteCarouselId").value = "";
+  byId("siteCarouselSort").value = "10";
+  byId("siteCarouselStatus").value = "published";
+  loadSiteCarouselAssets();
 }
 
 function resetStorageForm() {

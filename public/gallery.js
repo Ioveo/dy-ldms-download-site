@@ -1,24 +1,41 @@
 let activeTag = "all";
+let searchText = "";
 let galleryItems = [];
+let visibleItems = [];
+let activeIndex = -1;
 
 const masonry = byId("galleryMasonry");
 const viewer = byId("galleryViewer");
 const viewerImage = byId("galleryViewerImage");
 const viewerTitle = byId("galleryViewerTitle");
 const viewerDescription = byId("galleryViewerDescription");
+const viewerOriginal = byId("galleryOriginal");
 const figure = byId("galleryFigure");
 
 loadGallery();
 
 byId("galleryClose").addEventListener("click", closeViewer);
+byId("galleryPrev").addEventListener("click", () => moveViewer(-1));
+byId("galleryNext").addEventListener("click", () => moveViewer(1));
+byId("galleryFullscreen").addEventListener("click", toggleFullscreen);
+byId("gallerySearch").addEventListener("input", event => {
+  searchText = event.target.value.trim().toLowerCase();
+  renderGallery();
+});
+
 viewer.addEventListener("click", event => {
   if (event.target === viewer) closeViewer();
 });
-viewerImage.addEventListener("click", () => {
-  figure.classList.toggle("is-fullscreen");
-});
+
+viewerImage.addEventListener("click", toggleFullscreen);
+viewerImage.addEventListener("dblclick", toggleFullscreen);
+
 document.addEventListener("keydown", event => {
-  if (event.key === "Escape" && !viewer.hidden) closeViewer();
+  if (viewer.hidden) return;
+  if (event.key === "Escape") closeViewer();
+  if (event.key === "ArrowLeft") moveViewer(-1);
+  if (event.key === "ArrowRight") moveViewer(1);
+  if (event.key === "Enter" || event.key.toLowerCase() === "f") toggleFullscreen();
 });
 
 async function loadGallery() {
@@ -27,7 +44,14 @@ async function loadGallery() {
     if (!response.ok) throw new Error("catalog request failed");
     const catalog = await response.json();
     renderNavigation(catalog);
-    galleryItems = (catalog.gallery || []).filter(item => item.imageUrl);
+    galleryItems = (catalog.gallery || [])
+      .filter(item => item.imageUrl)
+      .map(item => ({
+        ...item,
+        thumbUrl: item.thumbUrl || item.imageUrl,
+        tags: item.tags || []
+      }));
+    setHeroImage(galleryItems.find(item => item.featured) || galleryItems[0]);
     renderTags();
     renderGallery();
   } catch {
@@ -36,27 +60,36 @@ async function loadGallery() {
 }
 
 function renderGallery() {
-  const items = galleryItems.filter(item => activeTag === "all" || (item.tags || []).includes(activeTag));
-  byId("galleryCount").textContent = `${items.length} 张图片`;
+  visibleItems = galleryItems.filter(item => {
+    const inTag = activeTag === "all" || (item.tags || []).includes(activeTag);
+    if (!inTag) return false;
+    if (!searchText) return true;
+    return [item.title, item.description, ...(item.tags || [])].join(" ").toLowerCase().includes(searchText);
+  });
+
+  byId("galleryCount").textContent = `${visibleItems.length} 张图片`;
   masonry.replaceChildren();
-  if (!items.length) {
-    masonry.innerHTML = `<p class="gallery-empty">还没有可展示的图片。</p>`;
+  if (!visibleItems.length) {
+    masonry.innerHTML = `<p class="gallery-empty">没有匹配的图片。</p>`;
     return;
   }
 
-  items.forEach((item, index) => {
+  visibleItems.forEach((item, index) => {
     const button = document.createElement("button");
     button.type = "button";
     button.className = "gallery-tile";
-    button.style.setProperty("--delay", `${Math.min(index, 12) * 45}ms`);
+    button.style.setProperty("--delay", `${Math.min(index, 14) * 38}ms`);
     button.innerHTML = `
-      <img src="${escapeAttr(item.thumbUrl || item.imageUrl)}" alt="${escapeAttr(item.title)}" loading="lazy">
+      <img src="${escapeAttr(item.thumbUrl)}" alt="${escapeAttr(item.title)}" loading="lazy" decoding="async">
       <span>
         <strong>${escapeHtml(item.title)}</strong>
         ${item.description ? `<small>${escapeHtml(item.description)}</small>` : ""}
+        ${item.tags?.length ? `<em>${item.tags.map(escapeHtml).join(" / ")}</em>` : ""}
       </span>
     `;
-    button.addEventListener("click", () => openViewer(item));
+    const img = button.querySelector("img");
+    img.addEventListener("load", () => button.classList.add("is-loaded"), { once: true });
+    button.addEventListener("click", () => openViewer(index));
     masonry.append(button);
   });
 }
@@ -79,20 +112,54 @@ function renderTags() {
   });
 }
 
-function openViewer(item) {
+function openViewer(index) {
+  activeIndex = index;
+  const item = visibleItems[activeIndex];
+  if (!item) return;
   viewer.hidden = false;
   figure.classList.remove("is-fullscreen");
+  viewer.classList.add("is-loading");
+  viewerImage.onload = () => viewer.classList.remove("is-loading");
   viewerImage.src = item.imageUrl;
   viewerImage.alt = item.title || "画廊图片";
   viewerTitle.textContent = item.title || "画廊图片";
   viewerDescription.textContent = item.description || (item.tags || []).join(" / ");
+  viewerOriginal.href = item.imageUrl;
+  byId("galleryFullscreen").textContent = "全屏";
   document.body.classList.add("gallery-viewer-open");
+  preloadNeighbor(1);
+  preloadNeighbor(-1);
+}
+
+function moveViewer(step) {
+  if (!visibleItems.length) return;
+  activeIndex = (activeIndex + step + visibleItems.length) % visibleItems.length;
+  openViewer(activeIndex);
+}
+
+function toggleFullscreen() {
+  const isFullscreen = figure.classList.toggle("is-fullscreen");
+  byId("galleryFullscreen").textContent = isFullscreen ? "恢复" : "全屏";
 }
 
 function closeViewer() {
   viewer.hidden = true;
   viewerImage.removeAttribute("src");
   document.body.classList.remove("gallery-viewer-open");
+}
+
+function preloadNeighbor(step) {
+  if (!visibleItems.length) return;
+  const item = visibleItems[(activeIndex + step + visibleItems.length) % visibleItems.length];
+  if (!item?.imageUrl) return;
+  const img = new Image();
+  img.src = item.imageUrl;
+}
+
+function setHeroImage(item) {
+  const hero = byId("galleryHero");
+  if (!hero || !item?.imageUrl) return;
+  hero.style.setProperty("--hero-image", `url("${cssUrl(item.imageUrl)}")`);
 }
 
 function renderNavigation(catalog) {
@@ -121,4 +188,8 @@ function escapeHtml(value) {
 
 function escapeAttr(value) {
   return escapeHtml(value).replace(/`/g, "&#96;");
+}
+
+function cssUrl(value) {
+  return String(value || "").replace(/["\\\n\r]/g, encodeURIComponent);
 }

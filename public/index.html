@@ -3,18 +3,19 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>天才猫 - 你的直播运营快捷入口</title>
-    <meta name="description" content="天才猫把软件、数据、图库、音乐和授权入口集中到一个快速、清晰、可扩展的工作台。" />
+    <title>天才猫 - 直播运营工作台</title>
+    <meta name="description" content="天才猫把软件下载、数据中心、图片画廊、音乐频道、文章教程和授权购买整合成一个 Raycast 风格的直播运营入口。" />
     <link rel="icon" type="image/png" href="/logo.png?v=20260509" />
     <link rel="apple-touch-icon" href="/logo.png?v=20260509" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="/raycast-home.css?v=20260517-raycast-music" />
+    <link rel="stylesheet" href="/raycast-home.css?v=20260517-tiancaimao-workspace" />
   </head>
   <body class="home-page">
     <div class="site-glow site-glow--left"></div>
     <div class="site-glow site-glow--right"></div>
+    <div class="noise-layer" aria-hidden="true"></div>
 
     <header class="home-nav">
       <a class="home-brand" href="/">
@@ -22,24 +23,20 @@
         <span>天才猫</span>
       </a>
       <nav aria-label="主导航">
-        <a href="/download.html">Store</a>
-        <a href="/license.html">Pro</a>
-        <a href="/articles.html">AI</a>
-        <a href="/music.html">iOS</a>
-        <a href="/download.html">Windows</a>
-        <a href="/license.html">Teams</a>
-        <a href="/articles.html">Developers</a>
-        <a href="/articles.html">Blog</a>
-        <a href="/license.html">Pricing</a>
+        <a href="/download.html">软件下载</a>
+        <a href="/gallery.html">图片画廊</a>
+        <a href="/music.html">音乐频道</a>
+        <a href="/articles.html">文章教程</a>
+        <a href="/license.html">授权购买</a>
       </nav>
       <div class="nav-actions">
-        <a class="nav-login" href="/lvtuang">Log in</a>
-        <a class="nav-download" href="/download.html"><span>◆</span> Download</a>
+        <a class="nav-login" href="/lvtuang">管理后台</a>
+        <a class="nav-download" href="/download.html"><span>◆</span> 下载工具</a>
       </div>
     </header>
 
     <div class="home-announcement">
-      <a href="/gallery.html"><span>新功能</span> 画廊支持批量上传与沉浸式预览 <b>了解更多</b></a>
+      <a href="/gallery.html"><span>素材更新</span> 图片画廊、音乐频道和软件版本统一管理 <b>打开工作台</b></a>
     </div>
 
     <main>
@@ -51,28 +48,31 @@
           <span>Z</span><span>X</span><span>C</span><span>V</span><span>B</span><span>N</span><span>M</span><span>&lt;</span><span>&gt;</span>
           <span>fn</span><span>control</span><span>option</span><span>command</span><span class="space">space</span><span>command</span><span>option</span>
         </div>
-        <p class="hero-kicker">Tiancaimao Workspace</p>
-        <h1>你的直播运营快捷入口。</h1>
-        <p class="hero-copy">把下载、数据中心、辅助工具、图库素材和音乐频道集中到一个高速入口里，打开就能进入工作状态。</p>
+        <p class="hero-kicker">Tiancaimao Command Center</p>
+        <h1>把直播运营入口，压缩成一次打开。</h1>
+        <p class="hero-copy">像 Raycast 一样快，但内容全部换成天才猫自己的业务：软件下载、数据中心、DY 辅助、图库素材、音乐频道、文章教程和正版授权。</p>
         <div class="hero-actions">
           <a class="primary-action" href="/download.html">下载最新版</a>
-          <a class="secondary-action" href="/gallery.html">查看素材画廊</a>
+          <a class="secondary-action" href="/lvtuang">进入管理后台</a>
         </div>
-        <p class="hero-meta">Windows 桌面工具 · 数据中心 · DY 辅助 · R2 素材管理</p>
+        <p class="hero-meta">Windows 工具 · R2 素材 · 音乐频道 · 内容发布 · 授权购买</p>
 
         <div class="command-stage" aria-label="天才猫命令面板演示">
+          <div class="command-orbit command-orbit--top">DY</div>
+          <div class="command-orbit command-orbit--right">R2</div>
+          <div class="command-orbit command-orbit--bottom">API</div>
           <div class="launcher-window">
             <div class="window-dots"><i></i><i></i><i></i></div>
             <div class="launcher-search">
               <span>⌘</span>
-              <input value="搜索工具、素材和入口..." aria-label="搜索演示" readonly />
+              <input value="搜索 下载、图库、音乐、文章、授权..." aria-label="搜索演示" readonly />
             </div>
             <div class="launcher-list">
               <a href="/download.html" class="launcher-item is-active">
-                <i>⌁</i>
+                <i>↓</i>
                 <div>
                   <strong>下载天才猫 DY 辅助工具</strong>
-                  <small>官方版本 · 自动更新 · 发布包</small>
+                  <small>官方发布包、版本更新、最新安装入口</small>
                 </div>
                 <kbd>↵</kbd>
               </a>
@@ -80,7 +80,7 @@
                 <i>▧</i>
                 <div>
                   <strong>打开图片画廊</strong>
-                  <small>R2 图片 · 批量上传 · 原图预览</small>
+                  <small>R2 图片素材、沉浸预览、批量发布</small>
                 </div>
                 <kbd>G</kbd>
               </a>
@@ -88,52 +88,81 @@
                 <i>♪</i>
                 <div>
                   <strong>进入音乐频道</strong>
-                  <small>网易云 ID · R2 音频 · 推荐列表</small>
+                  <small>网易云 ID、R2 音频、直播歌单管理</small>
                 </div>
                 <kbd>M</kbd>
+              </a>
+              <a href="/articles.html" class="launcher-item">
+                <i>✦</i>
+                <div>
+                  <strong>查看文章教程</strong>
+                  <small>更新说明、使用教程、运营经验沉淀</small>
+                </div>
+                <kbd>A</kbd>
+              </a>
+              <a href="/license.html" class="launcher-item">
+                <i>✓</i>
+                <div>
+                  <strong>购买和绑定授权</strong>
+                  <small>正版授权、团队使用、长期更新服务</small>
+                </div>
+                <kbd>L</kbd>
               </a>
             </div>
           </div>
 
           <div class="floating-card floating-card--one">
-            <span>Live</span>
+            <span>Live Ops</span>
             <strong>数据中心</strong>
             <small>订单、场控、统计集中查看</small>
           </div>
           <div class="floating-card floating-card--two">
             <span>Assets</span>
-            <strong>图库管理</strong>
-            <small>批量上传后一键发布</small>
+            <strong>素材发布</strong>
+            <small>图片、音乐、文章统一维护</small>
           </div>
-          <div class="hero-orbit hero-orbit--one">⌘ K</div>
+          <div class="hero-orbit hero-orbit--one">⌘K</div>
           <div class="hero-orbit hero-orbit--two">AI</div>
+        </div>
+      </section>
+
+      <section class="shortcut-section">
+        <div class="section-heading">
+          <p>Shortcuts for Tiancaimao</p>
+          <h2>不是复制 Raycast，而是把你的业务入口变成命令。</h2>
+        </div>
+        <div class="shortcut-grid">
+          <a href="/download.html"><span>D</span><strong>软件下载</strong><small>发布包、最新版本、下载统计</small></a>
+          <a href="/gallery.html"><span>G</span><strong>图片画廊</strong><small>R2 图片素材、标签筛选、原图预览</small></a>
+          <a href="/music.html"><span>M</span><strong>音乐频道</strong><small>网易云歌曲、R2 音频、推荐列表</small></a>
+          <a href="/articles.html"><span>A</span><strong>文章教程</strong><small>教程、公告、更新说明</small></a>
+          <a href="/license.html"><span>L</span><strong>授权购买</strong><small>正版授权、团队服务、购买入口</small></a>
+          <a href="/lvtuang"><span>⌘</span><strong>管理后台</strong><small>内容维护、素材上传、版本发布</small></a>
         </div>
       </section>
 
       <section class="keyboard-section">
         <div class="section-heading">
-          <p>Fast by default</p>
-          <h2>所有常用入口，都在指尖。</h2>
+          <p>Keyboard first</p>
+          <h2>高频运营动作，直接映射到入口。</h2>
         </div>
         <div class="keyboard-grid" aria-hidden="true">
-          <span>esc</span><span>F1</span><span>F2</span><span>F3</span><span>F4</span><span>F5</span><span>F6</span><span>F7</span><span>F8</span><span>F9</span><span>F10</span><span>F11</span>
-          <span>~</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>0</span><span>⌫</span>
-          <span>tab</span><span>Q</span><span>W</span><span>E</span><span>R</span><span>T</span><span>Y</span><span>U</span><span>I</span><span>O</span><span>P</span><span>\</span>
-          <span>caps</span><span>A</span><span>S</span><span>D</span><span>F</span><span>G</span><span>H</span><span>J</span><span>K</span><span>L</span><span>;</span><span>↵</span>
-          <span>shift</span><span>Z</span><span>X</span><span>C</span><span>V</span><span>B</span><span>N</span><span>M</span><span>,</span><span>.</span><span>/</span><span>shift</span>
+          <span>esc</span><span>下载</span><span>图库</span><span>音乐</span><span>文章</span><span>授权</span><span>后台</span><span>统计</span><span>上传</span><span>发布</span><span>预览</span><span>购买</span>
+          <span>tab</span><span>DY</span><span>R2</span><span>API</span><span>云</span><span>素材</span><span>教程</span><span>版本</span><span>订单</span><span>歌单</span><span>封面</span><span>↵</span>
+          <span>shift</span><span>Data</span><span>Live</span><span>Asset</span><span>Music</span><span>Article</span><span>License</span><span>Admin</span><span>SEO</span><span>Sync</span><span>Open</span><span>shift</span>
         </div>
         <div class="keyboard-notes">
           <article>
-            <strong>毫秒级入口</strong>
-            <span>下载、图库、音乐、授权直接进入。</span>
+            <strong>更像命令面板</strong>
+            <span>首屏用搜索、快捷键和命令列表组织入口，不再只是普通导航。</span>
           </article>
           <article>
-            <strong>键盘优先</strong>
-            <span>为高频运营工作减少鼠标路径。</span>
+            <strong>内容换成你自己的</strong>
+            <span>下载、图库、音乐、文章、授权、后台都在首页露出。</span>
           </article>
           <article>
-            <strong>稳定发布</strong>
-            <span>软件包、版本和素材统一管理。</span>
+            <strong>动效保留克制</strong>
+            <span>浮动卡片、按键高亮、轨道卡片和音乐波形增强空间感。</span>
           </article>
         </div>
       </section>
@@ -141,42 +170,41 @@
       <section class="extension-section">
         <div class="section-heading">
           <div>
-            <p>There is music for that</p>
-            <h2>Use every channel without opening another tool.</h2>
+            <p>Extensions for live work</p>
+            <h2>每个模块都是天才猫的一个扩展。</h2>
           </div>
-          <div class="music-tabs" aria-label="音乐分类">
-            <button type="button" class="is-active">Playlist</button>
-            <button type="button">Live</button>
-            <button type="button">Focus</button>
-            <button type="button">Upload</button>
+          <div class="music-tabs" aria-label="运营模块">
+            <button type="button" class="is-active">下载</button>
+            <button type="button">图库</button>
+            <button type="button">音乐</button>
+            <button type="button">授权</button>
           </div>
         </div>
         <div class="music-card-row">
-          <a class="music-card music-card--green" href="/music.html">
-            <span class="music-icon">♪</span>
-            <b>网易云歌单</b>
-            <em>用歌曲 ID 快速生成频道内容。</em>
-            <div class="album-art album-art--disc"></div>
-            <div class="player-controls"><i></i><strong></strong><i></i></div>
+          <a class="music-card music-card--red" href="/download.html">
+            <span class="music-icon">↓</span>
+            <b>软件发布中心</b>
+            <em>把安装包、版本号、下载链接和最新发布状态集中呈现给用户。</em>
+            <div class="release-card"><strong>vLatest</strong><span>Download ready</span><small>Windows / DY Assistant</small></div>
+          </a>
+          <a class="music-card music-card--green" href="/gallery.html">
+            <span class="music-icon">▧</span>
+            <b>图片素材画廊</b>
+            <em>批量上传到 R2 后，用画廊方式筛选、预览、打开原图。</em>
+            <div class="gallery-stack"><i></i><i></i><i></i></div>
           </a>
           <a class="music-card music-card--purple" href="/music.html">
-            <span class="music-icon">∞</span>
-            <b>直播氛围</b>
-            <em>为现场准备开场、暖场和节奏音乐。</em>
+            <span class="music-icon">♪</span>
+            <b>直播音乐频道</b>
+            <em>网易云歌曲 ID 和 R2 音频都能收纳，适合直播暖场和内容页。</em>
             <div class="wave-line"></div>
-            <div class="playlist-mini"><span>Opening</span><span>Work</span><span>Late night</span></div>
+            <div class="playlist-mini"><span>Opening</span><span>Live room</span><span>Focus list</span></div>
           </a>
-          <a class="music-card music-card--teal" href="/music.html">
-            <span class="music-icon">↯</span>
-            <b>音频压缩</b>
-            <em>把 R2 音频素材整理到统一入口。</em>
-            <div class="compress-ui"><strong>150 KB</strong><span>Compress Audio</span></div>
-          </a>
-          <a class="music-card music-card--blue" href="/music.html">
-            <span class="music-icon">◎</span>
-            <b>频道管理</b>
-            <em>封面、外链、排序和推荐状态集中维护。</em>
-            <div class="equalizer"><i></i><i></i><i></i><i></i><i></i></div>
+          <a class="music-card music-card--blue" href="/license.html">
+            <span class="music-icon">✓</span>
+            <b>授权与购买</b>
+            <em>把购买入口、正版授权说明和团队使用路径放到清晰位置。</em>
+            <div class="license-rings"><i></i><i></i><i></i></div>
           </a>
         </div>
       </section>
@@ -185,20 +213,24 @@
         <div class="automation-panel">
           <div>
             <p class="hero-kicker">Automation</p>
-            <h2>少做重复操作，把时间留给直播现场。</h2>
-            <p>上传素材、维护版本、管理音乐和发布内容，都收束成后台里的明确动作。</p>
+            <h2>后台负责发布，首页负责让用户快速找到。</h2>
+            <p>用户看到的是一个精简的入口，后台维护的是软件、图片、音乐、文章、授权这些实际业务内容。</p>
           </div>
           <div class="automation-stack">
-            <div><span>01</span><strong>批量上传图片</strong><small>保存时自动上传并生成记录</small></div>
-            <div><span>02</span><strong>发布软件版本</strong><small>安装包、manifest 和下载入口同步</small></div>
-            <div><span>03</span><strong>维护内容入口</strong><small>导航、文章、音乐和素材统一编排</small></div>
+            <div><span>01</span><strong>发布软件版本</strong><small>维护安装包、版本和最新下载入口</small></div>
+            <div><span>02</span><strong>上传图片和音乐</strong><small>R2 素材进入画廊和音乐频道</small></div>
+            <div><span>03</span><strong>沉淀教程和授权</strong><small>文章、购买、后台入口形成闭环</small></div>
           </div>
         </div>
       </section>
 
       <section class="final-section">
-        <h2>走最短路径，进入工作。</h2>
-        <a class="primary-action" href="/download.html">开始使用天才猫</a>
+        <p class="hero-kicker">Ready</p>
+        <h2>进入天才猫工作台。</h2>
+        <div class="hero-actions">
+          <a class="primary-action" href="/download.html">下载最新版</a>
+          <a class="secondary-action" href="/gallery.html">浏览素材画廊</a>
+        </div>
       </section>
     </main>
   </body>

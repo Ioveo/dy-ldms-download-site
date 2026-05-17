@@ -3,165 +3,127 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>天才猫软件中心 - 官方下载</title>
-    <meta name="description" content="天才猫数据中心版与天才猫DY辅助工具官方下载，统一授权绑定，稳定交付给直播团队。" />
+    <title>天才猫 - 软件、音乐与内容生态</title>
+    <meta name="description" content="天才猫生态门户，集中展示软件下载、音乐频道、文章教程、授权购买与更新入口。" />
     <link rel="icon" type="image/png" href="/logo.png?v=20260509" />
     <link rel="apple-touch-icon" href="/logo.png?v=20260509" />
-    <link rel="stylesheet" href="/styles.css?v=20260510-premium-detail" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/styles.css?v=20260517-portal" />
   </head>
-  <body>
-    <header class="topbar">
-      <a class="brand" href="/">
+  <body class="portal-page">
+    <header class="portal-topbar">
+      <a class="portal-brand" href="/">
         <img src="/logo.png" alt="" />
-        <span>天才猫软件中心</span>
+        <span>天才猫</span>
       </a>
       <nav aria-label="主导航" data-nav>
         <a href="/">首页</a>
         <a href="/download.html">下载</a>
+        <a href="/music.html">音乐</a>
         <a href="/articles.html">文章</a>
         <a href="/license.html">授权</a>
-        <a href="https://mk.nsy.me/buy" target="_blank" rel="noopener">购买授权</a>
       </nav>
+      <a class="portal-buy" href="https://mk.nsy.me/buy" target="_blank" rel="noopener">购买授权</a>
     </header>
 
     <main>
-      <section class="showcase" aria-label="功能展示">
-        <div class="showcase__slides" id="showcaseSlides">
-          <figure class="showcase__slide is-active">
-            <img src="/2.jpg" alt="天才猫功能展示截图 1" />
-          </figure>
-          <figure class="showcase__slide">
-            <img src="/3.jpg" alt="天才猫功能展示截图 2" />
-          </figure>
-          <figure class="showcase__slide">
-            <img src="/4.jpg" alt="天才猫功能展示截图 3" />
-          </figure>
-          <figure class="showcase__slide">
-            <img src="/5.jpg" alt="天才猫功能展示截图 4" />
-          </figure>
-          <figure class="showcase__slide">
-            <img src="/6.jpg" alt="天才猫功能展示截图 5" />
-          </figure>
-        </div>
-        <div class="showcase__overlay">
-          <p class="eyebrow">Feature Preview</p>
-          <h1>功能界面，一屏看清。</h1>
-          <p>数据中心、直播辅助、授权购买与下载入口集中展示，客户打开页面先看到实际功能效果。</p>
-          <div class="actions">
-            <a class="button button--primary" href="/download.html">立即下载</a>
-            <a class="button button--ghost" href="https://mk.nsy.me/buy" target="_blank" rel="noopener">购买授权</a>
+      <section class="portal-hero">
+        <div class="portal-hero__media" aria-hidden="true">
+          <div class="portal-orbit portal-orbit--software">
+            <span class="material-symbols-outlined">terminal</span>
+            <strong>Software</strong>
+            <small>下载中心</small>
+          </div>
+          <div class="portal-orbit portal-orbit--music">
+            <span class="material-symbols-outlined">graphic_eq</span>
+            <strong>Music</strong>
+            <small>音乐频道</small>
+          </div>
+          <div class="portal-orbit portal-orbit--article">
+            <span class="material-symbols-outlined">article</span>
+            <strong>Articles</strong>
+            <small>教程更新</small>
+          </div>
+          <div class="portal-orbit portal-orbit--license">
+            <span class="material-symbols-outlined">workspace_premium</span>
+            <strong>License</strong>
+            <small>正版授权</small>
           </div>
         </div>
-        <div class="showcase__dots" id="showcaseDots" aria-label="轮播切换">
-          <button class="is-active" type="button" aria-label="显示第 1 张"></button>
-          <button type="button" aria-label="显示第 2 张"></button>
-          <button type="button" aria-label="显示第 3 张"></button>
-          <button type="button" aria-label="显示第 4 张"></button>
-          <button type="button" aria-label="显示第 5 张"></button>
+        <div class="portal-hero__copy">
+          <div class="portal-live"><i></i><span>生态入口已上线</span></div>
+          <h1>软件、音乐与内容，一站式进入天才猫生态。</h1>
+          <p>下载工具、发现音乐、阅读教程、管理授权，所有入口都在这里。</p>
+          <div class="portal-actions">
+            <a class="portal-button portal-button--primary" href="/download.html"><span class="material-symbols-outlined">download</span>进入下载中心</a>
+            <a class="portal-button portal-button--ghost" href="/music.html"><span class="material-symbols-outlined">play_circle</span>打开音乐频道</a>
+          </div>
         </div>
       </section>
 
-      <section class="hero" id="home">
-        <div class="hero__copy">
-          <p class="eyebrow">TianCaiMao Software Center</p>
-          <h1>直播运营，从记录到执行都更稳。</h1>
-          <p class="summary">数据中心版管理直播数据、复盘报表和结算；DY辅助工具处理自动讲解、快速回复和宏录制。两个软件独立下载，统一授权。</p>
-          <div class="actions">
-            <a class="button button--primary" href="/download.html">点击下载</a>
-            <a class="button button--ghost" href="https://mk.nsy.me/buy" target="_blank" rel="noopener">购买授权</a>
-          </div>
-          <div class="hero-points">
-            <span>数据管理</span>
-            <span>现场辅助</span>
-            <span>统一授权</span>
-          </div>
-        </div>
-        <div class="hero__preview">
-          <img src="/datacenter-preview.jpg" alt="天才猫数据中心版界面截图" />
-        </div>
-      </section>
-
-      <section class="features" id="features">
-        <div class="section-head">
-          <p class="eyebrow">Products</p>
-          <h2>两个版本，覆盖管理和现场执行。</h2>
-          <p>客户看到的是产品能力、版本下载和授权方式，不展示任何部署细节。</p>
-        </div>
-        <div class="feature-grid">
-          <article class="feature-card feature-card--image">
-            <img src="/datacenter-preview.jpg" alt="数据中心版界面截图" />
-          </article>
-          <article class="feature-card">
-            <span>数据中心版</span>
-            <h3>把直播数据变成可复盘、可结算、可追踪的团队资产。</h3>
-            <ul>
-              <li>直播场次数据录入，支持 OCR 辅助识别。</li>
-              <li>账号、主播、场次、接播数据统一沉淀。</li>
-              <li>日报、月报、复盘报表导入导出。</li>
-              <li>主播档案、结算方式和工资核销管理。</li>
-              <li>本地数据备份，适合团队长期使用。</li>
-            </ul>
-          </article>
-          <article class="feature-card feature-card--assistant">
-            <span>DY辅助工具</span>
-            <h3>给现场运营的轻量自动化工具，减少重复操作。</h3>
-            <ul>
-              <li>自动讲解循环，按设定间隔执行讲解/取消讲解。</li>
-              <li>讲解自检，方便定位当前商品讲解按钮。</li>
-              <li>三条快捷回复，可手动发送或自动循环发送。</li>
-              <li>支持后台控件调用、置顶频率和剪贴板恢复。</li>
-              <li>宏录制和回放，减少重复鼠标键盘操作。</li>
-            </ul>
-          </article>
-          <article class="feature-card feature-card--mini">
-            <div class="assistant-ui">
-              <strong>DY Assistant</strong>
-              <p>自动讲解：运行中</p>
-              <p>快捷回复：3 条短语</p>
-              <p>宏录制：F9 / F10</p>
-            </div>
-          </article>
-        </div>
-      </section>
-
-      <section class="home-journal" aria-labelledby="homeJournalTitle">
-        <div class="home-journal__head">
+      <section class="portal-section portal-software" id="software">
+        <div class="portal-section__head">
           <div>
-            <p class="eyebrow">Guides & Updates</p>
-            <h2 id="homeJournalTitle">把软件能力讲清楚，也把使用方法讲透。</h2>
+            <p>Software Center</p>
+            <h2>软件下载中心</h2>
           </div>
-          <p>发布产品介绍、功能教程和运营经验，客户在下载前就能快速理解适合自己的工具。</p>
+          <a href="/download.html">全部软件 <span class="material-symbols-outlined">arrow_forward</span></a>
         </div>
-        <div class="home-journal__grid" id="homeArticleGrid">
-          <article class="home-article home-article--empty">
-            <div>
-              <span>Article</span>
-              <h3>文章准备中</h3>
-              <p>后台发布文章后，会在这里展示精选内容。</p>
-            </div>
-          </article>
-        </div>
-        <a class="home-journal__more" href="/articles.html">查看全部文章</a>
+        <div class="portal-software-grid" id="portalSoftware"></div>
       </section>
 
-      <section class="license">
-        <div class="section-head">
-          <p class="eyebrow">Next</p>
-          <h2>下载和授权拆分成独立页面。</h2>
-          <p>客户可以进入软件下载页选择版本，也可以进入授权页了解购买和绑定流程。</p>
+      <section class="portal-section portal-music" id="music">
+        <div class="portal-section__head">
+          <div>
+            <p>Music Channel</p>
+            <h2>音乐频道</h2>
+          </div>
+          <a href="/music.html">进入频道 <span class="material-symbols-outlined">arrow_forward</span></a>
         </div>
-        <div class="license-action">
-          <a class="button button--primary" href="/download.html">进入下载中心</a>
-          <p>软件列表、分类和版本由后台维护，首页只保留产品展示和入口。</p>
+        <div class="portal-music-shell">
+          <div class="portal-player-card" id="portalFeaturedMusic">
+            <button type="button"><span class="material-symbols-outlined">play_arrow</span></button>
+            <div>
+              <small>今日主推</small>
+              <strong>等待音乐上架</strong>
+              <span>后台发布音乐后自动展示</span>
+            </div>
+          </div>
+          <div class="portal-music-list" id="portalMusic"></div>
         </div>
+      </section>
+
+      <section class="portal-section portal-articles" id="articles">
+        <div class="portal-section__head">
+          <div>
+            <p>Guides & Updates</p>
+            <h2>最新文章</h2>
+          </div>
+          <a href="/articles.html">全部文章 <span class="material-symbols-outlined">arrow_forward</span></a>
+        </div>
+        <div class="portal-article-grid" id="portalArticles"></div>
+      </section>
+
+      <section class="portal-license">
+        <div>
+          <p>License</p>
+          <h2>授权与购买</h2>
+          <span>获取正版授权，解锁完整功能与持续更新服务。</span>
+        </div>
+        <a class="portal-button portal-button--primary" href="https://mk.nsy.me/buy" target="_blank" rel="noopener">
+          <span class="material-symbols-outlined">workspace_premium</span>购买授权
+        </a>
       </section>
     </main>
 
-    <footer>
-      <span>天才猫软件中心</span>
-      <span>Data Center / DY Assistant</span>
+    <footer class="portal-footer">
+      <span>天才猫生态门户</span>
+      <span>Software / Music / Articles / License</span>
     </footer>
 
-    <script src="/site.js?v=20260510-premium-detail" type="module"></script>
+    <script src="/portal.js?v=20260517-portal" type="module"></script>
   </body>
 </html>

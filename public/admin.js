@@ -595,23 +595,34 @@ function useGalleryAsset() {
 async function uploadGalleryImage() {
   const file = byId("galleryFile").files[0];
   if (!file) return toast("请选择本地图片", true);
-  const mediaType = mediaTypeFor(file);
-  if (mediaType === "svg") return toast("不支持上传 SVG，请使用 PNG/JPG/WebP", true);
-  if (mediaType !== "image") return toast("请选择图片文件", true);
-  if (file.size > 8 * 1024 * 1024) return toast("图片不能超过 8MB", true);
+  const error = validateGalleryFile(file);
+  if (error) return toast(error, true);
   toast("正在上传画廊图片");
-  const storageId = byId("galleryStorage").value;
-  const result = storageId === "cloudflare-images"
-    ? await uploadCloudflareImage(file)
-    : await uploadAssetMedia(file, "image", "gallery", "gallery", storageId);
+  const result = await uploadGalleryFile(file);
   if (!result.success) return toast(result.msg || "图片上传失败", true);
   if (!result.url) return toast("图片已上传，但没有返回可用地址", true);
   byId("galleryImageUrl").value = result.url;
   byId("galleryThumbUrl").value = result.url;
   byId("galleryAssetKey").value = result.asset?.key || "";
+  byId("galleryStorage").value = result.asset?.storageId || byId("galleryStorage").value;
   byId("galleryFile").value = "";
   await loadGalleryAssets();
   toast("画廊图片已上传");
+}
+
+function validateGalleryFile(file) {
+  const mediaType = mediaTypeFor(file);
+  if (mediaType === "svg") return `不支持上传 SVG：${file.name || "未命名图片"}`;
+  if (mediaType !== "image") return `请选择图片文件：${file.name || "未命名文件"}`;
+  if (file.size > 8 * 1024 * 1024) return `图片不能超过 8MB：${file.name || "未命名图片"}`;
+  return "";
+}
+
+async function uploadGalleryFile(file) {
+  const storageId = byId("galleryStorage").value;
+  return storageId === "cloudflare-images"
+    ? uploadCloudflareImage(file)
+    : uploadAssetMedia(file, "image", "gallery", "gallery", storageId);
 }
 
 async function uploadCloudflareImage(file) {
@@ -936,26 +947,100 @@ async function deleteMusic(id) {
 
 async function saveGallery(event) {
   event.preventDefault();
+  const files = Array.from(byId("galleryFile").files || []);
+  if (files.length) {
+    await saveGalleryFiles(files);
+    return;
+  }
+
   const imageUrl = byId("galleryImageUrl").value.trim();
-  const payload = {
+  const payload = galleryPayload({
     id: byId("galleryId").value,
     title: byId("galleryTitle").value.trim(),
-    description: byId("galleryDescription").value.trim(),
     imageUrl,
     thumbUrl: byId("galleryThumbUrl").value.trim() || imageUrl,
-    storageId: byId("galleryStorage").value,
-    assetKey: byId("galleryAssetKey").value.trim(),
-    source: byId("galleryStorage").value === "cloudflare-images" ? "cloudflare-images" : /^https?:\/\//i.test(imageUrl) && !byId("galleryAssetKey").value.trim() ? "network" : "r2",
-    tags: byId("galleryTags").value.split(/[,，\n]/).map(item => item.trim()).filter(Boolean),
-    featured: byId("galleryFeatured").checked,
-    sortOrder: Number(byId("gallerySort").value || 0),
-    status: byId("galleryStatus").value
-  };
+    assetKey: byId("galleryAssetKey").value.trim()
+  });
+  if (!payload.title || !payload.imageUrl) return toast("请填写标题和图片地址，或选择本地图片后直接保存", true);
   const result = await api("/api/admin/gallery", payload);
   if (!result.success) return toast(result.msg || "保存失败", true);
   resetGalleryForm();
   render(result.catalog);
   toast("画廊图片已保存");
+}
+
+async function saveGalleryFiles(files) {
+  const editingId = byId("galleryId").value;
+  if (editingId && files.length > 1) {
+    return toast("编辑已有图片时只能选择 1 张；批量上传请先点清空", true);
+  }
+
+  for (const file of files) {
+    const error = validateGalleryFile(file);
+    if (error) return toast(error, true);
+  }
+
+  let nextCatalog = null;
+  const total = files.length;
+  const baseSort = Number(byId("gallerySort").value || 0);
+  const baseTitle = byId("galleryTitle").value.trim();
+
+  for (const [index, file] of files.entries()) {
+    toast(`正在上传 ${index + 1}/${total}：${file.name || "图片"}`);
+    const upload = await uploadGalleryFile(file);
+    if (!upload.success || !upload.url) {
+      return toast(`${file.name || "图片"} 上传失败：${upload.msg || "没有返回可用地址"}`, true);
+    }
+
+    const title = galleryTitleForFile(file, baseTitle, index, total);
+    const payload = galleryPayload({
+      id: editingId && total === 1 ? editingId : "",
+      title,
+      imageUrl: upload.url,
+      thumbUrl: upload.url,
+      assetKey: upload.asset?.key || ""
+    });
+    payload.storageId = upload.asset?.storageId || payload.storageId;
+    payload.source = payload.storageId === "cloudflare-images" ? "cloudflare-images" : "r2";
+    payload.sortOrder = baseSort + index;
+    payload.featured = byId("galleryFeatured").checked && index === 0;
+
+    const result = await api("/api/admin/gallery", payload);
+    if (!result.success) return toast(`${file.name || "图片"} 保存失败：${result.msg || "未知错误"}`, true);
+    nextCatalog = result.catalog;
+  }
+
+  byId("galleryFile").value = "";
+  await loadGalleryAssets();
+  resetGalleryForm();
+  if (nextCatalog) render(nextCatalog);
+  toast(total > 1 ? `已上传并保存 ${total} 张图片` : "画廊图片已上传并保存");
+}
+
+function galleryPayload(overrides = {}) {
+  const imageUrl = overrides.imageUrl ?? byId("galleryImageUrl").value.trim();
+  const assetKey = overrides.assetKey ?? byId("galleryAssetKey").value.trim();
+  const storageId = byId("galleryStorage").value;
+  return {
+    id: overrides.id ?? byId("galleryId").value,
+    title: overrides.title ?? byId("galleryTitle").value.trim(),
+    description: byId("galleryDescription").value.trim(),
+    imageUrl,
+    thumbUrl: overrides.thumbUrl ?? (byId("galleryThumbUrl").value.trim() || imageUrl),
+    storageId,
+    assetKey,
+    source: storageId === "cloudflare-images" ? "cloudflare-images" : /^https?:\/\//i.test(imageUrl) && !assetKey ? "network" : "r2",
+    tags: byId("galleryTags").value.split(/[,，\n]/).map(item => item.trim()).filter(Boolean),
+    featured: byId("galleryFeatured").checked,
+    sortOrder: Number(byId("gallerySort").value || 0),
+    status: byId("galleryStatus").value
+  };
+}
+
+function galleryTitleForFile(file, baseTitle, index, total) {
+  if (baseTitle && total === 1) return baseTitle;
+  if (baseTitle) return `${baseTitle} ${String(index + 1).padStart(2, "0")}`;
+  return String(file.name || `图片 ${index + 1}`).replace(/\.[^.]+$/, "").trim() || `图片 ${index + 1}`;
 }
 
 async function deleteGallery(id) {

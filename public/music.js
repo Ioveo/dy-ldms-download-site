@@ -17,7 +17,10 @@ clear.addEventListener("click", () => {
   renderMusic();
 });
 playButton.addEventListener("click", () => {
-  if (!audio.src) return;
+  if (!audio.src) {
+    byId("playerArtist").textContent = "\u5148\u9009\u62e9\u4e00\u9996\u6b4c";
+    return;
+  }
   if (audio.paused) audio.play();
   else audio.pause();
 });
@@ -26,6 +29,12 @@ audio.addEventListener("pause", () => playButton.textContent = "播放");
 audio.addEventListener("timeupdate", () => {
   if (!audio.duration) return;
   progress.value = String((audio.currentTime / audio.duration) * 100);
+});
+audio.addEventListener("error", () => {
+  playButton.textContent = "\u64ad\u653e";
+  byId("playerArtist").textContent = activeTrack?.neteaseId
+    ? "\u7f51\u6613\u4e91\u6682\u65f6\u4e0d\u53ef\u64ad\u653e\uff0c\u5efa\u8bae\u4e0a\u4f20\u97f3\u9891\u5230 R2"
+    : "\u97f3\u9891\u5730\u5740\u6682\u65f6\u4e0d\u53ef\u64ad\u653e";
 });
 progress.addEventListener("input", () => {
   if (!audio.duration) return;
@@ -66,7 +75,7 @@ function renderMusic() {
         <small>${(track.tags || []).map(escapeHtml).join(" / ") || (track.neteaseId ? `网易云 ID ${escapeHtml(track.neteaseId)}` : "R2 音频")}</small>
       </div>
     `;
-    card.querySelector("button").addEventListener("click", () => playTrack(track));
+    card.addEventListener("click", () => playTrack(track));
     grid.append(card);
   }
 }
@@ -77,15 +86,17 @@ function playTrack(track) {
   activeTrack = track;
   byId("playerCover").src = track.coverUrl || "/logo.png";
   byId("playerTitle").textContent = track.title;
-  byId("playerArtist").textContent = track.artist;
+  byId("playerArtist").textContent = `${track.artist}${track.neteaseId && !track.audioUrl ? " · \u7f51\u6613\u4e91\u97f3\u4e50" : ""}`;
   audio.src = url;
   player.hidden = false;
-  audio.play().catch(() => {});
+  audio.play().catch(() => {
+    byId("playerArtist").textContent = "\u6d4f\u89c8\u5668\u963b\u6b62\u4e86\u81ea\u52a8\u64ad\u653e\uff0c\u8bf7\u518d\u70b9\u4e00\u6b21\u64ad\u653e";
+  });
 }
 
 function playableUrl(track) {
   if (track.audioUrl) return track.audioUrl;
-  if (track.neteaseId) return `https://music.163.com/song/media/outer/url?id=${encodeURIComponent(track.neteaseId)}.mp3`;
+  if (track.neteaseId) return `/api/music/netease?id=${encodeURIComponent(track.neteaseId)}`;
   return "";
 }
 

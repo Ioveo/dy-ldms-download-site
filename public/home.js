@@ -67,6 +67,7 @@ async function loadAiSlides() {
     const response = await fetch("/api/catalog", { cache: "no-store" });
     if (!response.ok) throw new Error("catalog request failed");
     const catalog = await response.json();
+    applySiteText(catalog.site || {});
     const gallery = (catalog.gallery || [])
       .filter(item => item.imageUrl)
       .slice(0, 6)
@@ -76,6 +77,13 @@ async function loadAiSlides() {
     // Static slides keep the section useful before images are added in admin.
   }
   return fallbackAiSlides();
+}
+
+function applySiteText(site) {
+  for (const element of document.querySelectorAll("[data-site-text]")) {
+    const key = element.dataset.siteText;
+    if (site[key]) element.textContent = site[key];
+  }
 }
 
 function slideFromGallery(item, index) {

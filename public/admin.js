@@ -53,10 +53,12 @@ const ADMIN_MODULES = {
   },
   site: {
     title: "\u7ad9\u70b9\u8bbe\u7f6e",
-    description: "\u914d\u7f6e\u524d\u53f0\u5bfc\u822a\u548c\u5185\u5bb9\u5165\u53e3\u3002",
+    description: "配置首页文案、AI 轮播入口和前台导航。",
     items: [
-      { panel: "navigationPanel", label: "\u5bfc\u822a", action: "\u83dc\u5355\u914d\u7f6e" },
-      { panel: "healthPanel", label: "\u7cfb\u7edf\u72b6\u6001", action: "\u90e8\u7f72\u68c0\u67e5" }
+      { panel: "siteHomePanel", label: "首页文案", action: "主页内容" },
+      { panel: "galleryPanel", view: "galleryEdit", label: "添加轮播图", action: "AI 轮播图片" },
+      { panel: "navigationPanel", label: "导航设置", action: "菜单配置" },
+      { panel: "healthPanel", label: "系统状态", action: "部署检查" }
     ]
   },
   system: {
@@ -72,6 +74,21 @@ const DIRECT_UPLOAD_LIMIT = 95 * 1024 * 1024;
 const CHUNK_SIZE = 10 * 1024 * 1024;
 const CHUNK_UPLOAD_THRESHOLD = 10 * 1024 * 1024;
 const MAX_CHUNKED_SIZE = 5 * 1024 * 1024 * 1024;
+const SITE_HOME_FIELDS = [
+  "homeHeroKicker",
+  "homeHeroTitle",
+  "homeHeroDescription",
+  "shortcutsKicker",
+  "shortcutsTitle",
+  "aiKicker",
+  "aiTitle",
+  "aiDescription",
+  "aiPromptOne",
+  "aiPromptTwo",
+  "aiPromptThree",
+  "readyKicker",
+  "readyTitle"
+];
 let articleDraftTimer = null;
 
 const loginView = byId("loginView");
@@ -86,6 +103,7 @@ byId("softwareForm").addEventListener("submit", saveSoftware);
 byId("categoryForm").addEventListener("submit", saveCategory);
 byId("storageForm").addEventListener("submit", saveStorage);
 byId("navigationForm").addEventListener("submit", saveNavigation);
+byId("siteHomeForm").addEventListener("submit", saveSiteHome);
 byId("articleForm").addEventListener("submit", saveArticle);
 byId("musicForm").addEventListener("submit", saveMusic);
 byId("galleryForm").addEventListener("submit", saveGallery);
@@ -200,6 +218,7 @@ function hideApp() {
 
 function render(nextCatalog) {
   catalog = nextCatalog;
+  fillSiteHomeForm(catalog.site || {});
   renderStats();
   renderCategoryOptions();
   renderSoftwareRows();
@@ -772,6 +791,26 @@ async function saveNavigation(event) {
   resetNavigationForm();
   render(result.catalog);
   toast("导航已保存");
+}
+
+async function saveSiteHome(event) {
+  event.preventDefault();
+  const result = await api("/api/admin/site", siteHomePayload());
+  if (!result.success) return toast(result.msg || "保存失败", true);
+  render(result.catalog);
+  showPanel("siteHomePanel", { moduleId: "site" });
+  toast("首页文案已保存");
+}
+
+function fillSiteHomeForm(site = {}) {
+  for (const key of SITE_HOME_FIELDS) {
+    const input = byId(key);
+    if (input) input.value = site[key] || "";
+  }
+}
+
+function siteHomePayload() {
+  return Object.fromEntries(SITE_HOME_FIELDS.map(key => [key, byId(key).value.trim()]));
 }
 
 async function saveArticle(event) {

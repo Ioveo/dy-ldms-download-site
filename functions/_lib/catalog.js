@@ -16,6 +16,22 @@ export const DEFAULT_NAVIGATION = [
   { id: "buy", label: "购买授权", href: "https://mk.nsy.me/buy", sortOrder: 50, status: "active", external: true }
 ];
 
+export const DEFAULT_SITE = {
+  homeHeroKicker: "Tiancaimao Command Center",
+  homeHeroTitle: "把直播运营入口，压缩成一次打开。",
+  homeHeroDescription: "像 Raycast 一样快，但内容全部换成天才猫自己的业务：软件下载、数据中心、DY 辅助、图库素材、音乐频道、文章教程和正版授权。",
+  shortcutsKicker: "Shortcuts for Tiancaimao",
+  shortcutsTitle: "不是复制 Raycast，而是把你的业务入口变成命令。",
+  aiKicker: "AI workspace",
+  aiTitle: "让后台图片，变成会动的 AI 运营看板。",
+  aiDescription: "后台系统管理里添加的图片会自动进入这里，配合模拟的 AI 分析、标签整理和发布建议，形成类似 Raycast 的动态中场区域。",
+  aiPromptOne: "分析素材",
+  aiPromptTwo: "生成话术",
+  aiPromptThree: "整理标签",
+  readyKicker: "Ready",
+  readyTitle: "进入天才猫工作台。"
+};
+
 export async function loadCatalog(env) {
   const fallback = manifestToCatalog(DEFAULT_MANIFEST);
   if (!env.SOFTWARE_BUCKET?.get) return fallback;
@@ -85,6 +101,7 @@ export function normalizeCatalog(catalog) {
       status: category.status || "active"
     })).sort(bySortOrder),
     navigation: normalizeNavigation(catalog?.navigation || []),
+    site: normalizeSite(catalog?.site || catalog?.settings || {}),
     software: software.map((item, index) => normalizeSoftware(item, index, now)).sort(bySortOrder),
     articles: normalizeArticles(catalog?.articles || []),
     music: normalizeMusic(catalog?.music || catalog?.tracks || []),
@@ -166,6 +183,7 @@ export function publicCatalog(catalog) {
     product: catalog.product,
     categories: catalog.categories.filter(item => item.status !== "disabled"),
     navigation: (catalog.navigation || DEFAULT_NAVIGATION).filter(item => item.status !== "disabled"),
+    site: normalizeSite(catalog.site || {}),
     software: catalog.software
       .filter(item => item.status !== "disabled")
       .map(item => ({
@@ -178,6 +196,10 @@ export function publicCatalog(catalog) {
     storageAccounts: (catalog.storageAccounts || []).map(publicStorageAccount),
     updatedAt: catalog.updatedAt
   };
+}
+
+export function normalizeSite(site) {
+  return Object.fromEntries(Object.entries(DEFAULT_SITE).map(([key, fallback]) => [key, String(site?.[key] || fallback)]));
 }
 
 export function normalizeArticles(articles) {

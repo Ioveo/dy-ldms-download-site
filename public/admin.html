@@ -57,7 +57,7 @@
           <button data-module="gallery" data-panel="galleryPanel">画廊</button>
           <button data-module="article" data-panel="articlePanel">文章</button>
           <button data-module="asset" data-panel="assetPanel">资源</button>
-          <button data-module="site" data-panel="navigationPanel">站点</button>
+          <button data-module="site" data-panel="siteHomePanel">站点</button>
           <button data-module="system" data-panel="storagePanel">系统</button>
         </nav>
       </aside>
@@ -243,6 +243,32 @@
             <div class="form-actions span-2"><button type="submit">保存导航</button><button class="ghost" type="button" id="resetNavigation">清空</button></div>
           </form>
           <div class="table-wrap"><table><thead><tr><th>名称</th><th>链接</th><th>排序</th><th>打开方式</th><th>状态</th><th>操作</th></tr></thead><tbody id="navigationRows"></tbody></table></div>
+        </section>
+
+        <section class="panel tab-panel" id="siteHomePanel" hidden>
+          <div class="panel__head">
+            <div>
+              <h2>首页文案</h2>
+              <p>修改首页主标题、快捷入口标题、AI 轮播区域标题和底部 Ready 文案。</p>
+            </div>
+          </div>
+          <form class="form-grid" id="siteHomeForm">
+            <label>主视觉小标题<input id="homeHeroKicker" placeholder="Tiancaimao Command Center" /></label>
+            <label>主视觉大标题<input id="homeHeroTitle" placeholder="把直播运营入口，压缩成一次打开。" /></label>
+            <label class="span-2">主视觉说明<textarea id="homeHeroDescription" rows="3"></textarea></label>
+            <label>快捷区小标题<input id="shortcutsKicker" placeholder="Shortcuts for Tiancaimao" /></label>
+            <label>快捷区大标题<input id="shortcutsTitle" placeholder="不是复制 Raycast，而是把你的业务入口变成命令。" /></label>
+            <label>AI 区小标题<input id="aiKicker" placeholder="AI workspace" /></label>
+            <label>AI 区大标题<input id="aiTitle" placeholder="让后台图片，变成会动的 AI 运营看板。" /></label>
+            <label class="span-2">AI 区说明<textarea id="aiDescription" rows="3"></textarea></label>
+            <label>AI 按钮 1<input id="aiPromptOne" placeholder="分析素材" /></label>
+            <label>AI 按钮 2<input id="aiPromptTwo" placeholder="生成话术" /></label>
+            <label>AI 按钮 3<input id="aiPromptThree" placeholder="整理标签" /></label>
+            <label>底部小标题<input id="readyKicker" placeholder="Ready" /></label>
+            <label class="span-2">底部大标题<input id="readyTitle" placeholder="进入天才猫工作台。" /></label>
+            <p class="form-note span-2">首页 AI 轮播图在“站点 → 添加轮播图”里添加，实际使用画廊已发布图片；图片标题和说明就是轮播文字。</p>
+            <div class="form-actions span-2"><button type="submit">保存首页文案</button></div>
+          </form>
         </section>
 
         <section class="panel tab-panel" id="assetPanel" hidden>

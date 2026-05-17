@@ -3,6 +3,7 @@ let searchText = "";
 let galleryItems = [];
 let visibleItems = [];
 let activeIndex = -1;
+let openingClone = null;
 
 const masonry = byId("galleryMasonry");
 const viewer = byId("galleryViewer");
@@ -88,7 +89,7 @@ function renderGallery() {
     `;
     const img = button.querySelector("img");
     img.addEventListener("load", () => button.classList.add("is-loaded"), { once: true });
-    button.addEventListener("click", () => openViewer(index));
+    button.addEventListener("click", () => openViewer(index, button));
     masonry.append(button);
   });
 }
@@ -111,10 +112,11 @@ function renderTags() {
   });
 }
 
-function openViewer(index) {
+function openViewer(index, tile) {
   activeIndex = index;
   const item = visibleItems[activeIndex];
   if (!item) return;
+  const sourceImage = tile?.querySelector("img");
   viewer.hidden = false;
   enterScreenFitView();
   viewerImage.alt = item.title || "画廊图片";
@@ -124,15 +126,20 @@ function openViewer(index) {
   document.body.classList.add("gallery-viewer-open");
 
   viewer.classList.remove("is-ready", "is-entering");
-  viewer.classList.add("is-loading", "is-entering");
-  window.setTimeout(() => viewer.classList.remove("is-entering"), 260);
+  viewer.classList.add("is-loading");
+  if (sourceImage) {
+    viewer.classList.add("is-zooming");
+  } else {
+    viewer.classList.add("is-entering");
+    window.setTimeout(() => viewer.classList.remove("is-entering"), 260);
+  }
   viewerImage.onload = null;
   viewerImage.onerror = null;
-  viewerImage.onload = () => markViewerImageReady();
-  viewerImage.onerror = () => markViewerImageReady();
+  viewerImage.onload = () => revealViewerImage(sourceImage);
+  viewerImage.onerror = () => revealViewerImage(sourceImage);
   viewerImage.src = item.imageUrl;
   if (viewerImage.complete && viewerImage.naturalWidth > 0) {
-    markViewerImageReady();
+    revealViewerImage(sourceImage);
   }
 
   preloadNeighbor(1);
@@ -179,6 +186,68 @@ function markViewerImageReady() {
   viewer.classList.add("is-ready");
 }
 
+function revealViewerImage(sourceImage) {
+  if (!sourceImage || !sourceImage.getBoundingClientRect) {
+    markViewerImageReady();
+    return;
+  }
+
+  animateViewerFromThumbnail(sourceImage).finally(() => {
+    viewer.classList.remove("is-zooming");
+    markViewerImageReady();
+  });
+}
+
+async function animateViewerFromThumbnail(sourceImage) {
+  if (openingClone) openingClone.remove();
+  const from = sourceImage.getBoundingClientRect();
+  const to = targetImageRect();
+  if (!from.width || !from.height || !to.width || !to.height) return;
+
+  openingClone = sourceImage.cloneNode(false);
+  openingClone.className = "gallery-open-clone";
+  Object.assign(openingClone.style, rectStyle(from));
+  document.body.append(openingClone);
+
+  const animation = openingClone.animate([
+    { left: `${from.left}px`, top: `${from.top}px`, width: `${from.width}px`, height: `${from.height}px`, borderRadius: "0", opacity: 1 },
+    { left: `${to.left}px`, top: `${to.top}px`, width: `${to.width}px`, height: `${to.height}px`, borderRadius: "0", opacity: 1 }
+  ], {
+    duration: 420,
+    easing: "cubic-bezier(0.18, 0.88, 0.32, 1)"
+  });
+
+  await animation.finished.catch(() => {});
+  openingClone.remove();
+  openingClone = null;
+}
+
+function targetImageRect() {
+  const gap = window.innerWidth <= 760 ? 24 : 56;
+  const maxWidth = Math.max(1, window.innerWidth - gap);
+  const maxHeight = Math.max(1, window.innerHeight - gap);
+  const naturalWidth = viewerImage.naturalWidth || maxWidth;
+  const naturalHeight = viewerImage.naturalHeight || maxHeight;
+  const scale = Math.min(maxWidth / naturalWidth, maxHeight / naturalHeight, 1);
+  const width = Math.max(1, naturalWidth * scale);
+  const height = Math.max(1, naturalHeight * scale);
+  return {
+    left: (window.innerWidth - width) / 2,
+    top: (window.innerHeight - height) / 2,
+    width,
+    height
+  };
+}
+
+function rectStyle(rect) {
+  return {
+    left: `${rect.left}px`,
+    top: `${rect.top}px`,
+    width: `${rect.width}px`,
+    height: `${rect.height}px`
+  };
+}
+
 function flashViewerMode() {
   figure.classList.remove("is-mode-changing");
   void figure.offsetWidth;
@@ -186,9 +255,13 @@ function flashViewerMode() {
 }
 
 function closeViewer() {
+  if (openingClone) {
+    openingClone.remove();
+    openingClone = null;
+  }
   viewer.hidden = true;
   viewerImage.removeAttribute("src");
-  viewer.classList.remove("is-loading", "is-ready", "is-entering");
+  viewer.classList.remove("is-loading", "is-ready", "is-entering", "is-zooming");
   figure.classList.remove("is-mode-changing");
   enterScreenFitView();
   document.body.classList.remove("gallery-viewer-open");

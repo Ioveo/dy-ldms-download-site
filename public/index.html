@@ -11,7 +11,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="/styles.css?v=20260517-portal" />
+    <link rel="stylesheet" href="/styles.css?v=20260517-portal2" />
   </head>
   <body class="portal-page">
     <header class="portal-topbar">
@@ -26,40 +26,57 @@
         <a href="/articles.html">文章</a>
         <a href="/license.html">授权</a>
       </nav>
-      <a class="portal-buy" href="https://mk.nsy.me/buy" target="_blank" rel="noopener">购买授权</a>
+      <a class="portal-buy" href="https://mk.nsy.me/buy" target="_blank" rel="noopener">
+        <span class="material-symbols-outlined">workspace_premium</span>
+        购买授权
+      </a>
     </header>
 
     <main>
       <section class="portal-hero">
-        <div class="portal-hero__media" aria-hidden="true">
-          <div class="portal-orbit portal-orbit--software">
-            <span class="material-symbols-outlined">terminal</span>
-            <strong>Software</strong>
-            <small>下载中心</small>
-          </div>
-          <div class="portal-orbit portal-orbit--music">
-            <span class="material-symbols-outlined">graphic_eq</span>
-            <strong>Music</strong>
-            <small>音乐频道</small>
-          </div>
-          <div class="portal-orbit portal-orbit--article">
-            <span class="material-symbols-outlined">article</span>
-            <strong>Articles</strong>
-            <small>教程更新</small>
-          </div>
-          <div class="portal-orbit portal-orbit--license">
-            <span class="material-symbols-outlined">workspace_premium</span>
-            <strong>License</strong>
-            <small>正版授权</small>
+        <div class="portal-hero__copy">
+          <div class="portal-live"><i></i><span>天才猫生态入口</span></div>
+          <h1>软件、音乐、文章和授权，一个首页全部进入。</h1>
+          <p>保留设计稿的大版式节奏，把背景和主视觉换回天才猫自己的产品内容。软件下载、音乐频道、教程文章和正版授权都在这里统一展示。</p>
+          <div class="portal-actions">
+            <a class="portal-button portal-button--primary" href="/download.html">
+              <span class="material-symbols-outlined">download</span>
+              进入下载中心
+            </a>
+            <a class="portal-button portal-button--ghost" href="/music.html">
+              <span class="material-symbols-outlined">play_circle</span>
+              打开音乐频道
+            </a>
           </div>
         </div>
-        <div class="portal-hero__copy">
-          <div class="portal-live"><i></i><span>生态入口已上线</span></div>
-          <h1>软件、音乐与内容，一站式进入天才猫生态。</h1>
-          <p>下载工具、发现音乐、阅读教程、管理授权，所有入口都在这里。</p>
-          <div class="portal-actions">
-            <a class="portal-button portal-button--primary" href="/download.html"><span class="material-symbols-outlined">download</span>进入下载中心</a>
-            <a class="portal-button portal-button--ghost" href="/music.html"><span class="material-symbols-outlined">play_circle</span>打开音乐频道</a>
+
+        <div class="portal-hero__media" aria-label="天才猫产品视觉">
+          <div class="portal-product-stage">
+            <img class="portal-stage-logo" src="/logo.png" alt="天才猫" />
+            <figure class="portal-screen portal-screen--main">
+              <img src="/datacenter-preview.jpg" alt="天才猫数据中心版界面截图" />
+              <figcaption>
+                <span>Data Center</span>
+                <strong>直播数据管理</strong>
+              </figcaption>
+            </figure>
+            <figure class="portal-screen portal-screen--side">
+              <img src="/assistant-preview.jpg" alt="天才猫辅助工具界面截图" />
+              <figcaption>
+                <span>DY Assistant</span>
+                <strong>现场运营辅助</strong>
+              </figcaption>
+            </figure>
+            <div class="portal-orbit portal-orbit--music">
+              <span class="material-symbols-outlined">graphic_eq</span>
+              <strong>音乐</strong>
+              <small>网易云 ID / R2 音频</small>
+            </div>
+            <div class="portal-orbit portal-orbit--license">
+              <span class="material-symbols-outlined">verified_user</span>
+              <strong>授权</strong>
+              <small>正版购买与绑定</small>
+            </div>
           </div>
         </div>
       </section>
@@ -72,7 +89,12 @@
           </div>
           <a href="/download.html">全部软件 <span class="material-symbols-outlined">arrow_forward</span></a>
         </div>
-        <div class="portal-software-grid" id="portalSoftware"></div>
+        <div class="portal-software-layout">
+          <div class="portal-section-media">
+            <img src="/app-preview.png" alt="天才猫软件功能展示" />
+          </div>
+          <div class="portal-software-grid" id="portalSoftware"></div>
+        </div>
       </section>
 
       <section class="portal-section portal-music" id="music">
@@ -85,11 +107,11 @@
         </div>
         <div class="portal-music-shell">
           <div class="portal-player-card" id="portalFeaturedMusic">
-            <button type="button"><span class="material-symbols-outlined">play_arrow</span></button>
+            <button type="button" aria-label="播放"><span class="material-symbols-outlined">play_arrow</span></button>
             <div>
               <small>今日主推</small>
               <strong>等待音乐上架</strong>
-              <span>后台发布音乐后自动展示</span>
+              <span>后台发布音乐后自动展示上新和排行榜。</span>
             </div>
           </div>
           <div class="portal-music-list" id="portalMusic"></div>
@@ -111,10 +133,11 @@
         <div>
           <p>License</p>
           <h2>授权与购买</h2>
-          <span>获取正版授权，解锁完整功能与持续更新服务。</span>
+          <span>获取正版授权，解锁完整功能与持续更新服务。适合团队长期稳定使用。</span>
         </div>
         <a class="portal-button portal-button--primary" href="https://mk.nsy.me/buy" target="_blank" rel="noopener">
-          <span class="material-symbols-outlined">workspace_premium</span>购买授权
+          <span class="material-symbols-outlined">shopping_cart</span>
+          购买授权
         </a>
       </section>
     </main>
@@ -124,6 +147,6 @@
       <span>Software / Music / Articles / License</span>
     </footer>
 
-    <script src="/portal.js?v=20260517-portal" type="module"></script>
+    <script src="/portal.js?v=20260517-portal2" type="module"></script>
   </body>
 </html>

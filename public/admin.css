@@ -298,6 +298,8 @@ body[data-admin-view="releaseList"] #releasePanel #releaseForm,
 body[data-admin-view="releaseList"] #releasePanel #releaseRegisterForm,
 body[data-admin-view="musicEdit"] #musicPanel .table-wrap,
 body[data-admin-view="musicList"] #musicPanel #musicForm,
+body[data-admin-view="galleryEdit"] #galleryPanel .table-wrap,
+body[data-admin-view="galleryList"] #galleryPanel #galleryForm,
 body[data-admin-view="assetUpload"] #assetPanel .asset-toolbar,
 body[data-admin-view="assetUpload"] #assetPanel #assetRows,
 body[data-admin-view="assetList"] #assetPanel #assetUploadForm,
@@ -309,6 +311,7 @@ body[data-admin-view="articleList"] #articlePanel .article-editor {
 body[data-admin-view="softwareList"] #softwarePanel .table-wrap,
 body[data-admin-view="releaseList"] #releasePanel .table-wrap,
 body[data-admin-view="musicList"] #musicPanel .table-wrap,
+body[data-admin-view="galleryList"] #galleryPanel .table-wrap,
 body[data-admin-view="assetList"] #assetPanel .asset-grid,
 body[data-admin-view="articleList"] #articlePanel .article-manager {
   margin-top: 4px;

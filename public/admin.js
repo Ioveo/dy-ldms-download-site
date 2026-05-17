@@ -24,6 +24,15 @@ const ADMIN_MODULES = {
       { panel: "mediaPanel", label: "\u5a92\u4f53\u5e93", action: "\u97f3\u9891/\u56fe\u7247" }
     ]
   },
+  gallery: {
+    title: "画廊管理",
+    description: "管理前台画廊图片、R2 素材和展示状态。",
+    items: [
+      { panel: "galleryPanel", view: "galleryEdit", label: "添加图片", action: "图片编辑" },
+      { panel: "galleryPanel", view: "galleryList", label: "画廊列表", action: "列表管理" },
+      { panel: "assetPanel", view: "assetList", label: "资源列表", action: "R2 图片" }
+    ]
+  },
   article: {
     title: "\u6587\u7ae0\u7ba1\u7406",
     description: "\u53d1\u8868\u6587\u7ae0\u3001\u7ba1\u7406\u5c01\u9762\u548c\u5173\u8054\u8f6f\u4ef6\u3002",
@@ -79,6 +88,7 @@ byId("storageForm").addEventListener("submit", saveStorage);
 byId("navigationForm").addEventListener("submit", saveNavigation);
 byId("articleForm").addEventListener("submit", saveArticle);
 byId("musicForm").addEventListener("submit", saveMusic);
+byId("galleryForm").addEventListener("submit", saveGallery);
 byId("releaseForm").addEventListener("submit", uploadRelease);
 byId("releaseRegisterForm").addEventListener("submit", registerUploadedRelease);
 byId("uploadSoftwareCover").addEventListener("click", uploadSoftwareCover);
@@ -87,8 +97,14 @@ byId("uploadMusicAudio").addEventListener("click", uploadMusicAudio);
 byId("uploadMusicCover").addEventListener("click", uploadMusicCover);
 byId("useMusicCoverAsset").addEventListener("click", useMusicCoverAsset);
 byId("previewMusic").addEventListener("click", previewMusicFromForm);
+byId("loadGalleryAssets").addEventListener("click", loadGalleryAssets);
+byId("useGalleryAsset").addEventListener("click", useGalleryAsset);
+byId("uploadGalleryImage").addEventListener("click", uploadGalleryImage);
+byId("previewGalleryImage").addEventListener("click", previewGalleryImage);
+byId("galleryStorage").addEventListener("change", loadGalleryAssets);
 byId("resetSoftware").addEventListener("click", resetSoftwareForm);
 byId("resetMusic").addEventListener("click", resetMusicForm);
+byId("resetGallery").addEventListener("click", resetGalleryForm);
 byId("resetCategory").addEventListener("click", resetCategoryForm);
 byId("resetStorage").addEventListener("click", resetStorageForm);
 byId("resetNavigation").addEventListener("click", resetNavigationForm);
@@ -193,6 +209,7 @@ function render(nextCatalog) {
   renderArticleOptions();
   renderArticleRows();
   renderMusicRows();
+  renderGalleryRows();
   renderReleaseRows();
 }
 
@@ -214,8 +231,11 @@ function renderCategoryOptions() {
   byId("releaseSoftware").innerHTML = catalog.software.map(item => `<option value="${escapeAttr(item.id)}">${escapeHtml(item.name)}</option>`).join("");
   byId("registerSoftware").innerHTML = byId("releaseSoftware").innerHTML;
   byId("releaseStorage").innerHTML = `<option value="default">默认 R2：dy-ldms-downloads</option>${(catalog.storageAccounts || []).filter(item => item.status !== "disabled").map(item => `<option value="${escapeAttr(item.id)}">${escapeHtml(item.name)} / ${escapeHtml(item.bucket)}</option>`).join("")}`;
+  const galleryStorage = byId("galleryStorage");
+  if (galleryStorage) galleryStorage.innerHTML = `<option value="default">默认 R2</option>${(catalog.storageAccounts || []).filter(item => item.status !== "disabled").map(item => `<option value="${escapeAttr(item.id)}">${escapeHtml(item.name)} / ${escapeHtml(item.bucket)}</option>`).join("")}`;
   loadSoftwareCoverAssets();
   loadMusicCoverAssets();
+  loadGalleryAssets();
 }
 
 function renderArticleOptions() {
@@ -299,6 +319,23 @@ function renderMusicRows() {
       actionButton("试听", () => previewMusic(item)),
       actionButton("编辑", () => fillMusicForm(item)),
       actionButton("删除", () => deleteMusic(item.id), "danger")
+    );
+    rows.append(tr);
+  }
+}
+
+function renderGalleryRows() {
+  const rows = byId("galleryRows");
+  if (!rows) return;
+  rows.innerHTML = "";
+  for (const item of catalog.gallery || []) {
+    const tr = document.createElement("tr");
+    const source = item.source === "network" ? "网络图片" : item.storageId ? item.storageId : "-";
+    tr.innerHTML = `<td>${item.imageUrl ? `<img class="thumb" src="${escapeAttr(item.thumbUrl || item.imageUrl)}" alt="">` : "-"} <strong>${escapeHtml(item.title)}</strong><br><small>${escapeHtml(item.description || "")}</small></td><td class="code">${escapeHtml(source)}<br><small>${escapeHtml(item.assetKey || item.imageUrl)}</small></td><td>${escapeHtml((item.tags || []).join(", "))}</td><td class="status-${item.status === "published" ? "active" : item.status === "draft" ? "draft" : "disabled"}">${item.status === "published" ? "已发布" : item.status === "draft" ? "草稿" : "隐藏"}</td><td class="row-actions"></td>`;
+    tr.lastElementChild.append(
+      actionButton("预览", () => window.open(item.imageUrl, "_blank")),
+      actionButton("编辑", () => fillGalleryForm(item)),
+      actionButton("删除", () => deleteGallery(item.id), "danger")
     );
     rows.append(tr);
   }
@@ -515,6 +552,67 @@ async function loadMusicCoverAssets() {
   }
 }
 
+async function loadGalleryAssets() {
+  const select = byId("galleryAsset");
+  if (!select) return;
+  select.innerHTML = `<option value="">选择图片</option>`;
+  const storageId = byId("galleryStorage")?.value || "default";
+  const result = await api("/api/admin/assets/list", { storageId, kind: "image", status: "active", pageSize: 100 });
+  if (!result.success) {
+    toast(result.msg || "读取 R2 图片失败", true);
+    return;
+  }
+  for (const asset of result.assets || []) {
+    if (asset.kind !== "image" && asset.kind !== "site") continue;
+    const url = asset.url || asset.publicUrl || (asset.storageId === "default" && asset.key ? `/media/${encodeURIComponent(asset.key)}` : "");
+    if (!url) continue;
+    const option = document.createElement("option");
+    option.value = JSON.stringify({
+      url,
+      key: asset.key || "",
+      storageId: asset.storageId || storageId
+    });
+    option.textContent = `${asset.fileName || asset.key} (${formatBytes(asset.fileSize)})`;
+    select.append(option);
+  }
+}
+
+function useGalleryAsset() {
+  const value = byId("galleryAsset").value;
+  if (!value) return toast("请先选择一张 R2 图片", true);
+  const asset = JSON.parse(value);
+  byId("galleryImageUrl").value = asset.url || "";
+  byId("galleryThumbUrl").value = asset.url || "";
+  byId("galleryAssetKey").value = asset.key || "";
+  byId("galleryStorage").value = asset.storageId || "default";
+  toast("已使用选中的图片");
+}
+
+async function uploadGalleryImage() {
+  const file = byId("galleryFile").files[0];
+  if (!file) return toast("请选择本地图片", true);
+  const mediaType = mediaTypeFor(file);
+  if (mediaType === "svg") return toast("不支持上传 SVG，请使用 PNG/JPG/WebP", true);
+  if (mediaType !== "image") return toast("请选择图片文件", true);
+  if (file.size > 8 * 1024 * 1024) return toast("图片不能超过 8MB", true);
+  toast("正在上传画廊图片");
+  const result = await uploadAssetMedia(file, "image", "gallery", "gallery", byId("galleryStorage").value);
+  if (!result.success) return toast(result.msg || "图片上传失败", true);
+  if (!result.url) return toast("图片已上传，但没有返回可用地址", true);
+  byId("galleryImageUrl").value = result.url;
+  byId("galleryThumbUrl").value = result.url;
+  byId("galleryAssetKey").value = result.asset?.key || "";
+  byId("galleryFile").value = "";
+  await loadGalleryAssets();
+  toast("画廊图片已上传");
+}
+
+function previewGalleryImage() {
+  const url = byId("galleryImageUrl").value.trim();
+  if (!url) return toast("请先填写或选择图片地址", true);
+  window.open(url, "_blank");
+}
+
 function useMusicCoverAsset() {
   const value = byId("musicCoverAsset").value;
   if (!value) return toast("请先选择一张 R2 图片", true);
@@ -539,7 +637,7 @@ async function uploadMusicCover() {
   toast("音乐封面已上传");
 }
 
-async function uploadAssetMedia(file, kind, folder = "", refType = "") {
+async function uploadAssetMedia(file, kind, folder = "", refType = "", storageId = "default") {
   try {
     const data = await fileToBase64(file);
     const response = await fetch("/api/admin/assets/upload", {
@@ -547,6 +645,7 @@ async function uploadAssetMedia(file, kind, folder = "", refType = "") {
       headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
       body: JSON.stringify({
         token,
+        storageId,
         kind,
         folder,
         refType,
@@ -800,6 +899,38 @@ async function deleteMusic(id) {
   if (!result.success) return toast(result.msg || "删除失败", true);
   render(result.catalog);
   toast("音乐已删除");
+}
+
+async function saveGallery(event) {
+  event.preventDefault();
+  const imageUrl = byId("galleryImageUrl").value.trim();
+  const payload = {
+    id: byId("galleryId").value,
+    title: byId("galleryTitle").value.trim(),
+    description: byId("galleryDescription").value.trim(),
+    imageUrl,
+    thumbUrl: byId("galleryThumbUrl").value.trim() || imageUrl,
+    storageId: byId("galleryStorage").value,
+    assetKey: byId("galleryAssetKey").value.trim(),
+    source: /^https?:\/\//i.test(imageUrl) && !byId("galleryAssetKey").value.trim() ? "network" : "r2",
+    tags: byId("galleryTags").value.split(/[,，\n]/).map(item => item.trim()).filter(Boolean),
+    featured: byId("galleryFeatured").checked,
+    sortOrder: Number(byId("gallerySort").value || 0),
+    status: byId("galleryStatus").value
+  };
+  const result = await api("/api/admin/gallery", payload);
+  if (!result.success) return toast(result.msg || "保存失败", true);
+  resetGalleryForm();
+  render(result.catalog);
+  toast("画廊图片已保存");
+}
+
+async function deleteGallery(id) {
+  if (!confirm("确定删除这张画廊图片吗？R2 文件不会自动删除。")) return;
+  const result = await api("/api/admin/gallery", { action: "delete", id });
+  if (!result.success) return toast(result.msg || "删除失败", true);
+  render(result.catalog);
+  toast("画廊图片已删除");
 }
 
 async function saveCategory(event) {
@@ -1091,6 +1222,22 @@ function fillMusicForm(item) {
   byId("musicStatus").value = item.status || "draft";
 }
 
+function fillGalleryForm(item) {
+  showPanel("galleryPanel");
+  byId("galleryId").value = item.id;
+  byId("galleryTitle").value = item.title || "";
+  byId("galleryDescription").value = item.description || "";
+  byId("galleryImageUrl").value = item.imageUrl || "";
+  byId("galleryThumbUrl").value = item.thumbUrl || "";
+  byId("galleryStorage").value = item.storageId || "default";
+  byId("galleryAssetKey").value = item.assetKey || "";
+  byId("galleryTags").value = (item.tags || []).join(", ");
+  byId("galleryFeatured").checked = Boolean(item.featured);
+  byId("gallerySort").value = item.sortOrder || 0;
+  byId("galleryStatus").value = item.status || "draft";
+  loadGalleryAssets();
+}
+
 function fillStorageForm(item) {
   showPanel("storagePanel");
   byId("storageId").value = item.id;
@@ -1200,6 +1347,16 @@ function resetMusicForm() {
   byId("musicId").value = "";
   byId("musicSort").value = "10";
   byId("musicStatus").value = "published";
+}
+
+function resetGalleryForm() {
+  byId("galleryForm").reset();
+  byId("galleryId").value = "";
+  byId("galleryAssetKey").value = "";
+  byId("gallerySort").value = "10";
+  byId("galleryStatus").value = "published";
+  byId("galleryStorage").value = "default";
+  loadGalleryAssets();
 }
 
 function resetStorageForm() {

@@ -88,6 +88,7 @@ export function normalizeCatalog(catalog) {
     software: software.map((item, index) => normalizeSoftware(item, index, now)).sort(bySortOrder),
     articles: normalizeArticles(catalog?.articles || []),
     music: normalizeMusic(catalog?.music || catalog?.tracks || []),
+    gallery: normalizeGallery(catalog?.gallery || catalog?.photos || []),
     storageAccounts: normalizeStorageAccounts(catalog?.storageAccounts || catalog?.storage_accounts || []),
     updatedAt: Number(catalog?.updatedAt || now)
   };
@@ -173,6 +174,7 @@ export function publicCatalog(catalog) {
       })),
     articles: (catalog.articles || []).filter(item => item.status === "published"),
     music: (catalog.music || []).filter(item => item.status === "published"),
+    gallery: (catalog.gallery || []).filter(item => item.status === "published"),
     storageAccounts: (catalog.storageAccounts || []).map(publicStorageAccount),
     updatedAt: catalog.updatedAt
   };
@@ -219,12 +221,34 @@ export function normalizeMusic(items) {
   })).sort((a, b) => Number(Boolean(b.featured)) - Number(Boolean(a.featured)) || (a.sortOrder || 0) - (b.sortOrder || 0) || (b.updatedAt || 0) - (a.updatedAt || 0)) : [];
 }
 
+export function normalizeGallery(items) {
+  return Array.isArray(items) ? items.map((item, index) => ({
+    id: String(item.id || `gallery-${index + 1}`),
+    title: String(item.title || item.name || "未命名图片"),
+    description: String(item.description || item.summary || ""),
+    imageUrl: String(item.imageUrl || item.image_url || item.url || ""),
+    thumbUrl: String(item.thumbUrl || item.thumb_url || item.imageUrl || item.image_url || item.url || ""),
+    storageId: String(item.storageId || item.storage_id || ""),
+    assetKey: String(item.assetKey || item.asset_key || item.key || ""),
+    source: String(item.source || ""),
+    tags: Array.isArray(item.tags) ? item.tags.map(String) : String(item.tags || "").split(/[,，\n]/).map(entry => entry.trim()).filter(Boolean),
+    featured: Boolean(item.featured),
+    status: item.status || "draft",
+    sortOrder: Number(item.sortOrder ?? item.sort_order ?? index),
+    createdAt: Number(item.createdAt || Date.now()),
+    updatedAt: Number(item.updatedAt || Date.now())
+  })).sort((a, b) => Number(Boolean(b.featured)) - Number(Boolean(a.featured)) || (a.sortOrder || 0) - (b.sortOrder || 0) || (b.updatedAt || 0) - (a.updatedAt || 0)) : [];
+}
+
 export function normalizeNavigation(items) {
   const source = Array.isArray(items) && items.length ? items : DEFAULT_NAVIGATION;
   const withMusic = source.some(item => item.id === "music" || item.href === "/music.html")
     ? source
     : [...source, { id: "music", label: "音乐", href: "/music.html", sortOrder: 35, status: "active", external: false }];
-  return withMusic.map((item, index) => ({
+  const withGallery = withMusic.some(item => item.id === "gallery" || item.href === "/gallery.html")
+    ? withMusic
+    : [...withMusic, { id: "gallery", label: "画廊", href: "/gallery.html", sortOrder: 37, status: "active", external: false }];
+  return withGallery.map((item, index) => ({
     id: String(item.id || `nav-${index + 1}`),
     label: String(item.label || item.name || "导航"),
     href: String(item.href || "/"),

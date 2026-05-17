@@ -45,6 +45,7 @@
           <button data-panel="assetPanel">资源管理</button>
           <button data-panel="mediaPanel">媒体库</button>
           <button data-panel="musicPanel">音乐管理</button>
+          <button data-panel="galleryPanel">画廊管理</button>
           <button data-panel="navigationPanel">导航设置</button>
           <button data-panel="articlePanel">文章管理</button>
           <button data-panel="healthPanel">系统状态</button>
@@ -53,6 +54,7 @@
         <nav class="module-sidebar">
           <button class="is-active" data-module="software" data-panel="softwarePanel">软件</button>
           <button data-module="music" data-panel="musicPanel">音乐</button>
+          <button data-module="gallery" data-panel="galleryPanel">画廊</button>
           <button data-module="article" data-panel="articlePanel">文章</button>
           <button data-module="asset" data-panel="assetPanel">资源</button>
           <button data-module="site" data-panel="navigationPanel">站点</button>
@@ -193,6 +195,34 @@
             <div class="form-actions span-2"><button type="submit">保存音乐</button><button class="ghost" type="button" id="resetMusic">清空</button></div>
           </form>
           <div class="table-wrap"><table><thead><tr><th>歌曲</th><th>来源</th><th>封面</th><th>状态</th><th>操作</th></tr></thead><tbody id="musicRows"></tbody></table></div>
+        </section>
+
+        <section class="panel tab-panel" id="galleryPanel" hidden>
+          <div class="panel__head">
+            <div>
+              <h2>画廊管理</h2>
+              <p>维护前台画廊图片，支持默认 R2、第三方 R2 和网络图片。</p>
+            </div>
+          </div>
+          <form class="form-grid" id="galleryForm">
+            <input type="hidden" id="galleryId" />
+            <input type="hidden" id="galleryAssetKey" />
+            <label>标题<input id="galleryTitle" required placeholder="例如：现场花絮" /></label>
+            <label>存储位置<select id="galleryStorage"></select></label>
+            <label class="span-2">图片地址<input id="galleryImageUrl" required placeholder="/media/images/... 或 https://..." /></label>
+            <label class="span-2">缩略图地址<input id="galleryThumbUrl" placeholder="可留空，默认使用图片地址" /></label>
+            <label>R2 图片<select id="galleryAsset"><option value="">选择图片</option></select></label>
+            <div class="form-actions"><button class="ghost" type="button" id="loadGalleryAssets">加载图片</button><button class="ghost" type="button" id="useGalleryAsset">使用选中图片</button></div>
+            <label>本地图片<input id="galleryFile" type="file" accept="image/png,image/jpeg,image/webp,image/gif,image/avif" /></label>
+            <div class="form-actions"><button class="ghost" type="button" id="uploadGalleryImage">上传图片</button><button class="ghost" type="button" id="previewGalleryImage">预览</button></div>
+            <label>标签<input id="galleryTags" placeholder="活动, 产品, 现场" /></label>
+            <label>排序<input id="gallerySort" type="number" value="10" /></label>
+            <label><input id="galleryFeatured" type="checkbox" /> 推荐显示</label>
+            <label>状态<select id="galleryStatus"><option value="published">发布</option><option value="draft">草稿</option><option value="disabled">隐藏</option></select></label>
+            <label class="span-2">说明<textarea id="galleryDescription" rows="3" placeholder="图片说明、拍摄地点或备注"></textarea></label>
+            <div class="form-actions span-2"><button type="submit">保存图片</button><button class="ghost" type="button" id="resetGallery">清空</button></div>
+          </form>
+          <div class="table-wrap"><table><thead><tr><th>图片</th><th>来源</th><th>标签</th><th>状态</th><th>操作</th></tr></thead><tbody id="galleryRows"></tbody></table></div>
         </section>
 
         <section class="panel tab-panel" id="navigationPanel" hidden>
@@ -345,6 +375,6 @@
       </section>
     </main>
 
-    <script src="/admin.js?v=20260517-music-cover-json-upload" type="module"></script>
+    <script src="/admin.js?v=20260517-gallery-admin" type="module"></script>
   </body>
 </html>

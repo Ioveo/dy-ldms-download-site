@@ -144,7 +144,7 @@ byId("clearArticleSoftware").addEventListener("click", () => {
 });
 
 document.querySelectorAll(".sidebar nav button").forEach(button => {
-  button.addEventListener("click", () => showPanel(button.dataset.panel));
+  button.addEventListener("click", () => showPanel(button.dataset.panel, { moduleId: button.dataset.module }));
 });
 
 if (token) loadCatalog();

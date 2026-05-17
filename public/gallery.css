@@ -365,7 +365,7 @@
 }
 
 .gallery-viewer.is-zooming img {
-  opacity: 0;
+  opacity: 1;
   filter: none;
 }
 
@@ -384,21 +384,10 @@
   animation: galleryModePulse 220ms ease both;
 }
 
-.gallery-open-clone {
-  position: fixed;
-  z-index: 95;
-  display: block;
-  margin: 0;
-  object-fit: cover;
-  pointer-events: none;
-  user-select: none;
+.gallery-viewer img.is-opening {
+  border-radius: 0;
   box-shadow: 0 30px 90px rgba(0, 0, 0, 0.55);
   will-change: left, top, width, height;
-  transition: opacity 160ms ease;
-}
-
-.gallery-open-clone.is-fading-out {
-  opacity: 0;
 }
 
 .gallery-viewer figure.is-screen-fit img {
@@ -606,8 +595,7 @@
   .gallery-viewer,
   .gallery-viewer figure,
   .gallery-viewer img,
-  .gallery-viewer figure.is-mode-changing img,
-  .gallery-open-clone {
+  .gallery-viewer figure.is-mode-changing img {
     animation: none;
     transition: none;
   }

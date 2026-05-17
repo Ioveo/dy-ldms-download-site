@@ -3,7 +3,7 @@ let searchText = "";
 let galleryItems = [];
 let visibleItems = [];
 let activeIndex = -1;
-let openingClone = null;
+let openingAnimation = null;
 
 const masonry = byId("galleryMasonry");
 const viewer = byId("galleryViewer");
@@ -187,51 +187,52 @@ function markViewerImageReady() {
 }
 
 function revealViewerImage(sourceImage) {
+  viewerImage.onload = null;
+  viewerImage.onerror = null;
   if (!sourceImage || !sourceImage.getBoundingClientRect) {
     markViewerImageReady();
     return;
   }
 
-  animateViewerFromThumbnail(sourceImage).finally(() => {
+  animateViewerImageFromThumbnail(sourceImage).finally(() => {
     viewer.classList.remove("is-zooming");
     markViewerImageReady();
-    fadeOutOpeningClone();
   });
 }
 
-async function animateViewerFromThumbnail(sourceImage) {
-  if (openingClone) openingClone.remove();
+async function animateViewerImageFromThumbnail(sourceImage) {
+  if (openingAnimation) openingAnimation.cancel();
   const from = sourceImage.getBoundingClientRect();
   const to = targetImageRect();
   if (!from.width || !from.height || !to.width || !to.height) return;
 
-  openingClone = sourceImage.cloneNode(false);
-  openingClone.className = "gallery-open-clone";
-  Object.assign(openingClone.style, rectStyle(from));
-  document.body.append(openingClone);
+  markViewerImageReady();
+  viewerImage.classList.add("is-opening");
+  Object.assign(viewerImage.style, {
+    position: "fixed",
+    zIndex: "95",
+    left: `${from.left}px`,
+    top: `${from.top}px`,
+    width: `${from.width}px`,
+    height: `${from.height}px`,
+    maxWidth: "none",
+    maxHeight: "none",
+    objectFit: "cover",
+    transform: "none"
+  });
 
-  const animation = openingClone.animate([
-    { left: `${from.left}px`, top: `${from.top}px`, width: `${from.width}px`, height: `${from.height}px`, borderRadius: "0", opacity: 1 },
-    { left: `${to.left}px`, top: `${to.top}px`, width: `${to.width}px`, height: `${to.height}px`, borderRadius: "0", opacity: 1 }
+  openingAnimation = viewerImage.animate([
+    { left: `${from.left}px`, top: `${from.top}px`, width: `${from.width}px`, height: `${from.height}px`, opacity: 1 },
+    { left: `${to.left}px`, top: `${to.top}px`, width: `${to.width}px`, height: `${to.height}px`, opacity: 1 }
   ], {
     duration: 420,
     easing: "cubic-bezier(0.18, 0.88, 0.32, 1)"
   });
 
-  await animation.finished.catch(() => {});
-}
-
-function fadeOutOpeningClone() {
-  const clone = openingClone;
-  if (!clone) return;
-  openingClone = null;
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-      clone.classList.add("is-fading-out");
-      clone.addEventListener("transitionend", () => clone.remove(), { once: true });
-      window.setTimeout(() => clone.remove(), 220);
-    });
-  });
+  await openingAnimation.finished.catch(() => {});
+  openingAnimation = null;
+  viewerImage.classList.remove("is-opening");
+  clearOpeningImageStyle();
 }
 
 function targetImageRect() {
@@ -251,13 +252,14 @@ function targetImageRect() {
   };
 }
 
-function rectStyle(rect) {
-  return {
-    left: `${rect.left}px`,
-    top: `${rect.top}px`,
-    width: `${rect.width}px`,
-    height: `${rect.height}px`
-  };
+function clearOpeningImageStyle() {
+  ["position", "zIndex", "left", "top", "maxWidth", "maxHeight", "objectFit", "transform"].forEach(prop => {
+    viewerImage.style.removeProperty(prop);
+  });
+  if (!figure.classList.contains("is-original-size")) {
+    viewerImage.style.removeProperty("width");
+    viewerImage.style.removeProperty("height");
+  }
 }
 
 function flashViewerMode() {
@@ -267,12 +269,14 @@ function flashViewerMode() {
 }
 
 function closeViewer() {
-  if (openingClone) {
-    openingClone.remove();
-    openingClone = null;
+  if (openingAnimation) {
+    openingAnimation.cancel();
+    openingAnimation = null;
   }
   viewer.hidden = true;
   viewerImage.removeAttribute("src");
+  viewerImage.classList.remove("is-opening");
+  clearOpeningImageStyle();
   viewer.classList.remove("is-loading", "is-ready", "is-entering", "is-zooming");
   figure.classList.remove("is-mode-changing");
   enterScreenFitView();

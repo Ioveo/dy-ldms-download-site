@@ -10,7 +10,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="/raycast-home.css?v=20260517-raycast-inspired" />
+    <link rel="stylesheet" href="/raycast-home.css?v=20260517-raycast-nav-motion" />
   </head>
   <body class="home-page">
     <div class="site-glow site-glow--left"></div>
@@ -22,14 +22,24 @@
         <span>天才猫</span>
       </a>
       <nav aria-label="主导航">
-        <a href="/download.html">下载</a>
-        <a href="/gallery.html">画廊</a>
-        <a href="/music.html">音乐</a>
-        <a href="/articles.html">文章</a>
-        <a href="/license.html">授权</a>
+        <a href="/download.html">商店</a>
+        <a href="/license.html">专业版</a>
+        <a href="/articles.html">AI</a>
+        <a href="/download.html">Windows</a>
+        <a href="/license.html">团队</a>
+        <a href="/articles.html">开发者</a>
+        <a href="/articles.html">博客</a>
+        <a href="/license.html">价格</a>
       </nav>
-      <a class="nav-download" href="/download.html">立即下载</a>
+      <div class="nav-actions">
+        <a class="nav-login" href="/lvtuang">登录</a>
+        <a class="nav-download" href="/download.html">下载</a>
+      </div>
     </header>
+
+    <div class="home-announcement">
+      <a href="/gallery.html"><span>新功能</span> 画廊支持批量上传与沉浸式预览 <b>了解更多</b></a>
+    </div>
 
     <main>
       <section class="hero-section">
@@ -44,6 +54,7 @@
 
         <div class="command-stage" aria-label="天才猫命令面板演示">
           <div class="launcher-window">
+            <div class="window-dots"><i></i><i></i><i></i></div>
             <div class="launcher-search">
               <span>⌘</span>
               <input value="搜索工具、素材和入口..." aria-label="搜索演示" readonly />
@@ -86,6 +97,8 @@
             <strong>图库管理</strong>
             <small>批量上传后一键发布</small>
           </div>
+          <div class="hero-orbit hero-orbit--one">⌘ K</div>
+          <div class="hero-orbit hero-orbit--two">AI</div>
         </div>
       </section>
 

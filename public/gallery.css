@@ -367,10 +367,9 @@
 }
 
 .gallery-viewer figure.is-compact-size {
-  max-width: calc(100vw - 56px);
-  max-height: calc(100svh - 56px);
+  max-width: 78vw;
+  max-height: 78svh;
   gap: 0;
-  transform: scale(0.78);
 }
 
 .gallery-viewer img {
@@ -434,8 +433,8 @@
 }
 
 .gallery-viewer figure.is-compact-size img {
-  max-width: calc(100vw - 56px);
-  max-height: calc(100svh - 56px);
+  max-width: 78vw;
+  max-height: 78svh;
   border-radius: 0;
   cursor: zoom-in;
 }
@@ -613,8 +612,8 @@
 
   .gallery-viewer figure.is-compact-size,
   .gallery-viewer figure.is-compact-size img {
-    max-width: calc(100vw - 24px);
-    max-height: calc(100svh - 24px);
+    max-width: 82vw;
+    max-height: 82svh;
   }
 
   .gallery-viewer figcaption {

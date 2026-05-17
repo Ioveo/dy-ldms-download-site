@@ -124,14 +124,16 @@ function openViewer(index) {
   viewerOriginal.href = item.imageUrl;
   document.body.classList.add("gallery-viewer-open");
 
-  viewer.classList.add("is-loading");
+  viewer.classList.remove("is-ready");
+  viewer.classList.add("is-loading", "is-entering");
+  window.setTimeout(() => viewer.classList.remove("is-entering"), 360);
   viewerImage.onload = null;
   viewerImage.onerror = null;
-  viewerImage.onload = () => viewer.classList.remove("is-loading");
-  viewerImage.onerror = () => viewer.classList.remove("is-loading");
+  viewerImage.onload = () => markViewerImageReady();
+  viewerImage.onerror = () => markViewerImageReady();
   viewerImage.src = item.imageUrl;
   if (viewerImage.complete && viewerImage.naturalWidth > 0) {
-    viewer.classList.remove("is-loading");
+    markViewerImageReady();
   }
 
   preloadNeighbor(1);
@@ -166,6 +168,7 @@ function enterScreenFitView() {
   viewerImage.style.removeProperty("width");
   viewerImage.style.removeProperty("height");
   byId("galleryFullscreen").textContent = "原图";
+  flashViewerMode();
 }
 
 function enterOriginalSizeView() {
@@ -176,6 +179,18 @@ function enterOriginalSizeView() {
     viewerImage.style.height = `${viewerImage.naturalHeight}px`;
   }
   byId("galleryFullscreen").textContent = "恢复";
+  flashViewerMode();
+}
+
+function markViewerImageReady() {
+  viewer.classList.remove("is-loading");
+  viewer.classList.add("is-ready");
+}
+
+function flashViewerMode() {
+  figure.classList.remove("is-mode-changing");
+  void figure.offsetWidth;
+  figure.classList.add("is-mode-changing");
 }
 
 async function exitViewerFullscreen() {
@@ -187,6 +202,8 @@ async function exitViewerFullscreen() {
 async function closeViewer() {
   viewer.hidden = true;
   viewerImage.removeAttribute("src");
+  viewer.classList.remove("is-loading", "is-ready", "is-entering");
+  figure.classList.remove("is-mode-changing");
   enterScreenFitView();
   await exitViewerFullscreen();
   document.body.classList.remove("gallery-viewer-open");

@@ -394,6 +394,11 @@
   user-select: none;
   box-shadow: 0 30px 90px rgba(0, 0, 0, 0.55);
   will-change: left, top, width, height;
+  transition: opacity 160ms ease;
+}
+
+.gallery-open-clone.is-fading-out {
+  opacity: 0;
 }
 
 .gallery-viewer figure.is-screen-fit img {

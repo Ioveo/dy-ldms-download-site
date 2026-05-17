@@ -195,6 +195,7 @@ function revealViewerImage(sourceImage) {
   animateViewerFromThumbnail(sourceImage).finally(() => {
     viewer.classList.remove("is-zooming");
     markViewerImageReady();
+    fadeOutOpeningClone();
   });
 }
 
@@ -218,8 +219,19 @@ async function animateViewerFromThumbnail(sourceImage) {
   });
 
   await animation.finished.catch(() => {});
-  openingClone.remove();
+}
+
+function fadeOutOpeningClone() {
+  const clone = openingClone;
+  if (!clone) return;
   openingClone = null;
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      clone.classList.add("is-fading-out");
+      clone.addEventListener("transitionend", () => clone.remove(), { once: true });
+      window.setTimeout(() => clone.remove(), 220);
+    });
+  });
 }
 
 function targetImageRect() {

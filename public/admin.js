@@ -540,19 +540,32 @@ async function uploadMusicCover() {
 }
 
 async function uploadAssetMedia(file, kind, folder = "", refType = "") {
-  const form = new FormData();
-  form.append("token", token);
-  form.append("kind", kind);
-  form.append("folder", folder);
-  form.append("refType", refType);
-  form.append("file", file);
-  const result = await uploadMultipart("/api/admin/assets/upload", form, { title: "正在上传媒体", fileName: file.name });
-  if (!result.success) return result;
-  const asset = result.asset || {};
-  return {
-    ...result,
-    url: asset.url || asset.publicUrl || (asset.key ? `/media/${encodeURIComponent(asset.key)}` : "")
-  };
+  try {
+    const data = await fileToBase64(file);
+    const response = await fetch("/api/admin/assets/upload", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+      body: JSON.stringify({
+        token,
+        kind,
+        folder,
+        refType,
+        fileName: file.name || "asset.bin",
+        contentType: file.type || "",
+        data
+      })
+    });
+    const text = await response.text();
+    const result = parseUploadResponse(text);
+    if (!response.ok) return { success: false, msg: result.msg || `上传失败：HTTP ${response.status}` };
+    const asset = result.asset || {};
+    return {
+      ...result,
+      url: asset.url || asset.publicUrl || (asset.key ? `/media/${encodeURIComponent(asset.key)}` : "")
+    };
+  } catch (error) {
+    return { success: false, msg: `上传失败：${error.message || "网络或接口异常"}` };
+  }
 }
 
 async function uploadMusicAudio() {

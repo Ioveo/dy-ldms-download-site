@@ -6,6 +6,8 @@ const aiPrompts = [...document.querySelectorAll("[data-ai-slide]")];
 const aiStage = document.querySelector("[data-ai-stage]");
 const aiMedia = document.querySelector("[data-ai-media]");
 const aiDots = document.querySelector("[data-ai-dots]");
+const aiProgress = document.querySelector("[data-ai-progress]");
+const aiNext = document.querySelector("[data-ai-next]");
 const aiKicker = document.querySelector("[data-ai-kicker]");
 const aiTitle = document.querySelector("[data-ai-title]");
 const aiDescription = document.querySelector("[data-ai-description]");
@@ -49,6 +51,11 @@ async function initAiCarousel() {
       setAiSlide(Number(prompt.dataset.aiSlide || 0));
       startAiCarousel();
     });
+  });
+
+  aiNext?.addEventListener("click", () => {
+    setAiSlide(activeAiSlide + 1);
+    startAiCarousel();
   });
 
   aiStage.addEventListener("mouseenter", stopAiCarousel);
@@ -148,6 +155,9 @@ function setAiSlide(index) {
   images.forEach((image, imageIndex) => image.classList.toggle("is-active", imageSlideIndexes[imageIndex] === activeAiSlide));
   aiPrompts.forEach((prompt, promptIndex) => prompt.classList.toggle("is-active", promptIndex === activeAiSlide % aiPrompts.length));
   [...(aiDots?.children || [])].forEach((dot, dotIndex) => dot.classList.toggle("is-active", dotIndex === activeAiSlide));
+  if (aiProgress) {
+    aiProgress.style.setProperty("--progress", `${((activeAiSlide + 1) / aiSlides.length) * 100}%`);
+  }
   if (aiKicker) aiKicker.textContent = slide.kicker;
   if (aiTitle) aiTitle.textContent = slide.title;
   if (aiDescription) aiDescription.textContent = slide.description;

@@ -428,24 +428,26 @@ footer {
 }
 
 .gallery-page .gallery-toolbar {
-  top: 100px;
-  margin: 16px auto 18px;
-  border-radius: 24px !important;
+  position: relative;
+  top: auto;
+  z-index: 1;
+  margin: 0 auto;
+  border-radius: 0 !important;
 }
 
 .gallery-page .gallery-masonry {
   column-count: 5;
-  column-gap: 16px;
+  column-gap: 0;
   width: 100%;
   line-height: normal;
 }
 
 .gallery-page .gallery-tile {
-  margin: 0 0 16px;
+  margin: 0;
   border: 0 !important;
-  border-radius: 22px !important;
+  border-radius: 0 !important;
   background: #120c0d !important;
-  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.34) !important;
+  box-shadow: none !important;
   backdrop-filter: none;
 }
 
@@ -746,7 +748,7 @@ footer {
 
   .gallery-page .gallery-masonry {
     column-count: 2;
-    column-gap: 10px;
+    column-gap: 0;
   }
 
   .gallery-page .gallery-shell {
@@ -754,8 +756,8 @@ footer {
   }
 
   .gallery-page .gallery-tile {
-    margin-bottom: 10px;
-    border-radius: 16px !important;
+    margin-bottom: 0;
+    border-radius: 0 !important;
   }
 
   .articles-page .page-hero,

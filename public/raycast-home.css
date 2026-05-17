@@ -816,11 +816,23 @@ a { color: inherit; text-decoration: none; }
   left: 20px;
   right: 20px;
   bottom: 20px;
+  display: block;
+  width: auto;
+  color: inherit;
+  text-align: left;
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 20px;
   padding: 18px;
   background: rgba(8, 7, 8, 0.72);
   backdrop-filter: blur(18px);
+  cursor: pointer;
+  transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+}
+
+.ai-preview__meta:hover {
+  transform: translateY(-3px);
+  border-color: rgba(255, 97, 88, 0.44);
+  background: rgba(16, 11, 12, 0.82);
 }
 
 .ai-preview__meta strong,
@@ -891,6 +903,26 @@ a { color: inherit; text-decoration: none; }
 .ai-dots button.is-active {
   width: 54px;
   background: #ff6158;
+}
+
+.ai-progress {
+  z-index: 2;
+  width: min(440px, 72%);
+  height: 6px;
+  margin: 18px auto 0;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.ai-progress span {
+  display: block;
+  width: var(--progress, 33.333%);
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #ff2d25, #ff8b54);
+  box-shadow: 0 0 18px rgba(255, 45, 37, 0.54);
+  transition: width 360ms ease;
 }
 
 .shortcut-grid {

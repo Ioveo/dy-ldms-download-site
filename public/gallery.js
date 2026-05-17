@@ -52,7 +52,7 @@ async function loadGallery() {
         thumbUrl: item.thumbUrl || item.imageUrl,
         tags: item.tags || []
       }));
-    setHeroImage(galleryItems.find(item => item.featured) || galleryItems[0]);
+    setHeroImage(randomHeroItem(galleryItems));
     renderTags();
     renderGallery();
   } catch {
@@ -296,6 +296,13 @@ function setHeroImage(item) {
   const hero = byId("galleryHero");
   if (!hero || !item?.imageUrl) return;
   hero.style.setProperty("--hero-image", `url("${cssUrl(item.imageUrl)}")`);
+}
+
+function randomHeroItem(items) {
+  if (!items.length) return null;
+  const featured = items.filter(item => item.featured);
+  const pool = featured.length ? featured : items;
+  return pool[Math.floor(Math.random() * pool.length)];
 }
 
 function renderNavigation(catalog) {

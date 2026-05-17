@@ -5,55 +5,57 @@ let articleSoftwareSelection = new Set();
 const ARTICLE_DRAFT_KEY = "downloadAdminArticleDraft";
 const ADMIN_MODULES = {
   software: {
-    title: "软件管理",
-    description: "维护软件资料、分类和版本发布。",
+    title: "\u8f6f\u4ef6\u7ba1\u7406",
+    description: "\u7ef4\u62a4\u8f6f\u4ef6\u8d44\u6599\u3001\u5206\u7c7b\u548c\u7248\u672c\u53d1\u5e03\u3002",
     items: [
-      { panel: "softwarePanel", label: "软件资料", action: "新增/编辑" },
-      { panel: "categoryPanel", label: "分类", action: "分类维护" },
-      { panel: "releasePanel", label: "版本上传", action: "发布安装包" }
+      { panel: "softwarePanel", view: "softwareEdit", label: "\u6dfb\u52a0\u8f6f\u4ef6", action: "\u8d44\u6599\u7f16\u8f91" },
+      { panel: "softwarePanel", view: "softwareList", label: "\u8f6f\u4ef6\u5217\u8868", action: "\u5217\u8868\u7ba1\u7406" },
+      { panel: "categoryPanel", label: "\u5206\u7c7b\u7ba1\u7406", action: "\u5206\u7c7b\u7ef4\u62a4" },
+      { panel: "releasePanel", view: "releaseUpload", label: "\u4e0a\u4f20\u7248\u672c", action: "\u53d1\u5e03\u5b89\u88c5\u5305" },
+      { panel: "releasePanel", view: "releaseList", label: "\u7248\u672c\u5217\u8868", action: "\u6587\u4ef6\u7ba1\u7406" }
     ]
   },
   music: {
-    title: "音乐管理",
-    description: "管理音乐频道、曲库、封面和试听。",
+    title: "\u97f3\u4e50\u7ba1\u7406",
+    description: "\u7ba1\u7406\u97f3\u4e50\u9891\u9053\u3001\u66f2\u5e93\u3001\u5c01\u9762\u548c\u8bd5\u542c\u3002",
     items: [
-      { panel: "musicPanel", label: "添加音乐", action: "编辑曲目" },
-      { panel: "musicPanel", label: "音乐列表", action: "列表管理", anchor: "musicRows" },
-      { panel: "mediaPanel", label: "媒体库", action: "音频/图片" }
+      { panel: "musicPanel", view: "musicEdit", label: "\u6dfb\u52a0\u97f3\u4e50", action: "\u7f16\u8f91\u66f2\u76ee" },
+      { panel: "musicPanel", view: "musicList", label: "\u97f3\u4e50\u5217\u8868", action: "\u5217\u8868\u7ba1\u7406" },
+      { panel: "mediaPanel", label: "\u5a92\u4f53\u5e93", action: "\u97f3\u9891/\u56fe\u7247" }
     ]
   },
   article: {
-    title: "文章管理",
-    description: "编辑文章、管理封面和关联软件。",
+    title: "\u6587\u7ae0\u7ba1\u7406",
+    description: "\u53d1\u8868\u6587\u7ae0\u3001\u7ba1\u7406\u5c01\u9762\u548c\u5173\u8054\u8f6f\u4ef6\u3002",
     items: [
-      { panel: "articlePanel", label: "写文章", action: "新建/编辑" },
-      { panel: "articlePanel", label: "文章列表", action: "列表管理", anchor: "articleRows" },
-      { panel: "mediaPanel", label: "媒体库", action: "插入素材" }
+      { panel: "articlePanel", view: "articleEdit", label: "\u53d1\u8868\u6587\u7ae0", action: "\u65b0\u5efa/\u7f16\u8f91" },
+      { panel: "articlePanel", view: "articleList", label: "\u6587\u7ae0\u5217\u8868", action: "\u5217\u8868\u7ba1\u7406" },
+      { panel: "mediaPanel", label: "\u5a92\u4f53\u5e93", action: "\u63d2\u5165\u7d20\u6750" }
     ]
   },
   asset: {
-    title: "资源管理",
-    description: "管理 R2 中的图片、音频、软件包和站点资源。",
+    title: "\u8d44\u6e90\u7ba1\u7406",
+    description: "\u7ba1\u7406 R2 \u4e2d\u7684\u56fe\u7247\u3001\u97f3\u9891\u3001\u8f6f\u4ef6\u5305\u548c\u7ad9\u70b9\u8d44\u6e90\u3002",
     items: [
-      { panel: "assetPanel", label: "资源上传", action: "上传文件" },
-      { panel: "assetPanel", label: "资源列表", action: "扫描 R2", anchor: "assetRows" },
-      { panel: "mediaPanel", label: "媒体库", action: "文章媒体" }
+      { panel: "assetPanel", view: "assetUpload", label: "\u8d44\u6e90\u4e0a\u4f20", action: "\u4e0a\u4f20\u6587\u4ef6" },
+      { panel: "assetPanel", view: "assetList", label: "\u8d44\u6e90\u5217\u8868", action: "\u626b\u63cf R2" },
+      { panel: "mediaPanel", label: "\u5a92\u4f53\u5e93", action: "\u6587\u7ae0\u5a92\u4f53" }
     ]
   },
   site: {
-    title: "站点设置",
-    description: "配置前台导航和内容入口。",
+    title: "\u7ad9\u70b9\u8bbe\u7f6e",
+    description: "\u914d\u7f6e\u524d\u53f0\u5bfc\u822a\u548c\u5185\u5bb9\u5165\u53e3\u3002",
     items: [
-      { panel: "navigationPanel", label: "导航", action: "菜单配置" },
-      { panel: "healthPanel", label: "系统状态", action: "部署检查" }
+      { panel: "navigationPanel", label: "\u5bfc\u822a", action: "\u83dc\u5355\u914d\u7f6e" },
+      { panel: "healthPanel", label: "\u7cfb\u7edf\u72b6\u6001", action: "\u90e8\u7f72\u68c0\u67e5" }
     ]
   },
   system: {
-    title: "系统配置",
-    description: "检查 R2、D1、存储授权和系统健康。",
+    title: "\u7cfb\u7edf\u914d\u7f6e",
+    description: "\u68c0\u67e5 R2\u3001D1\u3001\u5b58\u50a8\u6388\u6743\u548c\u7cfb\u7edf\u5065\u5eb7\u3002",
     items: [
-      { panel: "storagePanel", label: "存储授权", action: "R2 账号" },
-      { panel: "healthPanel", label: "系统状态", action: "健康检查" }
+      { panel: "storagePanel", label: "\u5b58\u50a8\u6388\u6743", action: "R2 \u8d26\u53f7" },
+      { panel: "healthPanel", label: "\u7cfb\u7edf\u72b6\u6001", action: "\u5065\u5eb7\u68c0\u67e5" }
     ]
   }
 };
@@ -156,6 +158,7 @@ function showApp() {
   appView.hidden = false;
   document.body.classList.add("is-admin-ready");
   document.body.classList.add("admin-overview");
+  document.body.dataset.adminView = "softwareEdit";
   renderModuleNav("software", "softwarePanel");
   window.scrollTo({ top: 0, left: 0, behavior: "auto" });
 }
@@ -1424,12 +1427,20 @@ function articleStatusClass(status) {
   return status === "published" ? "active" : status === "draft" ? "draft" : "disabled";
 }
 
-function showPanel(id) {
+function defaultViewFor(panelId, moduleId = moduleForPanel(panelId)) {
+  const config = ADMIN_MODULES[moduleId] || ADMIN_MODULES.software;
+  const item = config.items.find(entry => entry.panel === panelId);
+  return item?.view || panelId;
+}
+
+function showPanel(id, options = {}) {
   document.querySelectorAll(".tab-panel").forEach(panel => panel.hidden = panel.id !== id);
-  const moduleId = moduleForPanel(id);
-  document.body.classList.toggle("admin-overview", id === "softwarePanel");
+  const moduleId = options.moduleId || moduleForPanel(id);
+  const view = options.view || defaultViewFor(id, moduleId);
+  document.body.dataset.adminView = view;
+  document.body.classList.toggle("admin-overview", id === "softwarePanel" && view === "softwareEdit");
   document.querySelectorAll(".module-sidebar button").forEach(button => button.classList.toggle("is-active", button.dataset.module === moduleId));
-  renderModuleNav(moduleId, id);
+  renderModuleNav(moduleId, id, view);
   const target = document.getElementById(id);
   if (target) target.scrollIntoView({ block: "start", behavior: "smooth" });
 }
@@ -1441,7 +1452,7 @@ function moduleForPanel(panelId) {
   return "software";
 }
 
-function renderModuleNav(moduleId, activePanel) {
+function renderModuleNav(moduleId, activePanel, activeView = defaultViewFor(activePanel, moduleId)) {
   const root = byId("moduleNav");
   const config = ADMIN_MODULES[moduleId] || ADMIN_MODULES.software;
   if (!root) return;
@@ -1451,12 +1462,16 @@ function renderModuleNav(moduleId, activePanel) {
       <span>${escapeHtml(config.description)}</span>
     </div>
     <nav>
-      ${config.items.map(item => `<button type="button" class="${item.panel === activePanel ? "is-active" : ""}" data-panel="${escapeAttr(item.panel)}" data-anchor="${escapeAttr(item.anchor || "")}"><b>${escapeHtml(item.label)}</b><small>${escapeHtml(item.action)}</small></button>`).join("")}
+      ${config.items.map(item => {
+        const view = item.view || defaultViewFor(item.panel, moduleId);
+        const isActive = item.panel === activePanel && view === activeView;
+        return `<button type="button" class="${isActive ? "is-active" : ""}" data-module="${escapeAttr(moduleId)}" data-panel="${escapeAttr(item.panel)}" data-view="${escapeAttr(view)}" data-anchor="${escapeAttr(item.anchor || "")}"><b>${escapeHtml(item.label)}</b><small>${escapeHtml(item.action)}</small></button>`;
+      }).join("")}
     </nav>
   `;
   root.querySelectorAll("button").forEach(button => {
     button.addEventListener("click", () => {
-      showPanel(button.dataset.panel);
+      showPanel(button.dataset.panel, { moduleId: button.dataset.module, view: button.dataset.view });
       if (button.dataset.anchor) {
         window.setTimeout(() => byId(button.dataset.anchor)?.scrollIntoView({ block: "center", behavior: "smooth" }), 80);
       }

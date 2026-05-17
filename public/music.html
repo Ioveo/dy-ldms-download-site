@@ -4,10 +4,10 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>音乐频道 - 天才猫软件中心</title>
-    <meta name="description" content="天才猫音乐频道，播放歌单、网易云音乐 ID 曲目和 R2 托管音频。" />
+    <meta name="description" content="天才猫音乐频道，提供上新音乐、热门排行榜、精选歌单和在线播放。" />
     <link rel="icon" type="image/png" href="/logo.png?v=20260509" />
     <link rel="stylesheet" href="/styles.css?v=20260510-premium-detail" />
-    <link rel="stylesheet" href="/music.css?v=20260517-player" />
+    <link rel="stylesheet" href="/music.css?v=20260517-studio" />
   </head>
   <body class="music-page">
     <header class="topbar topbar--music">
@@ -18,35 +18,83 @@
       <nav aria-label="主导航" data-nav>
         <a href="/">首页</a>
         <a href="/download.html">下载</a>
-        <a href="/music.html">音乐</a>
         <a href="/articles.html">文章</a>
+        <a href="/music.html">音乐</a>
         <a href="/license.html">授权</a>
       </nav>
     </header>
 
     <main>
-      <section class="music-hero">
+      <section class="music-hero" id="musicHero">
         <div class="music-hero__copy">
-          <p>Music Channel</p>
-          <h1>直播间、剪辑和夜间工作，都有自己的播放台。</h1>
-          <a href="#musicLibrary">进入歌单</a>
+          <p class="section-kicker">TianCaiMao Music</p>
+          <h1>给工作、剪辑和直播间一张专业播放台。</h1>
+          <p class="music-hero__lead">上新曲目、精选推荐和热门排行会自动从后台音乐库生成。</p>
+          <div class="hero-actions">
+            <button type="button" id="heroPlay">播放主推</button>
+            <a href="#newMusic">查看上新</a>
+          </div>
         </div>
-        <div class="music-hero__visual" aria-hidden="true">
-          <span></span><span></span><span></span><span></span>
+        <div class="hero-record">
+          <div class="hero-record__disc">
+            <img id="heroCover" src="/logo.png" alt="" />
+          </div>
+          <div class="hero-record__meta">
+            <span>今日主推</span>
+            <strong id="heroTitle">等待音乐上架</strong>
+            <small id="heroArtist">后台发布后自动展示</small>
+          </div>
         </div>
       </section>
 
-      <section class="music-library" id="musicLibrary">
+      <section class="music-dashboard" aria-label="音乐概览">
+        <article>
+          <span>曲库</span>
+          <strong id="statTracks">0</strong>
+        </article>
+        <article>
+          <span>上新</span>
+          <strong id="statNew">0</strong>
+        </article>
+        <article>
+          <span>推荐</span>
+          <strong id="statFeatured">0</strong>
+        </article>
+        <article>
+          <span>标签</span>
+          <strong id="statTags">0</strong>
+        </article>
+      </section>
+
+      <section class="music-section music-section--split" id="newMusic">
+        <div class="section-head">
+          <p class="section-kicker">New Releases</p>
+          <h2>上新音乐</h2>
+        </div>
+        <div class="new-release" id="newRelease"></div>
+        <div class="release-list" id="newReleaseList"></div>
+      </section>
+
+      <section class="music-section music-section--charts" id="musicCharts">
+        <div class="section-head">
+          <p class="section-kicker">Charts</p>
+          <h2>排行榜</h2>
+        </div>
+        <div class="chart-list" id="chartList"></div>
+      </section>
+
+      <section class="music-section" id="musicLibrary">
         <div class="music-library__head">
           <div>
-            <p>Library</p>
-            <h2>精选音乐</h2>
+            <p class="section-kicker">Library</p>
+            <h2>全部歌曲</h2>
           </div>
           <div class="music-filter">
             <input id="musicSearch" placeholder="搜索歌曲、歌手、标签" />
             <button id="clearMusicSearch" type="button">清空</button>
           </div>
         </div>
+        <div class="tag-strip" id="tagStrip"></div>
         <div class="music-grid" id="musicGrid"></div>
       </section>
     </main>
@@ -62,6 +110,6 @@
       <audio id="playerAudio" preload="metadata"></audio>
     </aside>
 
-    <script src="/music.js?v=20260517-player" type="module"></script>
+    <script src="/music.js?v=20260517-studio" type="module"></script>
   </body>
 </html>

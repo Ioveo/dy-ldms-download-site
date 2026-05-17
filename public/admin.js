@@ -530,12 +530,29 @@ async function uploadMusicCover() {
   if (mediaType !== "image") return toast("请选择图片文件", true);
   if (file.size > 8 * 1024 * 1024) return toast("封面图片不能超过 8MB", true);
   toast("正在上传音乐封面");
-  const result = await uploadArticleMedia(file, "image");
+  const result = await uploadAssetMedia(file, "image", "music-cover", "music-cover");
   if (!result.success) return toast(result.msg || "封面上传失败", true);
+  if (!result.url) return toast("封面已上传，但没有返回可用地址", true);
   byId("musicCoverUrl").value = result.url;
   byId("musicCoverFile").value = "";
   await loadMusicCoverAssets();
   toast("音乐封面已上传");
+}
+
+async function uploadAssetMedia(file, kind, folder = "", refType = "") {
+  const form = new FormData();
+  form.append("token", token);
+  form.append("kind", kind);
+  form.append("folder", folder);
+  form.append("refType", refType);
+  form.append("file", file);
+  const result = await uploadMultipart("/api/admin/assets/upload", form, { title: "正在上传媒体", fileName: file.name });
+  if (!result.success) return result;
+  const asset = result.asset || {};
+  return {
+    ...result,
+    url: asset.url || asset.publicUrl || (asset.key ? `/media/${encodeURIComponent(asset.key)}` : "")
+  };
 }
 
 async function uploadMusicAudio() {

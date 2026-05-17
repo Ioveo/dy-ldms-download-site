@@ -3,6 +3,60 @@ let catalog = null;
 let articleSoftwareCategory = "all";
 let articleSoftwareSelection = new Set();
 const ARTICLE_DRAFT_KEY = "downloadAdminArticleDraft";
+const ADMIN_MODULES = {
+  software: {
+    title: "软件管理",
+    description: "维护软件资料、分类和版本发布。",
+    items: [
+      { panel: "softwarePanel", label: "软件资料", action: "新增/编辑" },
+      { panel: "categoryPanel", label: "分类", action: "分类维护" },
+      { panel: "releasePanel", label: "版本上传", action: "发布安装包" }
+    ]
+  },
+  music: {
+    title: "音乐管理",
+    description: "管理音乐频道、曲库、封面和试听。",
+    items: [
+      { panel: "musicPanel", label: "添加音乐", action: "编辑曲目" },
+      { panel: "musicPanel", label: "音乐列表", action: "列表管理", anchor: "musicRows" },
+      { panel: "mediaPanel", label: "媒体库", action: "音频/图片" }
+    ]
+  },
+  article: {
+    title: "文章管理",
+    description: "编辑文章、管理封面和关联软件。",
+    items: [
+      { panel: "articlePanel", label: "写文章", action: "新建/编辑" },
+      { panel: "articlePanel", label: "文章列表", action: "列表管理", anchor: "articleRows" },
+      { panel: "mediaPanel", label: "媒体库", action: "插入素材" }
+    ]
+  },
+  asset: {
+    title: "资源管理",
+    description: "管理 R2 中的图片、音频、软件包和站点资源。",
+    items: [
+      { panel: "assetPanel", label: "资源上传", action: "上传文件" },
+      { panel: "assetPanel", label: "资源列表", action: "扫描 R2", anchor: "assetRows" },
+      { panel: "mediaPanel", label: "媒体库", action: "文章媒体" }
+    ]
+  },
+  site: {
+    title: "站点设置",
+    description: "配置前台导航和内容入口。",
+    items: [
+      { panel: "navigationPanel", label: "导航", action: "菜单配置" },
+      { panel: "healthPanel", label: "系统状态", action: "部署检查" }
+    ]
+  },
+  system: {
+    title: "系统配置",
+    description: "检查 R2、D1、存储授权和系统健康。",
+    items: [
+      { panel: "storagePanel", label: "存储授权", action: "R2 账号" },
+      { panel: "healthPanel", label: "系统状态", action: "健康检查" }
+    ]
+  }
+};
 const DIRECT_UPLOAD_LIMIT = 95 * 1024 * 1024;
 const CHUNK_SIZE = 10 * 1024 * 1024;
 const CHUNK_UPLOAD_THRESHOLD = 10 * 1024 * 1024;
@@ -101,6 +155,7 @@ function showApp() {
   loginView.hidden = true;
   appView.hidden = false;
   document.body.classList.add("is-admin-ready");
+  renderModuleNav("software", "softwarePanel");
   window.scrollTo({ top: 0, left: 0, behavior: "auto" });
 }
 
@@ -1370,7 +1425,41 @@ function articleStatusClass(status) {
 
 function showPanel(id) {
   document.querySelectorAll(".tab-panel").forEach(panel => panel.hidden = panel.id !== id);
-  document.querySelectorAll(".sidebar nav button").forEach(button => button.classList.toggle("is-active", button.dataset.panel === id));
+  const moduleId = moduleForPanel(id);
+  document.querySelectorAll(".module-sidebar button").forEach(button => button.classList.toggle("is-active", button.dataset.module === moduleId));
+  renderModuleNav(moduleId, id);
+  const target = document.getElementById(id);
+  if (target) target.scrollIntoView({ block: "start", behavior: "smooth" });
+}
+
+function moduleForPanel(panelId) {
+  for (const [moduleId, config] of Object.entries(ADMIN_MODULES)) {
+    if (config.items.some(item => item.panel === panelId)) return moduleId;
+  }
+  return "software";
+}
+
+function renderModuleNav(moduleId, activePanel) {
+  const root = byId("moduleNav");
+  const config = ADMIN_MODULES[moduleId] || ADMIN_MODULES.software;
+  if (!root) return;
+  root.innerHTML = `
+    <div>
+      <strong>${escapeHtml(config.title)}</strong>
+      <span>${escapeHtml(config.description)}</span>
+    </div>
+    <nav>
+      ${config.items.map(item => `<button type="button" class="${item.panel === activePanel ? "is-active" : ""}" data-panel="${escapeAttr(item.panel)}" data-anchor="${escapeAttr(item.anchor || "")}"><b>${escapeHtml(item.label)}</b><small>${escapeHtml(item.action)}</small></button>`).join("")}
+    </nav>
+  `;
+  root.querySelectorAll("button").forEach(button => {
+    button.addEventListener("click", () => {
+      showPanel(button.dataset.panel);
+      if (button.dataset.anchor) {
+        window.setTimeout(() => byId(button.dataset.anchor)?.scrollIntoView({ block: "center", behavior: "smooth" }), 80);
+      }
+    });
+  });
 }
 
 async function api(url, payload = {}) {

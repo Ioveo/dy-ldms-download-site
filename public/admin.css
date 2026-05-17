@@ -127,8 +127,20 @@ label { display: grid; gap: 8px; color: var(--muted); font-size: 13px; }
 .brand img { width: 34px; height: 34px; }
 
 .sidebar nav { display: grid; gap: 10px; }
-.sidebar nav button { width: 100%; text-align: left; background: transparent; color: var(--muted); }
-.sidebar nav button.is-active { color: #fff; background: var(--primary); }
+.module-sidebar { margin-top: 4px; }
+.module-sidebar button {
+  width: 100%;
+  min-height: 48px;
+  text-align: left;
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid transparent;
+}
+.module-sidebar button.is-active {
+  color: #fff;
+  background: linear-gradient(135deg, rgba(99,102,241,.98), rgba(34,197,94,.78));
+  border-color: rgba(255,255,255,.12);
+}
 
 .site-link {
   margin-top: auto;
@@ -148,6 +160,71 @@ label { display: grid; gap: 8px; color: var(--muted); font-size: 13px; }
 
 .workspace__head h1 { margin: 0; font-size: clamp(30px, 4vw, 54px); }
 .workspace__head p:not(.eyebrow) { margin: 8px 0 0; color: var(--muted); }
+
+.module-nav {
+  position: sticky;
+  top: 0;
+  z-index: 8;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin: -8px 0 18px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: rgba(15, 15, 19, .86);
+  backdrop-filter: blur(18px);
+}
+
+.module-nav strong,
+.module-nav span {
+  display: block;
+}
+
+.module-nav strong {
+  font-size: 18px;
+}
+
+.module-nav span {
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.module-nav nav {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.module-nav button {
+  display: grid;
+  gap: 3px;
+  min-width: 116px;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  text-align: left;
+  color: var(--muted);
+  background: #09090b;
+}
+
+.module-nav button b {
+  color: var(--text);
+  font-size: 14px;
+}
+
+.module-nav button small {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.module-nav button.is-active {
+  border-color: rgba(129, 140, 248, .72);
+  background: rgba(99, 102, 241, .22);
+}
 
 .stats {
   display: grid;

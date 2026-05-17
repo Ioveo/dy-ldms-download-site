@@ -37,7 +37,7 @@
           <img src="/logo.png" alt="" />
           <span>天才猫后台</span>
         </a>
-        <nav>
+        <nav class="legacy-nav" hidden>
           <button class="is-active" data-panel="softwarePanel">软件管理</button>
           <button data-panel="categoryPanel">分类管理</button>
           <button data-panel="releasePanel">版本上传</button>
@@ -50,6 +50,14 @@
           <button data-panel="healthPanel">系统状态</button>
         </nav>
         <a class="site-link" href="/" target="_blank" rel="noopener">打开前台</a>
+        <nav class="module-sidebar">
+          <button class="is-active" data-module="software" data-panel="softwarePanel">软件</button>
+          <button data-module="music" data-panel="musicPanel">音乐</button>
+          <button data-module="article" data-panel="articlePanel">文章</button>
+          <button data-module="asset" data-panel="assetPanel">资源</button>
+          <button data-module="site" data-panel="navigationPanel">站点</button>
+          <button data-module="system" data-panel="storagePanel">系统</button>
+        </nav>
       </aside>
 
       <section class="workspace">
@@ -62,6 +70,7 @@
           <button class="ghost" id="logoutButton">退出登录</button>
         </header>
 
+        <div class="module-nav" id="moduleNav"></div>
         <section class="stats" id="stats"></section>
 
         <section class="panel tab-panel" id="softwarePanel">

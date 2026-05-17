@@ -116,12 +116,12 @@ function openViewer(index) {
   const item = visibleItems[activeIndex];
   if (!item) return;
   viewer.hidden = false;
-  restoreFitView({ exitFullscreen: false });
+  enterScreenFitView();
+  requestViewerFullscreen();
   viewerImage.alt = item.title || "画廊图片";
   viewerTitle.textContent = item.title || "画廊图片";
   viewerDescription.textContent = item.description || (item.tags || []).join(" / ");
   viewerOriginal.href = item.imageUrl;
-  byId("galleryFullscreen").textContent = "全屏";
   document.body.classList.add("gallery-viewer-open");
 
   viewer.classList.add("is-loading");
@@ -146,30 +146,40 @@ function moveViewer(step) {
 
 async function toggleOriginalView() {
   if (figure.classList.contains("is-original-size")) {
-    await restoreFitView();
+    enterScreenFitView();
     return;
   }
 
-  figure.classList.add("is-fullscreen", "is-original-size");
+  enterOriginalSizeView();
+  requestViewerFullscreen();
+}
+
+function requestViewerFullscreen() {
+  if (!document.fullscreenElement && viewer.requestFullscreen) {
+    viewer.requestFullscreen().catch(() => {});
+  }
+}
+
+function enterScreenFitView() {
+  figure.classList.remove("is-original-size");
+  figure.classList.add("is-screen-fit");
+  viewerImage.style.removeProperty("width");
+  viewerImage.style.removeProperty("height");
+  byId("galleryFullscreen").textContent = "原图";
+}
+
+function enterOriginalSizeView() {
+  figure.classList.remove("is-screen-fit");
+  figure.classList.add("is-original-size");
   if (viewerImage.naturalWidth > 0) {
     viewerImage.style.width = `${viewerImage.naturalWidth}px`;
     viewerImage.style.height = `${viewerImage.naturalHeight}px`;
   }
   byId("galleryFullscreen").textContent = "恢复";
-
-  if (!document.fullscreenElement && viewer.requestFullscreen) {
-    await viewer.requestFullscreen().catch(() => {});
-  }
 }
 
-async function restoreFitView(options = {}) {
-  const { exitFullscreen = true } = options;
-  figure.classList.remove("is-fullscreen", "is-original-size");
-  viewerImage.style.removeProperty("width");
-  viewerImage.style.removeProperty("height");
-  byId("galleryFullscreen").textContent = "全屏";
-
-  if (exitFullscreen && document.fullscreenElement && document.exitFullscreen) {
+async function exitViewerFullscreen() {
+  if (document.fullscreenElement && document.exitFullscreen) {
     await document.exitFullscreen().catch(() => {});
   }
 }
@@ -177,7 +187,8 @@ async function restoreFitView(options = {}) {
 async function closeViewer() {
   viewer.hidden = true;
   viewerImage.removeAttribute("src");
-  await restoreFitView();
+  enterScreenFitView();
+  await exitViewerFullscreen();
   document.body.classList.remove("gallery-viewer-open");
 }
 

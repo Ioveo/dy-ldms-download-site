@@ -92,7 +92,7 @@ function renderNewReleases() {
       <span>播放</span>
     </button>
     <div>
-      <p class="section-kicker">Latest Drop</p>
+      <p class="music-kicker">Latest Drop</p>
       <h3>${escapeHtml(main.title)}</h3>
       <strong>${escapeHtml(main.artist)}</strong>
       <small>${escapeHtml(trackSource(main))} · ${formatDate(main.createdAt || main.updatedAt)}</small>

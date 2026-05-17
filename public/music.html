@@ -6,8 +6,12 @@
     <title>音乐频道 - 天才猫音乐</title>
     <meta name="description" content="天才猫音乐频道，提供今日主推、上新音乐、热门排行、精选标签和在线播放。" />
     <link rel="icon" type="image/png" href="/logo.png?v=20260509" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="/styles.css?v=20260510-premium-detail" />
-    <link rel="stylesheet" href="/music.css?v=20260517-app" />
+    <link rel="stylesheet" href="/music.css?v=20260517-app-polish" />
   </head>
   <body class="music-page">
     <aside class="music-sidebar">
@@ -16,10 +20,10 @@
         <span>天才猫音乐</span>
       </a>
       <nav class="music-sidebar__nav" aria-label="音乐频道导航">
-        <a class="is-active" href="#musicHero"><span>首页</span></a>
-        <a href="#musicCharts"><span>排行榜</span></a>
-        <a href="#newMusic"><span>上新</span></a>
-        <a href="#musicLibrary"><span>曲库</span></a>
+        <a class="is-active" href="#musicHero"><span class="material-symbols-outlined">home</span><span>首页</span></a>
+        <a href="#musicCharts"><span class="material-symbols-outlined">local_fire_department</span><span>排行榜</span></a>
+        <a href="#newMusic"><span class="material-symbols-outlined">new_releases</span><span>上新</span></a>
+        <a href="#musicLibrary"><span class="material-symbols-outlined">library_music</span><span>曲库</span></a>
       </nav>
       <div class="music-sidebar__stats" aria-label="音乐数据">
         <article><span>曲库</span><strong id="statTracks">0</strong></article>
@@ -36,7 +40,7 @@
           <span>天才猫音乐</span>
         </a>
         <div class="music-search">
-          <span>Search</span>
+          <span class="material-symbols-outlined">search</span>
           <input id="musicSearch" placeholder="搜索歌曲、歌手、标签" />
         </div>
         <nav aria-label="主导航" data-nav>
@@ -61,8 +65,8 @@
               <span id="heroArtist">后台发布后自动展示</span>
             </div>
             <div class="music-hero__actions">
-              <button type="button" id="heroPlay">播放主推</button>
-              <a href="#newMusic">查看上新</a>
+              <button type="button" id="heroPlay"><span class="material-symbols-outlined">play_arrow</span>播放主推</button>
+              <a href="#newMusic"><span class="material-symbols-outlined">new_releases</span>查看上新</a>
             </div>
           </div>
         </section>
@@ -116,14 +120,14 @@
           <span id="playerArtist">选择一首歌开始播放</span>
         </div>
         <div class="music-player__controls">
-          <button type="button" aria-label="上一首">‹</button>
+          <button type="button" aria-label="上一首"><span class="material-symbols-outlined">skip_previous</span></button>
           <button id="playerPlay" type="button">播放</button>
-          <button type="button" aria-label="下一首">›</button>
+          <button type="button" aria-label="下一首"><span class="material-symbols-outlined">skip_next</span></button>
         </div>
       </div>
       <audio id="playerAudio" preload="metadata"></audio>
     </aside>
 
-    <script src="/music.js?v=20260517-app" type="module"></script>
+    <script src="/music.js?v=20260517-app-polish" type="module"></script>
   </body>
 </html>

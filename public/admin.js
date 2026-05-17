@@ -155,6 +155,7 @@ function showApp() {
   loginView.hidden = true;
   appView.hidden = false;
   document.body.classList.add("is-admin-ready");
+  document.body.classList.add("admin-overview");
   renderModuleNav("software", "softwarePanel");
   window.scrollTo({ top: 0, left: 0, behavior: "auto" });
 }
@@ -1426,6 +1427,7 @@ function articleStatusClass(status) {
 function showPanel(id) {
   document.querySelectorAll(".tab-panel").forEach(panel => panel.hidden = panel.id !== id);
   const moduleId = moduleForPanel(id);
+  document.body.classList.toggle("admin-overview", id === "softwarePanel");
   document.querySelectorAll(".module-sidebar button").forEach(button => button.classList.toggle("is-active", button.dataset.module === moduleId));
   renderModuleNav(moduleId, id);
   const target = document.getElementById(id);

@@ -1,9 +1,9 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="zh-CN">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>天才猫下载管理后台</title>
+    <title>澶╂墠鐚笅杞界鐞嗗悗鍙?/title>
     <link rel="icon" type="image/png" href="/logo.png?v=20260509" />
     <link rel="stylesheet" href="/admin.css?v=20260510-editor-tools" />
   </head>
@@ -12,11 +12,11 @@
     <div class="upload-progress" id="uploadProgress" hidden>
       <div class="upload-progress__card">
         <div class="upload-progress__head">
-          <strong id="uploadProgressTitle">正在上传</strong>
+          <strong id="uploadProgressTitle">姝ｅ湪涓婁紶</strong>
           <span id="uploadProgressPercent">0%</span>
         </div>
         <div class="upload-progress__bar"><span id="uploadProgressBar"></span></div>
-        <p id="uploadProgressText">请保持页面打开，上传完成后会自动刷新。</p>
+        <p id="uploadProgressText">璇蜂繚鎸侀〉闈㈡墦寮€锛屼笂浼犲畬鎴愬悗浼氳嚜鍔ㄥ埛鏂般€?/p>
       </div>
     </div>
 
@@ -24,10 +24,10 @@
       <section class="panel login__panel">
         <img src="/logo.png" alt="" />
         <p class="eyebrow">TianCaiMao Admin</p>
-        <h1>下载管理后台</h1>
-        <label for="adminPassword">管理员密码</label>
-        <input id="adminPassword" type="password" placeholder="请输入后台密码" />
-        <button id="loginButton">进入后台</button>
+        <h1>涓嬭浇绠＄悊鍚庡彴</h1>
+        <label for="adminPassword">绠＄悊鍛樺瘑鐮?/label>
+        <input id="adminPassword" type="password" placeholder="璇疯緭鍏ュ悗鍙板瘑鐮? />
+        <button id="loginButton">杩涘叆鍚庡彴</button>
       </section>
     </main>
 
@@ -35,39 +35,39 @@
       <aside class="sidebar">
         <a class="brand" href="/admin.html">
           <img src="/logo.png" alt="" />
-          <span>天才猫后台</span>
+          <span>澶╂墠鐚悗鍙?/span>
         </a>
         <nav class="legacy-nav" hidden>
-          <button class="is-active" data-panel="softwarePanel">软件管理</button>
-          <button data-panel="categoryPanel">分类管理</button>
-          <button data-panel="releasePanel">版本上传</button>
-          <button data-panel="storagePanel">存储授权</button>
-          <button data-panel="assetPanel">资源管理</button>
-          <button data-panel="mediaPanel">媒体库</button>
-          <button data-panel="musicPanel">音乐管理</button>
-          <button data-panel="navigationPanel">导航设置</button>
-          <button data-panel="articlePanel">文章管理</button>
-          <button data-panel="healthPanel">系统状态</button>
+          <button class="is-active" data-panel="softwarePanel">杞欢绠＄悊</button>
+          <button data-panel="categoryPanel">鍒嗙被绠＄悊</button>
+          <button data-panel="releasePanel">鐗堟湰涓婁紶</button>
+          <button data-panel="storagePanel">瀛樺偍鎺堟潈</button>
+          <button data-panel="assetPanel">璧勬簮绠＄悊</button>
+          <button data-panel="mediaPanel">濯掍綋搴?/button>
+          <button data-panel="musicPanel">闊充箰绠＄悊</button>
+          <button data-panel="navigationPanel">瀵艰埅璁剧疆</button>
+          <button data-panel="articlePanel">鏂囩珷绠＄悊</button>
+          <button data-panel="healthPanel">绯荤粺鐘舵€?/button>
+        </nav>
+        <nav class="module-sidebar">
+          <button class="is-active" data-module="software" data-panel="softwarePanel">杞欢</button>
+          <button data-module="music" data-panel="musicPanel">闊充箰</button>
+          <button data-module="article" data-panel="articlePanel">鏂囩珷</button>
+          <button data-module="asset" data-panel="assetPanel">璧勬簮</button>
+          <button data-module="site" data-panel="navigationPanel">绔欑偣</button>
+          <button data-module="system" data-panel="storagePanel">绯荤粺</button>
         </nav>
         <a class="site-link" href="/" target="_blank" rel="noopener">打开前台</a>
-        <nav class="module-sidebar">
-          <button class="is-active" data-module="software" data-panel="softwarePanel">软件</button>
-          <button data-module="music" data-panel="musicPanel">音乐</button>
-          <button data-module="article" data-panel="articlePanel">文章</button>
-          <button data-module="asset" data-panel="assetPanel">资源</button>
-          <button data-module="site" data-panel="navigationPanel">站点</button>
-          <button data-module="system" data-panel="storagePanel">系统</button>
-        </nav>
       </aside>
 
       <section class="workspace">
         <header class="workspace__head">
           <div>
             <p class="eyebrow">Download Center</p>
-            <h1>软件下载管理</h1>
-            <p>上传版本、维护分类、控制前台下载卡片。</p>
+            <h1>杞欢涓嬭浇绠＄悊</h1>
+            <p>涓婁紶鐗堟湰銆佺淮鎶ゅ垎绫汇€佹帶鍒跺墠鍙颁笅杞藉崱鐗囥€?/p>
           </div>
-          <button class="ghost" id="logoutButton">退出登录</button>
+          <button class="ghost" id="logoutButton">閫€鍑虹櫥褰?/button>
         </header>
 
         <div class="module-nav" id="moduleNav"></div>
@@ -76,162 +76,162 @@
         <section class="panel tab-panel" id="softwarePanel">
           <div class="panel__head">
             <div>
-              <h2>软件管理</h2>
-              <p>新增软件后，可在“版本上传”里上传安装包。</p>
+              <h2>杞欢绠＄悊</h2>
+              <p>鏂板杞欢鍚庯紝鍙湪鈥滅増鏈笂浼犫€濋噷涓婁紶瀹夎鍖呫€?/p>
             </div>
           </div>
           <form class="form-grid" id="softwareForm">
             <input type="hidden" id="softwareId" />
-            <label>软件名称<input id="softwareName" required placeholder="例如：数据中心版" /></label>
-            <label>软件标识<input id="softwareSlug" required placeholder="例如：datacenter" /></label>
-            <label>分类<select id="softwareCategory"></select></label>
-            <label>封面地址<input id="softwareCover" placeholder="/datacenter-preview.jpg 或 https://..." /></label>
-            <label>R2 封面图<select id="softwareCoverAsset"><option value="">选择 R2 图片</option></select></label>
-            <label>本地封面<input id="softwareCoverFile" type="file" accept="image/png,image/jpeg,image/webp,image/gif,image/avif" /></label>
-            <div class="form-actions"><button class="ghost" type="button" id="useSoftwareCoverAsset">使用 R2 图片</button><button class="ghost" type="button" id="uploadSoftwareCover">上传封面</button></div>
-            <label class="span-2">简介<textarea id="softwareDescription" rows="3" placeholder="软件说明"></textarea></label>
-            <label>排序<input id="softwareSort" type="number" value="10" /></label>
-            <label>状态<select id="softwareStatus"><option value="active">上架</option><option value="disabled">下架</option></select></label>
-            <div class="form-actions span-2"><button type="submit">保存软件</button><button class="ghost" type="button" id="resetSoftware">清空</button></div>
+            <label>杞欢鍚嶇О<input id="softwareName" required placeholder="渚嬪锛氭暟鎹腑蹇冪増" /></label>
+            <label>杞欢鏍囪瘑<input id="softwareSlug" required placeholder="渚嬪锛歞atacenter" /></label>
+            <label>鍒嗙被<select id="softwareCategory"></select></label>
+            <label>灏侀潰鍦板潃<input id="softwareCover" placeholder="/datacenter-preview.jpg 鎴?https://..." /></label>
+            <label>R2 灏侀潰鍥?select id="softwareCoverAsset"><option value="">閫夋嫨 R2 鍥剧墖</option></select></label>
+            <label>鏈湴灏侀潰<input id="softwareCoverFile" type="file" accept="image/png,image/jpeg,image/webp,image/gif,image/avif" /></label>
+            <div class="form-actions"><button class="ghost" type="button" id="useSoftwareCoverAsset">浣跨敤 R2 鍥剧墖</button><button class="ghost" type="button" id="uploadSoftwareCover">涓婁紶灏侀潰</button></div>
+            <label class="span-2">绠€浠?textarea id="softwareDescription" rows="3" placeholder="杞欢璇存槑"></textarea></label>
+            <label>鎺掑簭<input id="softwareSort" type="number" value="10" /></label>
+            <label>鐘舵€?select id="softwareStatus"><option value="active">涓婃灦</option><option value="disabled">涓嬫灦</option></select></label>
+            <div class="form-actions span-2"><button type="submit">淇濆瓨杞欢</button><button class="ghost" type="button" id="resetSoftware">娓呯┖</button></div>
           </form>
-          <div class="table-wrap"><table><thead><tr><th>软件</th><th>分类</th><th>最新版本</th><th>状态</th><th>操作</th></tr></thead><tbody id="softwareRows"></tbody></table></div>
+          <div class="table-wrap"><table><thead><tr><th>杞欢</th><th>鍒嗙被</th><th>鏈€鏂扮増鏈?/th><th>鐘舵€?/th><th>鎿嶄綔</th></tr></thead><tbody id="softwareRows"></tbody></table></div>
         </section>
 
         <section class="panel tab-panel" id="categoryPanel" hidden>
-          <div class="panel__head"><h2>分类管理</h2></div>
+          <div class="panel__head"><h2>鍒嗙被绠＄悊</h2></div>
           <form class="form-grid" id="categoryForm">
             <input type="hidden" id="categoryId" />
-            <label>分类名称<input id="categoryName" required placeholder="例如：直播辅助" /></label>
-            <label>分类标识<input id="categorySlug" required placeholder="例如：assistant" /></label>
-            <label>排序<input id="categorySort" type="number" value="10" /></label>
-            <label>状态<select id="categoryStatus"><option value="active">启用</option><option value="disabled">隐藏</option></select></label>
-            <div class="form-actions span-2"><button type="submit">保存分类</button><button class="ghost" type="button" id="resetCategory">清空</button></div>
+            <label>鍒嗙被鍚嶇О<input id="categoryName" required placeholder="渚嬪锛氱洿鎾緟鍔? /></label>
+            <label>鍒嗙被鏍囪瘑<input id="categorySlug" required placeholder="渚嬪锛歛ssistant" /></label>
+            <label>鎺掑簭<input id="categorySort" type="number" value="10" /></label>
+            <label>鐘舵€?select id="categoryStatus"><option value="active">鍚敤</option><option value="disabled">闅愯棌</option></select></label>
+            <div class="form-actions span-2"><button type="submit">淇濆瓨鍒嗙被</button><button class="ghost" type="button" id="resetCategory">娓呯┖</button></div>
           </form>
-          <div class="table-wrap"><table><thead><tr><th>分类</th><th>标识</th><th>排序</th><th>状态</th><th>操作</th></tr></thead><tbody id="categoryRows"></tbody></table></div>
+          <div class="table-wrap"><table><thead><tr><th>鍒嗙被</th><th>鏍囪瘑</th><th>鎺掑簭</th><th>鐘舵€?/th><th>鎿嶄綔</th></tr></thead><tbody id="categoryRows"></tbody></table></div>
         </section>
 
         <section class="panel tab-panel" id="releasePanel" hidden>
           <div class="panel__head">
             <div>
-              <h2>版本上传</h2>
-              <p>文件会上传到 R2，并自动写入软件目录。</p>
+              <h2>鐗堟湰涓婁紶</h2>
+              <p>鏂囦欢浼氫笂浼犲埌 R2锛屽苟鑷姩鍐欏叆杞欢鐩綍銆?/p>
             </div>
           </div>
           <div class="form-grid">
-            <p class="span-2">大于 95MB 的安装包不要使用下面的网页直传。请先上传到 R2，然后使用下方“登记已上传 R2 文件”。</p>
+            <p class="span-2">澶т簬 95MB 鐨勫畨瑁呭寘涓嶈浣跨敤涓嬮潰鐨勭綉椤电洿浼犮€傝鍏堜笂浼犲埌 R2锛岀劧鍚庝娇鐢ㄤ笅鏂光€滅櫥璁板凡涓婁紶 R2 鏂囦欢鈥濄€?/p>
           </div>
           <form class="form-grid" id="releaseForm">
-            <label>所属软件<select id="releaseSoftware"></select></label>
-            <label>存储位置<select id="releaseStorage"></select></label>
-            <label>版本号<input id="releaseVersion" required placeholder="1.0.0" /></label>
-            <label class="span-2">安装包<input id="releaseFile" type="file" required /></label>
-            <label class="span-2">更新说明<textarea id="releaseChangelog" rows="4" placeholder="每行一条更新内容"></textarea></label>
-            <label><input id="releaseLatest" type="checkbox" checked /> 设为最新版</label>
-            <div class="form-actions span-2"><button type="submit">上传并发布</button></div>
+            <label>鎵€灞炶蒋浠?select id="releaseSoftware"></select></label>
+            <label>瀛樺偍浣嶇疆<select id="releaseStorage"></select></label>
+            <label>鐗堟湰鍙?input id="releaseVersion" required placeholder="1.0.0" /></label>
+            <label class="span-2">瀹夎鍖?input id="releaseFile" type="file" required /></label>
+            <label class="span-2">鏇存柊璇存槑<textarea id="releaseChangelog" rows="4" placeholder="姣忚涓€鏉℃洿鏂板唴瀹?></textarea></label>
+            <label><input id="releaseLatest" type="checkbox" checked /> 璁句负鏈€鏂扮増</label>
+            <div class="form-actions span-2"><button type="submit">涓婁紶骞跺彂甯?/button></div>
           </form>
           <form class="form-grid" id="releaseRegisterForm">
-            <label>已传文件所属软件<select id="registerSoftware"></select></label>
-            <label>版本号<input id="registerVersion" required placeholder="1.0.0" /></label>
-            <label class="span-2">R2 文件路径<input id="registerFileKey" required placeholder="software/datacenter/1.0.0/TianCaiMao-DataCenter-1.0.0.zip" /></label>
-            <label>文件名 选填<input id="registerFileName" placeholder="TianCaiMao-DataCenter-1.0.0.zip" /></label>
-            <label>SHA256 选填<input id="registerSha256" placeholder="可留空" /></label>
-            <label class="span-2">更新说明<textarea id="registerChangelog" rows="3" placeholder="每行一条更新内容"></textarea></label>
-            <label><input id="registerLatest" type="checkbox" checked /> 设为最新版</label>
-            <div class="form-actions span-2"><button class="ghost" type="submit">登记已上传 R2 文件</button></div>
+            <label>宸蹭紶鏂囦欢鎵€灞炶蒋浠?select id="registerSoftware"></select></label>
+            <label>鐗堟湰鍙?input id="registerVersion" required placeholder="1.0.0" /></label>
+            <label class="span-2">R2 鏂囦欢璺緞<input id="registerFileKey" required placeholder="software/datacenter/1.0.0/TianCaiMao-DataCenter-1.0.0.zip" /></label>
+            <label>鏂囦欢鍚?閫夊～<input id="registerFileName" placeholder="TianCaiMao-DataCenter-1.0.0.zip" /></label>
+            <label>SHA256 閫夊～<input id="registerSha256" placeholder="鍙暀绌? /></label>
+            <label class="span-2">鏇存柊璇存槑<textarea id="registerChangelog" rows="3" placeholder="姣忚涓€鏉℃洿鏂板唴瀹?></textarea></label>
+            <label><input id="registerLatest" type="checkbox" checked /> 璁句负鏈€鏂扮増</label>
+            <div class="form-actions span-2"><button class="ghost" type="submit">鐧昏宸蹭笂浼?R2 鏂囦欢</button></div>
           </form>
-          <div class="table-wrap"><table><thead><tr><th>软件</th><th>版本</th><th>文件</th><th>大小</th><th>最新</th><th>下载</th><th>操作</th></tr></thead><tbody id="releaseRows"></tbody></table></div>
+          <div class="table-wrap"><table><thead><tr><th>杞欢</th><th>鐗堟湰</th><th>鏂囦欢</th><th>澶у皬</th><th>鏈€鏂?/th><th>涓嬭浇</th><th>鎿嶄綔</th></tr></thead><tbody id="releaseRows"></tbody></table></div>
         </section>
 
         <section class="panel tab-panel" id="storagePanel" hidden>
           <div class="panel__head">
             <div>
-              <h2>存储授权</h2>
-              <p>添加其他 Cloudflare R2 账户，用于把软件上传到指定客户或团队的 R2。</p>
+              <h2>瀛樺偍鎺堟潈</h2>
+              <p>娣诲姞鍏朵粬 Cloudflare R2 璐︽埛锛岀敤浜庢妸杞欢涓婁紶鍒版寚瀹氬鎴锋垨鍥㈤槦鐨?R2銆?/p>
             </div>
           </div>
           <form class="form-grid" id="storageForm">
             <input type="hidden" id="storageId" />
-            <label>显示名称<input id="storageName" required placeholder="例如：客户A R2" /></label>
+            <label>鏄剧ず鍚嶇О<input id="storageName" required placeholder="渚嬪锛氬鎴稟 R2" /></label>
             <label>Account ID<input id="storageAccountId" required placeholder="Cloudflare Account ID" /></label>
             <label>Bucket<input id="storageBucket" required placeholder="bucket-name" /></label>
             <label>Access Key ID<input id="storageAccessKeyId" required placeholder="R2 API Token Access Key" /></label>
-            <label class="span-2">Secret Access Key<input id="storageSecretAccessKey" type="password" placeholder="留空表示不修改已保存 Secret" /></label>
-            <label>Endpoint 选填<input id="storageEndpoint" placeholder="默认自动生成 R2 S3 Endpoint" /></label>
-            <label>公开访问地址 选填<input id="storagePublicBaseUrl" placeholder="https://files.example.com" /></label>
-            <label>排序<input id="storageSort" type="number" value="10" /></label>
-            <label>状态<select id="storageStatus"><option value="active">启用</option><option value="disabled">停用</option></select></label>
-            <div class="form-actions span-2"><button type="submit">保存存储授权</button><button class="ghost" type="button" id="testStorage">测试连接</button><button class="ghost" type="button" id="resetStorage">清空</button></div>
+            <label class="span-2">Secret Access Key<input id="storageSecretAccessKey" type="password" placeholder="鐣欑┖琛ㄧず涓嶄慨鏀瑰凡淇濆瓨 Secret" /></label>
+            <label>Endpoint 閫夊～<input id="storageEndpoint" placeholder="榛樿鑷姩鐢熸垚 R2 S3 Endpoint" /></label>
+            <label>鍏紑璁块棶鍦板潃 閫夊～<input id="storagePublicBaseUrl" placeholder="https://files.example.com" /></label>
+            <label>鎺掑簭<input id="storageSort" type="number" value="10" /></label>
+            <label>鐘舵€?select id="storageStatus"><option value="active">鍚敤</option><option value="disabled">鍋滅敤</option></select></label>
+            <div class="form-actions span-2"><button type="submit">淇濆瓨瀛樺偍鎺堟潈</button><button class="ghost" type="button" id="testStorage">娴嬭瘯杩炴帴</button><button class="ghost" type="button" id="resetStorage">娓呯┖</button></div>
           </form>
-          <div class="table-wrap"><table><thead><tr><th>名称</th><th>Account</th><th>Bucket</th><th>Secret</th><th>状态</th><th>操作</th></tr></thead><tbody id="storageRows"></tbody></table></div>
+          <div class="table-wrap"><table><thead><tr><th>鍚嶇О</th><th>Account</th><th>Bucket</th><th>Secret</th><th>鐘舵€?/th><th>鎿嶄綔</th></tr></thead><tbody id="storageRows"></tbody></table></div>
         </section>
 
         <section class="panel tab-panel" id="musicPanel" hidden>
           <div class="panel__head">
             <div>
-              <h2>音乐管理</h2>
-              <p>维护音乐频道、网易云 ID、R2 音频、封面、标签和试听状态。</p>
+              <h2>闊充箰绠＄悊</h2>
+              <p>缁存姢闊充箰棰戦亾銆佺綉鏄撲簯 ID銆丷2 闊抽銆佸皝闈€佹爣绛惧拰璇曞惉鐘舵€併€?/p>
             </div>
           </div>
           <form class="form-grid" id="musicForm">
             <input type="hidden" id="musicId" />
-            <label>歌曲名<input id="musicTitle" required placeholder="例如：夜航频道" /></label>
-            <label>歌手<input id="musicArtist" required placeholder="例如：天才猫" /></label>
-            <label>专辑<input id="musicAlbum" placeholder="选填" /></label>
-            <label>网易云音乐 ID<input id="musicNeteaseId" placeholder="例如：2058263035" /></label>
-            <label class="span-2">音频地址<input id="musicAudioUrl" placeholder="/media/music-audio-xxx.mp3 或 https://..." /></label>
-            <label>本地音频<input id="musicAudioFile" type="file" accept="audio/mpeg,audio/mp4,audio/aac,audio/wav,audio/ogg,audio/webm,audio/flac" /></label>
-            <div class="form-actions"><button class="ghost" type="button" id="uploadMusicAudio">上传音频</button><button class="ghost" type="button" id="previewMusic">试听</button></div>
-            <label class="span-2">封面地址<input id="musicCoverUrl" placeholder="/media/article-image-xxx.webp 或 https://..." /></label>
-            <label>R2 封面图<select id="musicCoverAsset"><option value="">选择 R2 图片</option></select></label>
-            <label>本地封面<input id="musicCoverFile" type="file" accept="image/png,image/jpeg,image/webp,image/gif,image/avif" /></label>
-            <div class="form-actions span-2"><button class="ghost" type="button" id="useMusicCoverAsset">使用 R2 封面</button><button class="ghost" type="button" id="uploadMusicCover">上传封面</button></div>
-            <label>标签<input id="musicTags" placeholder="电子, 直播间, 放松" /></label>
-            <label>排序<input id="musicSort" type="number" value="10" /></label>
-            <label><input id="musicFeatured" type="checkbox" /> 推荐到音乐首页</label>
-            <label>状态<select id="musicStatus"><option value="published">发布</option><option value="draft">草稿</option><option value="disabled">隐藏</option></select></label>
-            <label class="span-2">歌词/备注<textarea id="musicLyric" rows="4" placeholder="可填写歌词、版权备注或使用说明"></textarea></label>
-            <div class="form-actions span-2"><button type="submit">保存音乐</button><button class="ghost" type="button" id="resetMusic">清空</button></div>
+            <label>姝屾洸鍚?input id="musicTitle" required placeholder="渚嬪锛氬鑸閬? /></label>
+            <label>姝屾墜<input id="musicArtist" required placeholder="渚嬪锛氬ぉ鎵嶇尗" /></label>
+            <label>涓撹緫<input id="musicAlbum" placeholder="閫夊～" /></label>
+            <label>缃戞槗浜戦煶涔?ID<input id="musicNeteaseId" placeholder="渚嬪锛?058263035" /></label>
+            <label class="span-2">闊抽鍦板潃<input id="musicAudioUrl" placeholder="/media/music-audio-xxx.mp3 鎴?https://..." /></label>
+            <label>鏈湴闊抽<input id="musicAudioFile" type="file" accept="audio/mpeg,audio/mp4,audio/aac,audio/wav,audio/ogg,audio/webm,audio/flac" /></label>
+            <div class="form-actions"><button class="ghost" type="button" id="uploadMusicAudio">涓婁紶闊抽</button><button class="ghost" type="button" id="previewMusic">璇曞惉</button></div>
+            <label class="span-2">灏侀潰鍦板潃<input id="musicCoverUrl" placeholder="/media/article-image-xxx.webp 鎴?https://..." /></label>
+            <label>R2 灏侀潰鍥?select id="musicCoverAsset"><option value="">閫夋嫨 R2 鍥剧墖</option></select></label>
+            <label>鏈湴灏侀潰<input id="musicCoverFile" type="file" accept="image/png,image/jpeg,image/webp,image/gif,image/avif" /></label>
+            <div class="form-actions span-2"><button class="ghost" type="button" id="useMusicCoverAsset">浣跨敤 R2 灏侀潰</button><button class="ghost" type="button" id="uploadMusicCover">涓婁紶灏侀潰</button></div>
+            <label>鏍囩<input id="musicTags" placeholder="鐢靛瓙, 鐩存挱闂? 鏀炬澗" /></label>
+            <label>鎺掑簭<input id="musicSort" type="number" value="10" /></label>
+            <label><input id="musicFeatured" type="checkbox" /> 鎺ㄨ崘鍒伴煶涔愰椤?/label>
+            <label>鐘舵€?select id="musicStatus"><option value="published">鍙戝竷</option><option value="draft">鑽夌</option><option value="disabled">闅愯棌</option></select></label>
+            <label class="span-2">姝岃瘝/澶囨敞<textarea id="musicLyric" rows="4" placeholder="鍙～鍐欐瓕璇嶃€佺増鏉冨娉ㄦ垨浣跨敤璇存槑"></textarea></label>
+            <div class="form-actions span-2"><button type="submit">淇濆瓨闊充箰</button><button class="ghost" type="button" id="resetMusic">娓呯┖</button></div>
           </form>
-          <div class="table-wrap"><table><thead><tr><th>歌曲</th><th>来源</th><th>封面</th><th>状态</th><th>操作</th></tr></thead><tbody id="musicRows"></tbody></table></div>
+          <div class="table-wrap"><table><thead><tr><th>姝屾洸</th><th>鏉ユ簮</th><th>灏侀潰</th><th>鐘舵€?/th><th>鎿嶄綔</th></tr></thead><tbody id="musicRows"></tbody></table></div>
         </section>
 
         <section class="panel tab-panel" id="navigationPanel" hidden>
           <div class="panel__head">
             <div>
-              <h2>导航设置</h2>
-              <p>控制前台顶部导航。后台入口不会自动显示，仍使用隐藏地址 /lvtuang。</p>
+              <h2>瀵艰埅璁剧疆</h2>
+              <p>鎺у埗鍓嶅彴椤堕儴瀵艰埅銆傚悗鍙板叆鍙ｄ笉浼氳嚜鍔ㄦ樉绀猴紝浠嶄娇鐢ㄩ殣钘忓湴鍧€ /lvtuang銆?/p>
             </div>
           </div>
           <form class="form-grid" id="navigationForm">
             <input type="hidden" id="navigationId" />
-            <label>导航名称<input id="navigationLabel" required placeholder="例如：首页" /></label>
-            <label>链接地址<input id="navigationHref" required placeholder="/download.html" /></label>
-            <label>排序<input id="navigationSort" type="number" value="10" /></label>
-            <label>状态<select id="navigationStatus"><option value="active">显示</option><option value="disabled">隐藏</option></select></label>
-            <label><input id="navigationExternal" type="checkbox" /> 新窗口打开</label>
-            <div class="form-actions span-2"><button type="submit">保存导航</button><button class="ghost" type="button" id="resetNavigation">清空</button></div>
+            <label>瀵艰埅鍚嶇О<input id="navigationLabel" required placeholder="渚嬪锛氶椤? /></label>
+            <label>閾炬帴鍦板潃<input id="navigationHref" required placeholder="/download.html" /></label>
+            <label>鎺掑簭<input id="navigationSort" type="number" value="10" /></label>
+            <label>鐘舵€?select id="navigationStatus"><option value="active">鏄剧ず</option><option value="disabled">闅愯棌</option></select></label>
+            <label><input id="navigationExternal" type="checkbox" /> 鏂扮獥鍙ｆ墦寮€</label>
+            <div class="form-actions span-2"><button type="submit">淇濆瓨瀵艰埅</button><button class="ghost" type="button" id="resetNavigation">娓呯┖</button></div>
           </form>
-          <div class="table-wrap"><table><thead><tr><th>名称</th><th>链接</th><th>排序</th><th>打开方式</th><th>状态</th><th>操作</th></tr></thead><tbody id="navigationRows"></tbody></table></div>
+          <div class="table-wrap"><table><thead><tr><th>鍚嶇О</th><th>閾炬帴</th><th>鎺掑簭</th><th>鎵撳紑鏂瑰紡</th><th>鐘舵€?/th><th>鎿嶄綔</th></tr></thead><tbody id="navigationRows"></tbody></table></div>
         </section>
 
         <section class="panel tab-panel" id="assetPanel" hidden>
           <div class="panel__head">
             <div>
-              <h2>资源管理</h2>
-              <p>统一管理默认 R2 中的软件包、图片、音频和站点资源。</p>
+              <h2>璧勬簮绠＄悊</h2>
+              <p>缁熶竴绠＄悊榛樿 R2 涓殑杞欢鍖呫€佸浘鐗囥€侀煶棰戝拰绔欑偣璧勬簮銆?/p>
             </div>
-            <button class="ghost" type="button" id="refreshAssets">刷新</button>
+            <button class="ghost" type="button" id="refreshAssets">鍒锋柊</button>
           </div>
           <form class="form-grid" id="assetUploadForm">
-            <label>资源类型<select id="assetKind"><option value="image">图片</option><option value="audio">音频</option><option value="software">软件包</option><option value="site">站点资源</option><option value="other">其他</option></select></label>
-            <label>目录用途<input id="assetFolder" placeholder="例如 logo / qrcode / article" /></label>
-            <label class="span-2">选择文件<input id="assetFile" type="file" /></label>
-            <div class="form-actions span-2"><button type="submit">上传资源</button></div>
+            <label>璧勬簮绫诲瀷<select id="assetKind"><option value="image">鍥剧墖</option><option value="audio">闊抽</option><option value="software">杞欢鍖?/option><option value="site">绔欑偣璧勬簮</option><option value="other">鍏朵粬</option></select></label>
+            <label>鐩綍鐢ㄩ€?input id="assetFolder" placeholder="渚嬪 logo / qrcode / article" /></label>
+            <label class="span-2">閫夋嫨鏂囦欢<input id="assetFile" type="file" /></label>
+            <div class="form-actions span-2"><button type="submit">涓婁紶璧勬簮</button></div>
           </form>
           <div class="asset-toolbar">
-            <select id="assetKindFilter"><option value="all">全部类型</option><option value="software">软件包</option><option value="image">图片</option><option value="audio">音频</option><option value="site">站点资源</option><option value="other">其他</option></select>
-            <select id="assetStatusFilter"><option value="active">正常</option><option value="all">全部状态</option><option value="deleted">已删除</option></select>
-            <input id="assetSearch" placeholder="搜索文件名 / key / 引用 ID" />
+            <select id="assetKindFilter"><option value="all">鍏ㄩ儴绫诲瀷</option><option value="software">杞欢鍖?/option><option value="image">鍥剧墖</option><option value="audio">闊抽</option><option value="site">绔欑偣璧勬簮</option><option value="other">鍏朵粬</option></select>
+            <select id="assetStatusFilter"><option value="active">姝ｅ父</option><option value="all">鍏ㄩ儴鐘舵€?/option><option value="deleted">宸插垹闄?/option></select>
+            <input id="assetSearch" placeholder="鎼滅储鏂囦欢鍚?/ key / 寮曠敤 ID" />
           </div>
           <div class="asset-grid" id="assetRows"></div>
         </section>
@@ -239,13 +239,13 @@
         <section class="panel tab-panel" id="mediaPanel" hidden>
           <div class="panel__head">
             <div>
-              <h2>媒体库</h2>
-              <p>管理文章图片和音频，可复制链接、插入正文或设为封面。</p>
+              <h2>濯掍綋搴?/h2>
+              <p>绠＄悊鏂囩珷鍥剧墖鍜岄煶棰戯紝鍙鍒堕摼鎺ャ€佹彃鍏ユ鏂囨垨璁句负灏侀潰銆?/p>
             </div>
             <div class="row-actions">
-              <button class="ghost" type="button" id="loadMediaImage">图片</button>
-              <button class="ghost" type="button" id="loadMediaAudio">音频</button>
-              <button class="ghost" type="button" id="loadMediaAll">全部</button>
+              <button class="ghost" type="button" id="loadMediaImage">鍥剧墖</button>
+              <button class="ghost" type="button" id="loadMediaAudio">闊抽</button>
+              <button class="ghost" type="button" id="loadMediaAll">鍏ㄩ儴</button>
             </div>
           </div>
           <div class="media-grid" id="mediaRows"></div>
@@ -254,8 +254,8 @@
         <section class="panel tab-panel" id="articlePanel" hidden>
           <div class="panel__head">
             <div>
-              <h2>文章管理</h2>
-              <p>专业文章编辑台，支持草稿、发布、封面、关联软件和正文排版。</p>
+              <h2>鏂囩珷绠＄悊</h2>
+              <p>涓撲笟鏂囩珷缂栬緫鍙帮紝鏀寔鑽夌銆佸彂甯冦€佸皝闈€佸叧鑱旇蒋浠跺拰姝ｆ枃鎺掔増銆?/p>
             </div>
           </div>
           <div class="article-admin-shell">
@@ -264,68 +264,68 @@
               <div class="editor-toolbar">
                 <div>
                   <p class="eyebrow">Editor</p>
-                  <strong id="articleEditorMode">新建文章</strong>
+                  <strong id="articleEditorMode">鏂板缓鏂囩珷</strong>
                 </div>
                 <div class="editor-toolbar__actions">
-                  <button class="ghost" type="button" id="restoreArticleDraft">恢复草稿</button>
-                  <button class="ghost" type="button" id="clearArticleDraft">清除本地草稿</button>
-                  <button type="submit">保存文章</button>
-                  <button class="ghost" type="button" id="resetArticle">新建</button>
+                  <button class="ghost" type="button" id="restoreArticleDraft">鎭㈠鑽夌</button>
+                  <button class="ghost" type="button" id="clearArticleDraft">娓呴櫎鏈湴鑽夌</button>
+                  <button type="submit">淇濆瓨鏂囩珷</button>
+                  <button class="ghost" type="button" id="resetArticle">鏂板缓</button>
                 </div>
               </div>
-              <p class="draft-status" id="articleDraftStatus">本地草稿：未检测</p>
-              <label class="editor-title">文章标题<input id="articleTitle" required placeholder="例如：数据中心版使用介绍" /></label>
+              <p class="draft-status" id="articleDraftStatus">鏈湴鑽夌锛氭湭妫€娴?/p>
+              <label class="editor-title">鏂囩珷鏍囬<input id="articleTitle" required placeholder="渚嬪锛氭暟鎹腑蹇冪増浣跨敤浠嬬粛" /></label>
               <div class="editor-grid">
-                <label>文章标识<input id="articleSlug" placeholder="datacenter-guide" /></label>
-                <label>状态<select id="articleStatus"><option value="draft">草稿</option><option value="published">发布</option><option value="disabled">隐藏</option></select></label>
-                <label>排序<input id="articleSort" type="number" value="10" /></label>
+                <label>鏂囩珷鏍囪瘑<input id="articleSlug" placeholder="datacenter-guide" /></label>
+                <label>鐘舵€?select id="articleStatus"><option value="draft">鑽夌</option><option value="published">鍙戝竷</option><option value="disabled">闅愯棌</option></select></label>
+                <label>鎺掑簭<input id="articleSort" type="number" value="10" /></label>
               </div>
-              <label>摘要<textarea id="articleSummary" rows="3" maxlength="180" placeholder="显示在文章列表中的简短说明，建议 60-120 字。"></textarea></label>
-              <div class="editor-meta"><span id="articleWordCount">0 字</span><span id="articleSummaryCount">摘要 0/180</span></div>
-              <label>封面图地址<input id="articleCover" placeholder="/datacenter-preview.jpg 或图片 URL" /></label>
+              <label>鎽樿<textarea id="articleSummary" rows="3" maxlength="180" placeholder="鏄剧ず鍦ㄦ枃绔犲垪琛ㄤ腑鐨勭畝鐭鏄庯紝寤鸿 60-120 瀛椼€?></textarea></label>
+              <div class="editor-meta"><span id="articleWordCount">0 瀛?/span><span id="articleSummaryCount">鎽樿 0/180</span></div>
+              <label>灏侀潰鍥惧湴鍧€<input id="articleCover" placeholder="/datacenter-preview.jpg 鎴栧浘鐗?URL" /></label>
               <div class="editor-grid">
-                <label>文章分类<input id="articleCategory" placeholder="教程 / 更新 / 产品介绍" /></label>
-                <label>标签<input id="articleTags" placeholder="多个标签用逗号分隔" /></label>
-                <label><input id="articleFeatured" type="checkbox" /> 首页精选</label>
+                <label>鏂囩珷鍒嗙被<input id="articleCategory" placeholder="鏁欑▼ / 鏇存柊 / 浜у搧浠嬬粛" /></label>
+                <label>鏍囩<input id="articleTags" placeholder="澶氫釜鏍囩鐢ㄩ€楀彿鍒嗛殧" /></label>
+                <label><input id="articleFeatured" type="checkbox" /> 棣栭〉绮鹃€?/label>
               </div>
-              <label>SEO 标题<input id="articleSeoTitle" placeholder="留空使用文章标题" /></label>
-              <label>SEO 描述<textarea id="articleSeoDescription" rows="2" maxlength="180" placeholder="搜索引擎摘要，建议 80-150 字。"></textarea></label>
-              <div class="article-cover-preview" id="articleCoverPreview"><span>封面预览</span></div>
-              <label>上传本地媒体<input id="articleImageFile" type="file" accept="image/*,audio/*" /></label>
-              <div class="article-editor-tools" aria-label="文章编辑工具">
-                <button class="ghost" type="button" id="insertArticleH2">二级标题</button>
-                <button class="ghost" type="button" id="insertArticleList">列表</button>
-                <button class="ghost" type="button" id="insertArticleCode">代码块</button>
-                <button class="ghost" type="button" id="uploadArticleImage">上传并设为封面</button>
-                <button class="ghost" type="button" id="insertArticleImage">插入图片</button>
-                <button class="ghost" type="button" id="insertArticleAudio">插入音频</button>
-                <button class="ghost" type="button" id="insertArticleTable">插入表格</button>
-                <button class="ghost" type="button" id="insertArticleQuote">插入引用</button>
+              <label>SEO 鏍囬<input id="articleSeoTitle" placeholder="鐣欑┖浣跨敤鏂囩珷鏍囬" /></label>
+              <label>SEO 鎻忚堪<textarea id="articleSeoDescription" rows="2" maxlength="180" placeholder="鎼滅储寮曟搸鎽樿锛屽缓璁?80-150 瀛椼€?></textarea></label>
+              <div class="article-cover-preview" id="articleCoverPreview"><span>灏侀潰棰勮</span></div>
+              <label>涓婁紶鏈湴濯掍綋<input id="articleImageFile" type="file" accept="image/*,audio/*" /></label>
+              <div class="article-editor-tools" aria-label="鏂囩珷缂栬緫宸ュ叿">
+                <button class="ghost" type="button" id="insertArticleH2">浜岀骇鏍囬</button>
+                <button class="ghost" type="button" id="insertArticleList">鍒楄〃</button>
+                <button class="ghost" type="button" id="insertArticleCode">浠ｇ爜鍧?/button>
+                <button class="ghost" type="button" id="uploadArticleImage">涓婁紶骞惰涓哄皝闈?/button>
+                <button class="ghost" type="button" id="insertArticleImage">鎻掑叆鍥剧墖</button>
+                <button class="ghost" type="button" id="insertArticleAudio">鎻掑叆闊抽</button>
+                <button class="ghost" type="button" id="insertArticleTable">鎻掑叆琛ㄦ牸</button>
+                <button class="ghost" type="button" id="insertArticleQuote">鎻掑叆寮曠敤</button>
               </div>
               <div class="article-software-picker">
                 <div class="article-software-picker__head">
-                  <label>关联软件<select id="articleSoftwareCategory"></select></label>
-                  <button class="ghost" type="button" id="clearArticleSoftware">不关联软件</button>
+                  <label>鍏宠仈杞欢<select id="articleSoftwareCategory"></select></label>
+                  <button class="ghost" type="button" id="clearArticleSoftware">涓嶅叧鑱旇蒋浠?/button>
                 </div>
-                <p class="muted" id="articleSoftwareHint">可以按分类选择相关软件，也可以不选。</p>
+                <p class="muted" id="articleSoftwareHint">鍙互鎸夊垎绫婚€夋嫨鐩稿叧杞欢锛屼篃鍙互涓嶉€夈€?/p>
                 <div class="check-grid" id="articleSoftware"></div>
               </div>
-              <label>正文<textarea id="articleContent" rows="18" placeholder="支持普通文本和简单 HTML。普通文本会自动按段落排版；也可以插入 h2、h3、ul、blockquote、img 等 HTML。"></textarea></label>
+              <label>姝ｆ枃<textarea id="articleContent" rows="18" placeholder="鏀寔鏅€氭枃鏈拰绠€鍗?HTML銆傛櫘閫氭枃鏈細鑷姩鎸夋钀芥帓鐗堬紱涔熷彲浠ユ彃鍏?h2銆乭3銆乽l銆乥lockquote銆乮mg 绛?HTML銆?></textarea></label>
               <div class="article-preview-card">
                 <div class="article-preview-card__head">
-                  <strong>实时预览</strong>
-                  <span>支持 Markdown 和简单 HTML</span>
+                  <strong>瀹炴椂棰勮</strong>
+                  <span>鏀寔 Markdown 鍜岀畝鍗?HTML</span>
                 </div>
-                <article class="article-preview" id="articlePreview"><p>正文预览会显示在这里。</p></article>
+                <article class="article-preview" id="articlePreview"><p>姝ｆ枃棰勮浼氭樉绀哄湪杩欓噷銆?/p></article>
               </div>
             </form>
             <div class="article-manager">
               <div class="article-manager__head">
                 <div>
                   <p class="eyebrow">Library</p>
-                  <h3>文章库</h3>
+                  <h3>鏂囩珷搴?/h3>
                 </div>
-                <span id="articleCount">0 篇</span>
+                <span id="articleCount">0 绡?/span>
               </div>
               <div class="article-admin-list" id="articleRows"></div>
             </div>
@@ -335,10 +335,10 @@
         <section class="panel tab-panel" id="healthPanel" hidden>
           <div class="panel__head">
             <div>
-              <h2>系统状态</h2>
-              <p>检查 R2、D1、catalog 和后台配置，便于排查线上问题。</p>
+              <h2>绯荤粺鐘舵€?/h2>
+              <p>妫€鏌?R2銆丏1銆乧atalog 鍜屽悗鍙伴厤缃紝渚夸簬鎺掓煡绾夸笂闂銆?/p>
             </div>
-            <button class="ghost" type="button" id="runHealthCheck">一键检测</button>
+            <button class="ghost" type="button" id="runHealthCheck">涓€閿娴?/button>
           </div>
           <div class="health-grid" id="healthRows"></div>
         </section>
@@ -348,3 +348,5 @@
     <script src="/admin.js?v=20260511-auth" type="module"></script>
   </body>
 </html>
+
+

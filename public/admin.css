@@ -108,9 +108,9 @@ label { display: grid; gap: 8px; color: var(--muted); font-size: 13px; }
   height: 100vh;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 18px;
   border-right: 1px solid var(--line);
-  padding: 24px;
+  padding: 24px 16px;
   background: rgba(9, 9, 11, 0.86);
   backdrop-filter: blur(18px);
 }
@@ -127,7 +127,10 @@ label { display: grid; gap: 8px; color: var(--muted); font-size: 13px; }
 .brand img { width: 34px; height: 34px; }
 
 .sidebar nav { display: grid; gap: 10px; }
-.module-sidebar { margin-top: 4px; }
+.module-sidebar {
+  margin-top: 14px;
+  align-content: start;
+}
 .module-sidebar button {
   width: 100%;
   min-height: 48px;
@@ -144,6 +147,9 @@ label { display: grid; gap: 8px; color: var(--muted); font-size: 13px; }
 
 .site-link {
   margin-top: auto;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
   color: var(--muted);
   text-decoration: none;
 }
@@ -165,12 +171,12 @@ label { display: grid; gap: 8px; color: var(--muted); font-size: 13px; }
   position: sticky;
   top: 0;
   z-index: 8;
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) auto;
   align-items: center;
-  justify-content: space-between;
   gap: 18px;
   margin: -8px 0 18px;
-  padding: 12px;
+  padding: 10px 12px;
   border: 1px solid var(--line);
   border-radius: 16px;
   background: rgba(15, 15, 19, .86);
@@ -183,18 +189,18 @@ label { display: grid; gap: 8px; color: var(--muted); font-size: 13px; }
 }
 
 .module-nav strong {
-  font-size: 18px;
+  font-size: 16px;
 }
 
 .module-nav span {
   margin-top: 3px;
   color: var(--muted);
-  font-size: 13px;
+  font-size: 12px;
 }
 
 .module-nav nav {
   display: flex;
-  gap: 10px;
+  gap: 8px;
   flex-wrap: wrap;
   justify-content: flex-end;
 }
@@ -202,8 +208,9 @@ label { display: grid; gap: 8px; color: var(--muted); font-size: 13px; }
 .module-nav button {
   display: grid;
   gap: 3px;
-  min-width: 116px;
-  padding: 10px 14px;
+  min-width: 104px;
+  min-height: 50px;
+  padding: 8px 12px;
   border: 1px solid var(--line);
   border-radius: 12px;
   text-align: left;
@@ -213,12 +220,12 @@ label { display: grid; gap: 8px; color: var(--muted); font-size: 13px; }
 
 .module-nav button b {
   color: var(--text);
-  font-size: 14px;
+  font-size: 13px;
 }
 
 .module-nav button small {
   color: var(--muted);
-  font-size: 11px;
+  font-size: 10px;
 }
 
 .module-nav button.is-active {
@@ -231,6 +238,10 @@ label { display: grid; gap: 8px; color: var(--muted); font-size: 13px; }
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 14px;
   margin-bottom: 18px;
+}
+
+body:not(.admin-overview) .stats {
+  display: none;
 }
 
 .stat {
@@ -743,6 +754,17 @@ td small { color: var(--muted); }
   .app { grid-template-columns: 1fr; }
   .sidebar { position: static; height: auto; }
   .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .module-nav {
+    position: static;
+    grid-template-columns: 1fr;
+  }
+  .module-nav nav {
+    justify-content: stretch;
+  }
+  .module-nav button {
+    min-width: 0;
+    flex: 1 1 120px;
+  }
   .article-admin-shell { grid-template-columns: 1fr; }
   .editor-grid { grid-template-columns: 1fr; }
   .article-software-picker__head { grid-template-columns: 1fr; }

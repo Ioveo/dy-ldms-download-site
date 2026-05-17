@@ -117,16 +117,21 @@ function openViewer(index) {
   if (!item) return;
   viewer.hidden = false;
   enterScreenFitView();
-  requestViewerFullscreen();
   viewerImage.alt = item.title || "画廊图片";
   viewerTitle.textContent = item.title || "画廊图片";
   viewerDescription.textContent = item.description || (item.tags || []).join(" / ");
   viewerOriginal.href = item.imageUrl;
   document.body.classList.add("gallery-viewer-open");
 
-  viewer.classList.remove("is-ready");
-  viewer.classList.add("is-loading", "is-entering");
-  window.setTimeout(() => viewer.classList.remove("is-entering"), 360);
+  viewer.classList.remove("is-ready", "is-entering");
+  viewer.classList.add("is-loading", "is-preparing");
+  requestViewerFullscreen().finally(() => {
+    window.setTimeout(() => {
+      viewer.classList.remove("is-preparing");
+      viewer.classList.add("is-entering");
+      window.setTimeout(() => viewer.classList.remove("is-entering"), 360);
+    }, 80);
+  });
   viewerImage.onload = null;
   viewerImage.onerror = null;
   viewerImage.onload = () => markViewerImageReady();
@@ -158,8 +163,9 @@ async function toggleOriginalView() {
 
 function requestViewerFullscreen() {
   if (!document.fullscreenElement && viewer.requestFullscreen) {
-    viewer.requestFullscreen().catch(() => {});
+    return viewer.requestFullscreen().catch(() => {});
   }
+  return Promise.resolve();
 }
 
 function enterScreenFitView() {
@@ -202,7 +208,7 @@ async function exitViewerFullscreen() {
 async function closeViewer() {
   viewer.hidden = true;
   viewerImage.removeAttribute("src");
-  viewer.classList.remove("is-loading", "is-ready", "is-entering");
+  viewer.classList.remove("is-loading", "is-ready", "is-entering", "is-preparing");
   figure.classList.remove("is-mode-changing");
   enterScreenFitView();
   await exitViewerFullscreen();

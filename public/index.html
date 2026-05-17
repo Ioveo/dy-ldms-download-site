@@ -166,6 +166,50 @@
         </div>
       </section>
 
+      <section class="ai-section" id="aiWorkspace">
+        <div class="ai-section__copy">
+          <p class="hero-kicker">AI workspace</p>
+          <h2>让后台图片，变成会动的 AI 运营看板。</h2>
+          <p>后台系统管理里添加的图片会自动进入这里，配合模拟的 AI 分析、标签整理和发布建议，形成类似 Raycast 的动态中场区域。</p>
+          <div class="ai-prompts" data-ai-prompts>
+            <button type="button" class="is-active" data-ai-slide="0">分析素材</button>
+            <button type="button" data-ai-slide="1">生成话术</button>
+            <button type="button" data-ai-slide="2">整理标签</button>
+          </div>
+        </div>
+        <div class="ai-stage" data-ai-stage aria-live="polite">
+          <div class="ai-stage__glow"></div>
+          <div class="ai-window">
+            <div class="window-dots"><i></i><i></i><i></i></div>
+            <div class="ai-window__body">
+              <aside class="ai-command-list">
+                <span>Tiancaimao AI</span>
+                <button type="button" class="is-active">分析当前素材</button>
+                <button type="button">生成直播话术</button>
+                <button type="button">整理发布标签</button>
+                <button type="button">推荐配套音乐</button>
+              </aside>
+              <div class="ai-preview">
+                <div class="ai-preview__media" data-ai-media>
+                  <div class="ai-fallback-card">AI</div>
+                </div>
+                <div class="ai-preview__meta">
+                  <span data-ai-kicker>素材洞察</span>
+                  <strong data-ai-title>等待后台图片</strong>
+                  <p data-ai-description>在后台添加图片后，这里会自动轮播展示，并生成运营建议。</p>
+                </div>
+              </div>
+              <div class="ai-response">
+                <span>AI Suggestion</span>
+                <strong data-ai-suggestion>把高质量素材设为主推，搭配下载入口和音乐频道联动展示。</strong>
+                <div class="ai-response__bars"><i></i><i></i><i></i></div>
+              </div>
+            </div>
+          </div>
+          <div class="ai-dots" data-ai-dots></div>
+        </div>
+      </section>
+
       <section class="extension-section">
         <div class="section-heading">
           <div>

@@ -538,6 +538,123 @@ footer {
   font-size: clamp(24px, 3vw, 38px);
 }
 
+.articles-page .page-hero,
+.article-page .article-cover {
+  width: calc(100% - 32px);
+  max-width: none;
+  min-height: min(620px, calc(100svh - 128px));
+  margin-top: 24px;
+  border: 1px solid var(--site-line) !important;
+  border-radius: 34px;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 12% 18%, rgba(255, 77, 69, 0.34), transparent 36rem),
+    radial-gradient(circle at 80% 18%, rgba(255, 139, 84, 0.18), transparent 30rem),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.025)) !important;
+  box-shadow: 0 40px 120px rgba(0, 0, 0, 0.36), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.articles-page .page-hero {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: clamp(86px, 10vw, 150px) clamp(24px, 6vw, 86px) !important;
+}
+
+.articles-page .page-hero h1,
+.article-page .article-cover h1 {
+  max-width: 1160px;
+  font-size: clamp(56px, 9vw, 128px) !important;
+}
+
+.articles-page .article-list {
+  width: 100%;
+  max-width: none;
+  padding: 28px 16px 110px !important;
+}
+
+.articles-page .article-list__head,
+.articles-page .article-controls {
+  width: 100%;
+  border-radius: 26px !important;
+}
+
+.articles-page .article-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.articles-page .article-card {
+  min-height: 420px;
+  border-radius: 28px !important;
+}
+
+.articles-page .article-card--lead {
+  grid-column: span 2;
+  grid-row: span 2;
+  min-height: 680px;
+}
+
+.articles-page .article-card img {
+  height: 280px;
+}
+
+.articles-page .article-card--lead img {
+  min-height: 680px;
+}
+
+.articles-page .article-card > div {
+  padding: clamp(22px, 2.8vw, 38px);
+}
+
+.articles-page .article-card--lead h2 {
+  font-size: clamp(38px, 4.8vw, 72px);
+}
+
+.article-page .article-detail {
+  width: 100%;
+  max-width: none;
+}
+
+.article-page .article-cover {
+  grid-template-columns: minmax(0, 1fr) minmax(380px, 0.48fr);
+  gap: clamp(24px, 4vw, 68px);
+  align-items: end;
+  padding: clamp(58px, 8vw, 112px) clamp(24px, 6vw, 86px) !important;
+}
+
+.article-page .article-cover img {
+  width: 100%;
+  height: min(560px, 58svh);
+  max-height: none;
+  border-radius: 30px;
+  object-fit: cover;
+}
+
+.article-page .article-body {
+  width: 100%;
+  max-width: none;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 380px);
+  gap: 20px;
+  padding: 22px 16px 116px !important;
+}
+
+.article-page .article-body article,
+.article-page .article-related {
+  border-radius: 28px !important;
+}
+
+.article-page .article-body article {
+  min-height: 70svh;
+  padding: clamp(30px, 4vw, 64px);
+  font-size: clamp(18px, 1.35vw, 21px);
+  line-height: 1.95;
+}
+
+.article-page .article-related {
+  top: 112px;
+}
+
 footer {
   width: min(1180px, calc(100% - 32px));
   margin: 30px auto 0;
@@ -588,6 +705,25 @@ footer {
   .gallery-page .gallery-masonry {
     column-count: 3;
   }
+
+  .articles-page .article-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .articles-page .article-card--lead {
+    grid-column: span 2;
+    grid-row: auto;
+    min-height: 520px;
+  }
+
+  .article-page .article-cover,
+  .article-page .article-body {
+    grid-template-columns: 1fr;
+  }
+
+  .article-page .article-related {
+    position: static;
+  }
 }
 
 @media (max-width: 620px) {
@@ -620,5 +756,40 @@ footer {
   .gallery-page .gallery-tile {
     margin-bottom: 10px;
     border-radius: 16px !important;
+  }
+
+  .articles-page .page-hero,
+  .article-page .article-cover {
+    width: calc(100% - 20px);
+    min-height: auto;
+    border-radius: 24px;
+  }
+
+  .articles-page .article-list {
+    padding-inline: 10px !important;
+  }
+
+  .articles-page .article-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .articles-page .article-card--lead {
+    grid-column: span 1;
+    min-height: 420px;
+  }
+
+  .articles-page .article-card--lead img,
+  .articles-page .article-card img {
+    min-height: 0;
+    height: 260px;
+  }
+
+  .articles-page .article-controls {
+    grid-template-columns: 1fr;
+  }
+
+  .article-page .article-body {
+    padding-inline: 10px !important;
   }
 }

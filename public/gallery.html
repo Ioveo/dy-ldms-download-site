@@ -6,7 +6,7 @@
     <title>画廊 - 天才猫</title>
     <link rel="icon" type="image/png" href="/logo.png?v=20260509" />
     <link rel="stylesheet" href="/styles.css?v=20260517-gallery" />
-    <link rel="stylesheet" href="/gallery.css?v=20260517-gallery-flip" />
+    <link rel="stylesheet" href="/gallery.css?v=20260517-gallery-blur-bg" />
   </head>
   <body class="gallery-page">
     <header class="topbar">
@@ -50,6 +50,7 @@
     </main>
 
     <div class="gallery-viewer" id="galleryViewer" hidden>
+      <div class="gallery-viewer__backdrop" id="galleryBackdrop" aria-hidden="true"></div>
       <button class="gallery-viewer__close" type="button" id="galleryClose" aria-label="关闭">×</button>
       <button class="gallery-viewer__nav gallery-viewer__nav--prev" type="button" id="galleryPrev" aria-label="上一张">‹</button>
       <button class="gallery-viewer__nav gallery-viewer__nav--next" type="button" id="galleryNext" aria-label="下一张">›</button>
@@ -68,6 +69,6 @@
       </figure>
     </div>
 
-    <script src="/gallery.js?v=20260517-gallery-flip" type="module"></script>
+    <script src="/gallery.js?v=20260517-gallery-blur-bg" type="module"></script>
   </body>
 </html>

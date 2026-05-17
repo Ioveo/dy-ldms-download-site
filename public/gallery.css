@@ -317,6 +317,28 @@
   animation: galleryViewerIn 180ms ease both;
 }
 
+.gallery-viewer__backdrop {
+  position: fixed;
+  inset: -34px;
+  z-index: -1;
+  background-color: #050409;
+  background-position: center;
+  background-size: cover;
+  opacity: 0.72;
+  filter: blur(34px) saturate(1.18) brightness(0.62);
+  transform: scale(1.08);
+  transition: opacity 220ms ease, background-image 120ms ease;
+}
+
+.gallery-viewer__backdrop::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 50% 42%, rgba(0, 0, 0, 0.12), rgba(0, 0, 0, 0.64) 68%),
+    rgba(0, 0, 0, 0.22);
+}
+
 .gallery-viewer[hidden] {
   display: none;
 }

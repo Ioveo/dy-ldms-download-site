@@ -11,6 +11,7 @@ const viewerImage = byId("galleryViewerImage");
 const viewerTitle = byId("galleryViewerTitle");
 const viewerDescription = byId("galleryViewerDescription");
 const viewerOriginal = byId("galleryOriginal");
+const viewerBackdrop = byId("galleryBackdrop");
 const figure = byId("galleryFigure");
 
 loadGallery();
@@ -123,6 +124,7 @@ function openViewer(index, tile) {
   viewerTitle.textContent = item.title || "画廊图片";
   viewerDescription.textContent = item.description || (item.tags || []).join(" / ");
   viewerOriginal.href = item.imageUrl;
+  viewerBackdrop.style.backgroundImage = `url("${cssUrl(item.imageUrl)}")`;
   document.body.classList.add("gallery-viewer-open");
 
   viewer.classList.remove("is-ready", "is-entering");
@@ -275,6 +277,7 @@ function closeViewer() {
   }
   viewer.hidden = true;
   viewerImage.removeAttribute("src");
+  viewerBackdrop.style.removeProperty("background-image");
   viewerImage.classList.remove("is-opening");
   clearOpeningImageStyle();
   viewer.classList.remove("is-loading", "is-ready", "is-entering", "is-zooming");

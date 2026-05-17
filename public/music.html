@@ -3,113 +3,127 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>音乐频道 - 天才猫软件中心</title>
-    <meta name="description" content="天才猫音乐频道，提供上新音乐、热门排行榜、精选歌单和在线播放。" />
+    <title>音乐频道 - 天才猫音乐</title>
+    <meta name="description" content="天才猫音乐频道，提供今日主推、上新音乐、热门排行、精选标签和在线播放。" />
     <link rel="icon" type="image/png" href="/logo.png?v=20260509" />
     <link rel="stylesheet" href="/styles.css?v=20260510-premium-detail" />
-    <link rel="stylesheet" href="/music.css?v=20260517-console" />
+    <link rel="stylesheet" href="/music.css?v=20260517-app" />
   </head>
   <body class="music-page">
-    <header class="topbar topbar--music">
-      <a class="brand" href="/">
+    <aside class="music-sidebar">
+      <a class="music-sidebar__brand" href="/music.html">
         <img src="/logo.png" alt="" />
         <span>天才猫音乐</span>
       </a>
-      <nav aria-label="主导航" data-nav>
-        <a href="/">首页</a>
-        <a href="/download.html">下载</a>
-        <a href="/articles.html">文章</a>
-        <a href="/music.html">音乐</a>
-        <a href="/license.html">授权</a>
+      <nav class="music-sidebar__nav" aria-label="音乐频道导航">
+        <a class="is-active" href="#musicHero"><span>首页</span></a>
+        <a href="#musicCharts"><span>排行榜</span></a>
+        <a href="#newMusic"><span>上新</span></a>
+        <a href="#musicLibrary"><span>曲库</span></a>
       </nav>
-    </header>
+      <div class="music-sidebar__stats" aria-label="音乐数据">
+        <article><span>曲库</span><strong id="statTracks">0</strong></article>
+        <article><span>上新</span><strong id="statNew">0</strong></article>
+        <article><span>推荐</span><strong id="statFeatured">0</strong></article>
+        <article><span>标签</span><strong id="statTags">0</strong></article>
+      </div>
+    </aside>
 
-    <main>
-      <section class="music-hero" id="musicHero">
-        <div class="music-hero__copy">
-          <p class="section-kicker">TianCaiMao Music Console</p>
-          <h1>一座为直播和创作准备的音乐控制台。</h1>
-          <p class="music-hero__lead">上新、排行、精选标签和播放状态，从后台曲库实时生成。</p>
-          <div class="hero-actions">
-            <button type="button" id="heroPlay">播放主推</button>
-            <a href="#newMusic">查看上新</a>
-          </div>
+    <div class="music-app">
+      <header class="music-topbar">
+        <a class="music-mobile-brand" href="/music.html">
+          <img src="/logo.png" alt="" />
+          <span>天才猫音乐</span>
+        </a>
+        <div class="music-search">
+          <span>Search</span>
+          <input id="musicSearch" placeholder="搜索歌曲、歌手、标签" />
         </div>
-        <div class="hero-record">
-          <div class="hero-record__disc">
-            <img id="heroCover" src="/logo.png" alt="" />
-          </div>
-          <div class="hero-record__meta">
-            <span>今日主推</span>
-            <strong id="heroTitle">等待音乐上架</strong>
-            <small id="heroArtist">后台发布后自动展示</small>
-          </div>
-        </div>
-      </section>
+        <nav aria-label="主导航" data-nav>
+          <a href="/">首页</a>
+          <a href="/download.html">下载</a>
+          <a href="/articles.html">文章</a>
+          <a href="/music.html">音乐</a>
+          <a href="/license.html">授权</a>
+        </nav>
+      </header>
 
-      <section class="music-dashboard" aria-label="音乐概览">
-        <article>
-          <span>曲库</span>
-          <strong id="statTracks">0</strong>
-        </article>
-        <article>
-          <span>上新</span>
-          <strong id="statNew">0</strong>
-        </article>
-        <article>
-          <span>推荐</span>
-          <strong id="statFeatured">0</strong>
-        </article>
-        <article>
-          <span>标签</span>
-          <strong id="statTags">0</strong>
-        </article>
-      </section>
-
-      <section class="music-section music-section--split" id="newMusic">
-        <div class="section-head">
-          <p class="section-kicker">New Releases</p>
-          <h2>上新音乐</h2>
-        </div>
-        <div class="new-release" id="newRelease"></div>
-        <div class="release-list" id="newReleaseList"></div>
-      </section>
-
-      <section class="music-section music-section--charts" id="musicCharts">
-        <div class="section-head">
-          <p class="section-kicker">Charts</p>
-          <h2>排行榜</h2>
-        </div>
-        <div class="chart-list" id="chartList"></div>
-      </section>
-
-      <section class="music-section" id="musicLibrary">
-        <div class="music-library__head">
-          <div>
-            <p class="section-kicker">Library</p>
-            <h2>全部歌曲</h2>
+      <main class="music-main">
+        <section class="music-hero" id="musicHero">
+          <img class="music-hero__image" id="heroCover" src="/logo.png" alt="" />
+          <div class="music-hero__shade"></div>
+          <div class="music-hero__content">
+            <p class="music-kicker">Today's Pick</p>
+            <h1>今天听点新的</h1>
+            <p class="music-hero__lead">为直播、剪辑和夜间工作准备的音乐频道。</p>
+            <div class="music-hero__track">
+              <strong id="heroTitle">等待音乐上架</strong>
+              <span id="heroArtist">后台发布后自动展示</span>
+            </div>
+            <div class="music-hero__actions">
+              <button type="button" id="heroPlay">播放主推</button>
+              <a href="#newMusic">查看上新</a>
+            </div>
           </div>
-          <div class="music-filter">
-            <input id="musicSearch" placeholder="搜索歌曲、歌手、标签" />
-            <button id="clearMusicSearch" type="button">清空</button>
+        </section>
+
+        <section class="music-layout">
+          <aside class="music-panel" id="musicCharts">
+            <div class="music-section-head">
+              <div>
+                <p class="music-kicker">Trending</p>
+                <h2>热门排行</h2>
+              </div>
+              <a href="#musicLibrary">全部</a>
+            </div>
+            <div class="chart-list" id="chartList"></div>
+          </aside>
+
+          <div class="music-content">
+            <section class="music-panel" id="newMusic">
+              <div class="music-section-head">
+                <div>
+                  <p class="music-kicker">New Releases</p>
+                  <h2>最新发布</h2>
+                </div>
+              </div>
+              <div class="new-release" id="newRelease"></div>
+              <div class="release-list" id="newReleaseList"></div>
+            </section>
+
+            <section class="music-panel" id="musicLibrary">
+              <div class="music-section-head">
+                <div>
+                  <p class="music-kicker">Explore Genres</p>
+                  <h2>精选标签</h2>
+                </div>
+                <button id="clearMusicSearch" type="button">清空</button>
+              </div>
+              <div class="tag-strip" id="tagStrip"></div>
+              <div class="music-grid" id="musicGrid"></div>
+            </section>
           </div>
-        </div>
-        <div class="tag-strip" id="tagStrip"></div>
-        <div class="music-grid" id="musicGrid"></div>
-      </section>
-    </main>
+        </section>
+      </main>
+    </div>
 
     <aside class="music-player" id="musicPlayer" hidden>
-      <img id="playerCover" src="/logo.png" alt="" />
-      <div>
-        <strong id="playerTitle">未选择音乐</strong>
-        <span id="playerArtist">选择一首歌开始播放</span>
-        <input id="playerProgress" type="range" min="0" max="100" value="0" />
+      <div class="music-player__progress"><input id="playerProgress" type="range" min="0" max="100" value="0" /></div>
+      <div class="music-player__body">
+        <img id="playerCover" src="/logo.png" alt="" />
+        <div>
+          <strong id="playerTitle">未选择音乐</strong>
+          <span id="playerArtist">选择一首歌开始播放</span>
+        </div>
+        <div class="music-player__controls">
+          <button type="button" aria-label="上一首">‹</button>
+          <button id="playerPlay" type="button">播放</button>
+          <button type="button" aria-label="下一首">›</button>
+        </div>
       </div>
-      <button id="playerPlay" type="button">播放</button>
       <audio id="playerAudio" preload="metadata"></audio>
     </aside>
 
-    <script src="/music.js?v=20260517-console" type="module"></script>
+    <script src="/music.js?v=20260517-app" type="module"></script>
   </body>
 </html>

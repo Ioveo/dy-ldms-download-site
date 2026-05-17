@@ -119,6 +119,7 @@ label { display: grid; gap: 8px; color: var(--muted); font-size: 13px; }
   display: flex;
   align-items: center;
   gap: 10px;
+  order: 1;
   color: var(--text);
   font-weight: 950;
   text-decoration: none;
@@ -127,7 +128,9 @@ label { display: grid; gap: 8px; color: var(--muted); font-size: 13px; }
 .brand img { width: 34px; height: 34px; }
 
 .sidebar nav { display: grid; gap: 10px; }
+.legacy-nav { display: none !important; }
 .module-sidebar {
+  order: 2;
   margin-top: 14px;
   align-content: start;
 }
@@ -146,6 +149,7 @@ label { display: grid; gap: 8px; color: var(--muted); font-size: 13px; }
 }
 
 .site-link {
+  order: 10;
   margin-top: auto;
   padding: 12px 14px;
   border: 1px solid var(--line);

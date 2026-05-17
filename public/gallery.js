@@ -124,14 +124,8 @@ function openViewer(index) {
   document.body.classList.add("gallery-viewer-open");
 
   viewer.classList.remove("is-ready", "is-entering");
-  viewer.classList.add("is-loading", "is-preparing");
-  requestViewerFullscreen().finally(() => {
-    window.setTimeout(() => {
-      viewer.classList.remove("is-preparing");
-      viewer.classList.add("is-entering");
-      window.setTimeout(() => viewer.classList.remove("is-entering"), 360);
-    }, 80);
-  });
+  viewer.classList.add("is-loading", "is-entering");
+  window.setTimeout(() => viewer.classList.remove("is-entering"), 260);
   viewerImage.onload = null;
   viewerImage.onerror = null;
   viewerImage.onload = () => markViewerImageReady();
@@ -158,14 +152,6 @@ async function toggleOriginalView() {
   }
 
   enterOriginalSizeView();
-  requestViewerFullscreen();
-}
-
-function requestViewerFullscreen() {
-  if (!document.fullscreenElement && viewer.requestFullscreen) {
-    return viewer.requestFullscreen().catch(() => {});
-  }
-  return Promise.resolve();
 }
 
 function enterScreenFitView() {
@@ -199,19 +185,12 @@ function flashViewerMode() {
   figure.classList.add("is-mode-changing");
 }
 
-async function exitViewerFullscreen() {
-  if (document.fullscreenElement && document.exitFullscreen) {
-    await document.exitFullscreen().catch(() => {});
-  }
-}
-
-async function closeViewer() {
+function closeViewer() {
   viewer.hidden = true;
   viewerImage.removeAttribute("src");
-  viewer.classList.remove("is-loading", "is-ready", "is-entering", "is-preparing");
+  viewer.classList.remove("is-loading", "is-ready", "is-entering");
   figure.classList.remove("is-mode-changing");
   enterScreenFitView();
-  await exitViewerFullscreen();
   document.body.classList.remove("gallery-viewer-open");
 }
 

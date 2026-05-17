@@ -11,7 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="/styles.css?v=20260510-premium-detail" />
-    <link rel="stylesheet" href="/music.css?v=20260517-app-polish" />
+    <link rel="stylesheet" href="/music.css?v=20260517-wave-stage" />
   </head>
   <body class="music-page">
     <aside class="music-sidebar">
@@ -56,6 +56,7 @@
         <section class="music-hero" id="musicHero">
           <img class="music-hero__image" id="heroCover" src="/logo.png" alt="" />
           <div class="music-hero__shade"></div>
+          <div class="wave-stage" id="heroCarousel"></div>
           <div class="music-hero__content">
             <p class="music-kicker">Today's Pick</p>
             <h1>今天听点新的</h1>
@@ -111,7 +112,7 @@
       </main>
     </div>
 
-    <aside class="music-player" id="musicPlayer" hidden>
+    <aside class="music-player" id="musicPlayer">
       <div class="music-player__progress"><input id="playerProgress" type="range" min="0" max="100" value="0" /></div>
       <div class="music-player__body">
         <img id="playerCover" src="/logo.png" alt="" />
@@ -128,6 +129,6 @@
       <audio id="playerAudio" preload="metadata"></audio>
     </aside>
 
-    <script src="/music.js?v=20260517-app-polish" type="module"></script>
+    <script src="/music.js?v=20260517-wave-stage" type="module"></script>
   </body>
 </html>

@@ -10,6 +10,7 @@ const audio = byId("playerAudio");
 const playButton = byId("playerPlay");
 const progress = byId("playerProgress");
 const heroPlay = byId("heroPlay");
+const heroCarousel = byId("heroCarousel");
 
 loadMusic();
 
@@ -69,11 +70,44 @@ function renderOverview() {
     byId("heroCover").src = hero.coverUrl || "/logo.png";
     byId("heroTitle").textContent = hero.title;
     byId("heroArtist").textContent = hero.artist;
+    byId("playerCover").src = hero.coverUrl || "/logo.png";
+    byId("playerTitle").textContent = hero.title;
+    byId("playerArtist").textContent = hero.artist;
   }
 
+  renderHeroCarousel();
   renderNewReleases();
   renderCharts();
   renderTags(tags);
+}
+
+function renderHeroCarousel() {
+  if (!heroCarousel) return;
+  const featured = tracks.length ? tracks.slice(0, 6) : [];
+  if (!featured.length) {
+    heroCarousel.innerHTML = `
+      <article class="stage-card">
+        <div class="stage-card__cover"><img src="/logo.png" alt=""></div>
+        <strong>等待音乐上架</strong>
+        <span>后台发布后自动展示</span>
+      </article>
+    `;
+    return;
+  }
+  heroCarousel.replaceChildren(...featured.map((track, index) => {
+    const card = document.createElement("article");
+    card.className = `stage-card ${index === 1 ? "is-focus" : ""}`;
+    card.innerHTML = `
+      <button type="button" class="stage-card__cover" aria-label="播放 ${escapeAttr(track.title)}">
+        <img src="${escapeAttr(track.coverUrl || "/logo.png")}" alt="">
+        <span class="material-symbols-outlined">play_arrow</span>
+      </button>
+      <strong>${escapeHtml(track.title)}</strong>
+      <span>${escapeHtml(track.artist)}</span>
+    `;
+    card.addEventListener("click", () => playTrack(track));
+    return card;
+  }));
 }
 
 function renderNewReleases() {

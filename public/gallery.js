@@ -17,7 +17,7 @@ loadGallery();
 byId("galleryClose").addEventListener("click", closeViewer);
 byId("galleryPrev").addEventListener("click", () => moveViewer(-1));
 byId("galleryNext").addEventListener("click", () => moveViewer(1));
-byId("galleryFullscreen").addEventListener("click", toggleFullscreen);
+byId("galleryFullscreen").addEventListener("click", toggleOriginalView);
 byId("gallerySearch").addEventListener("input", event => {
   searchText = event.target.value.trim().toLowerCase();
   renderGallery();
@@ -27,15 +27,14 @@ viewer.addEventListener("click", event => {
   if (event.target === viewer) closeViewer();
 });
 
-viewerImage.addEventListener("click", toggleFullscreen);
-viewerImage.addEventListener("dblclick", toggleFullscreen);
+viewerImage.addEventListener("click", toggleOriginalView);
 
 document.addEventListener("keydown", event => {
   if (viewer.hidden) return;
   if (event.key === "Escape") closeViewer();
   if (event.key === "ArrowLeft") moveViewer(-1);
   if (event.key === "ArrowRight") moveViewer(1);
-  if (event.key === "Enter" || event.key.toLowerCase() === "f") toggleFullscreen();
+  if (event.key === "Enter" || event.key.toLowerCase() === "f") toggleOriginalView();
 });
 
 async function loadGallery() {
@@ -117,16 +116,24 @@ function openViewer(index) {
   const item = visibleItems[activeIndex];
   if (!item) return;
   viewer.hidden = false;
-  figure.classList.remove("is-fullscreen");
-  viewer.classList.add("is-loading");
-  viewerImage.onload = () => viewer.classList.remove("is-loading");
-  viewerImage.src = item.imageUrl;
+  restoreFitView({ exitFullscreen: false });
   viewerImage.alt = item.title || "画廊图片";
   viewerTitle.textContent = item.title || "画廊图片";
   viewerDescription.textContent = item.description || (item.tags || []).join(" / ");
   viewerOriginal.href = item.imageUrl;
   byId("galleryFullscreen").textContent = "全屏";
   document.body.classList.add("gallery-viewer-open");
+
+  viewer.classList.add("is-loading");
+  viewerImage.onload = null;
+  viewerImage.onerror = null;
+  viewerImage.onload = () => viewer.classList.remove("is-loading");
+  viewerImage.onerror = () => viewer.classList.remove("is-loading");
+  viewerImage.src = item.imageUrl;
+  if (viewerImage.complete && viewerImage.naturalWidth > 0) {
+    viewer.classList.remove("is-loading");
+  }
+
   preloadNeighbor(1);
   preloadNeighbor(-1);
 }
@@ -137,14 +144,40 @@ function moveViewer(step) {
   openViewer(activeIndex);
 }
 
-function toggleFullscreen() {
-  const isFullscreen = figure.classList.toggle("is-fullscreen");
-  byId("galleryFullscreen").textContent = isFullscreen ? "恢复" : "全屏";
+async function toggleOriginalView() {
+  if (figure.classList.contains("is-original-size")) {
+    await restoreFitView();
+    return;
+  }
+
+  figure.classList.add("is-fullscreen", "is-original-size");
+  if (viewerImage.naturalWidth > 0) {
+    viewerImage.style.width = `${viewerImage.naturalWidth}px`;
+    viewerImage.style.height = `${viewerImage.naturalHeight}px`;
+  }
+  byId("galleryFullscreen").textContent = "恢复";
+
+  if (!document.fullscreenElement && viewer.requestFullscreen) {
+    await viewer.requestFullscreen().catch(() => {});
+  }
 }
 
-function closeViewer() {
+async function restoreFitView(options = {}) {
+  const { exitFullscreen = true } = options;
+  figure.classList.remove("is-fullscreen", "is-original-size");
+  viewerImage.style.removeProperty("width");
+  viewerImage.style.removeProperty("height");
+  byId("galleryFullscreen").textContent = "全屏";
+
+  if (exitFullscreen && document.fullscreenElement && document.exitFullscreen) {
+    await document.exitFullscreen().catch(() => {});
+  }
+}
+
+async function closeViewer() {
   viewer.hidden = true;
   viewerImage.removeAttribute("src");
+  await restoreFitView();
   document.body.classList.remove("gallery-viewer-open");
 }
 

@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>画廊 - 天才猫</title>
+    <link rel="icon" type="image/png" href="/logo.png?v=20260509" />
+    <link rel="stylesheet" href="/styles.css?v=20260517-gallery" />
+    <link rel="stylesheet" href="/gallery.css?v=20260517-gallery-compact-scale" />
+  </head>
+  <body class="gallery-page">
+    <header class="topbar">
+      <a class="brand" href="/">
+        <img src="/logo.png" alt="" />
+        <span>天才猫</span>
+      </a>
+      <nav data-nav>
+        <a href="/">首页</a>
+        <a href="/download.html">下载</a>
+        <a href="/music.html">音乐</a>
+        <a href="/gallery.html">画廊</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="gallery-hero" id="galleryHero">
+        <div class="gallery-hero__shade"></div>
+        <div class="gallery-hero__content">
+          <p class="eyebrow">Tiancaimao Gallery</p>
+          <h1>数字影像画廊</h1>
+          <p>产品、现场与创作过程里的关键画面，在这里以原图质感呈现。</p>
+          <a class="gallery-hero__action" href="#galleryWall">开始浏览</a>
+        </div>
+      </section>
+
+      <section class="gallery-shell" id="galleryWall">
+        <div class="gallery-toolbar">
+          <div class="gallery-toolbar__meta">
+            <strong id="galleryCount">0 张图片</strong>
+            <span>点击图片查看原图，方向键切换，双击或按钮进入全屏。</span>
+          </div>
+          <label class="gallery-search">
+            <span>搜索</span>
+            <input id="gallerySearch" type="search" placeholder="标题、说明、标签" autocomplete="off" />
+          </label>
+          <div id="galleryTags" class="gallery-tags"></div>
+        </div>
+        <div class="gallery-masonry" id="galleryMasonry" aria-live="polite"></div>
+      </section>
+    </main>
+
+    <div class="gallery-viewer" id="galleryViewer" hidden>
+      <div class="gallery-viewer__backdrop" id="galleryBackdrop" aria-hidden="true"></div>
+      <button class="gallery-viewer__close" type="button" id="galleryClose" aria-label="关闭">×</button>
+      <button class="gallery-viewer__nav gallery-viewer__nav--prev" type="button" id="galleryPrev" aria-label="上一张">‹</button>
+      <button class="gallery-viewer__nav gallery-viewer__nav--next" type="button" id="galleryNext" aria-label="下一张">›</button>
+      <figure id="galleryFigure">
+        <img id="galleryViewerImage" alt="" decoding="async" />
+        <figcaption>
+          <div>
+            <strong id="galleryViewerTitle"></strong>
+            <span id="galleryViewerDescription"></span>
+          </div>
+          <div class="gallery-viewer__actions">
+            <button type="button" id="galleryFullscreen">全屏</button>
+            <a id="galleryOriginal" href="#" target="_blank" rel="noopener">原图</a>
+          </div>
+        </figcaption>
+      </figure>
+    </div>
+
+    <script src="/gallery.js?v=20260517-gallery-compact-scale" type="module"></script>
+  </body>
+</html>

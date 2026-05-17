@@ -241,7 +241,11 @@ function emptyBlock(title, body) {
 function renderNavigation(items) {
   const nav = document.querySelector("[data-nav]");
   if (!nav || !items.length) return;
-  nav.innerHTML = items.filter(item => item.status !== "disabled").map(item => `<a href="${escapeAttr(item.href)}"${item.external ? ` target="_blank" rel="noopener"` : ""}>${escapeHtml(item.label)}</a>`).join("");
+  nav.innerHTML = items.filter(item => item.status !== "disabled" && !isAdminHref(item.href)).map(item => `<a href="${escapeAttr(item.href)}"${item.external ? ` target="_blank" rel="noopener"` : ""}>${escapeHtml(item.label)}</a>`).join("");
+}
+
+function isAdminHref(href) {
+  return /^\/(lvtuang|admin\.html)(?:$|[?#])/.test(String(href || ""));
 }
 
 function byId(id) {

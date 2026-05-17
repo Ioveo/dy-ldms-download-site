@@ -844,7 +844,7 @@ a { color: inherit; text-decoration: none; }
   font: inherit;
   font-size: 14px;
   font-weight: 820;
-  cursor: default;
+  cursor: pointer;
 }
 
 .music-tabs button.is-active {
@@ -858,9 +858,17 @@ a { color: inherit; text-decoration: none; }
   grid-auto-flow: column;
   grid-auto-columns: minmax(320px, 360px);
   gap: 56px;
-  width: max-content;
+  width: 100%;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scroll-snap-type: x proximity;
+  scrollbar-width: none;
   padding: 0 max(16px, calc((100vw - 1180px) / 2)) 12px 0;
   animation: cardRail 780ms 180ms ease both;
+}
+
+.music-card-row::-webkit-scrollbar {
+  display: none;
 }
 
 .music-card {
@@ -874,12 +882,18 @@ a { color: inherit; text-decoration: none; }
   overflow: hidden;
   box-shadow: 0 28px 90px rgba(0, 0, 0, 0.34), inset 0 1px 0 rgba(255, 255, 255, 0.08);
   transition: transform 220ms ease, border-color 220ms ease, filter 220ms ease;
+  scroll-snap-align: start;
 }
 
-.music-card:hover {
+.music-card:hover,
+.music-card.is-focused {
   transform: translateY(-8px);
   border-color: rgba(255, 255, 255, 0.22);
   filter: saturate(1.08);
+}
+
+.music-card.is-focused {
+  box-shadow: 0 34px 110px rgba(255, 45, 37, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.12);
 }
 
 .music-card::before {

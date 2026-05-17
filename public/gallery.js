@@ -302,7 +302,7 @@ function renderNavigation(catalog) {
   const nav = document.querySelector("[data-nav]");
   if (!nav || !Array.isArray(catalog.navigation)) return;
   nav.replaceChildren();
-  for (const item of catalog.navigation.filter(entry => entry.status !== "disabled")) {
+  for (const item of catalog.navigation.filter(entry => entry.status !== "disabled" && !isAdminHref(entry.href))) {
     const link = document.createElement("a");
     link.href = item.href;
     link.textContent = item.label;
@@ -312,6 +312,10 @@ function renderNavigation(catalog) {
     }
     nav.append(link);
   }
+}
+
+function isAdminHref(href) {
+  return /^\/(lvtuang|admin\.html)(?:$|[?#])/.test(String(href || ""));
 }
 
 function byId(id) {

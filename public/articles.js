@@ -83,13 +83,17 @@ function renderNavigation(items) {
   const nav = document.querySelector("[data-nav]");
   if (!nav || !items.length) return;
   nav.replaceChildren();
-  for (const item of items.filter(entry => entry.status !== "disabled")) {
+  for (const item of items.filter(entry => entry.status !== "disabled" && !isAdminHref(entry.href))) {
     const link = document.createElement("a");
     link.href = item.href;
     link.textContent = item.label;
     if (item.external) { link.target = "_blank"; link.rel = "noopener"; }
     nav.append(link);
   }
+}
+
+function isAdminHref(href) {
+  return /^\/(lvtuang|admin\.html)(?:$|[?#])/.test(String(href || ""));
 }
 
 function formatDate(timestamp) {

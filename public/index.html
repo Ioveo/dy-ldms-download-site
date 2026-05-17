@@ -172,34 +172,34 @@
             <p>Extensions for live work</p>
             <h2>每个模块都是天才猫的一个扩展。</h2>
           </div>
-          <div class="music-tabs" aria-label="运营模块">
-            <button type="button" class="is-active">下载</button>
-            <button type="button">图库</button>
-            <button type="button">音乐</button>
-            <button type="button">授权</button>
+          <div class="music-tabs" aria-label="运营模块" data-extension-tabs>
+            <button type="button" class="is-active" data-extension-tab="download">下载</button>
+            <button type="button" data-extension-tab="gallery">图库</button>
+            <button type="button" data-extension-tab="music">音乐</button>
+            <button type="button" data-extension-tab="license">授权</button>
           </div>
         </div>
-        <div class="music-card-row">
-          <a class="music-card music-card--red" href="/download.html">
+        <div class="music-card-row" data-extension-row>
+          <a class="music-card music-card--red is-focused" href="/download.html" data-extension-card="download">
             <span class="music-icon">↓</span>
             <b>软件发布中心</b>
             <em>把安装包、版本号、下载链接和最新发布状态集中呈现给用户。</em>
             <div class="release-card"><strong>vLatest</strong><span>Download ready</span><small>Windows / DY Assistant</small></div>
           </a>
-          <a class="music-card music-card--green" href="/gallery.html">
+          <a class="music-card music-card--green" href="/gallery.html" data-extension-card="gallery">
             <span class="music-icon">▧</span>
             <b>图片素材画廊</b>
             <em>批量上传到 R2 后，用画廊方式筛选、预览、打开原图。</em>
             <div class="gallery-stack"><i></i><i></i><i></i></div>
           </a>
-          <a class="music-card music-card--purple" href="/music.html">
+          <a class="music-card music-card--purple" href="/music.html" data-extension-card="music">
             <span class="music-icon">♪</span>
             <b>直播音乐频道</b>
             <em>网易云歌曲 ID 和 R2 音频都能收纳，适合直播暖场和内容页。</em>
             <div class="wave-line"></div>
             <div class="playlist-mini"><span>Opening</span><span>Live room</span><span>Focus list</span></div>
           </a>
-          <a class="music-card music-card--blue" href="/license.html">
+          <a class="music-card music-card--blue" href="/license.html" data-extension-card="license">
             <span class="music-icon">✓</span>
             <b>授权与购买</b>
             <em>把购买入口、正版授权说明和团队使用路径放到清晰位置。</em>
@@ -232,5 +232,6 @@
         </div>
       </section>
     </main>
+    <script src="/home.js?v=20260517-extension-tabs" type="module"></script>
   </body>
 </html>

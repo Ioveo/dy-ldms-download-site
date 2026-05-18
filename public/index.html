@@ -10,7 +10,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="/raycast-home.css?v=20260518-carousel-title-nav" />
+    <link rel="stylesheet" href="/raycast-home.css?v=20260518-carousel-info-below" />
   </head>
   <body class="home-page">
     <div class="site-glow site-glow--left"></div>
@@ -186,19 +186,18 @@
                 <span>Tiancaimao AI</span>
                 <button type="button" class="is-active" data-ai-command="0">等待后台图片</button>
               </aside>
-              <div class="ai-preview">
+              <button class="ai-preview" type="button" data-ai-next aria-label="切换下一张轮播图">
                 <div class="ai-preview__media" data-ai-media>
                   <div class="ai-fallback-card">AI</div>
                 </div>
-                <button class="ai-preview__meta" type="button" data-ai-next>
+              </button>
+              <div class="ai-response">
+                <div class="ai-response__copy">
                   <span data-ai-kicker>素材洞察</span>
                   <strong data-ai-title>等待后台图片</strong>
                   <p data-ai-description>在后台添加图片后，这里会自动轮播展示，并生成运营建议。</p>
-                </button>
-              </div>
-              <div class="ai-response">
-                <span>AI Suggestion</span>
-                <strong data-ai-suggestion>把高质量素材设为主推，搭配下载入口和音乐频道联动展示。</strong>
+                  <small data-ai-suggestion>把高质量素材设为主推，搭配下载入口和音乐频道联动展示。</small>
+                </div>
                 <div class="ai-response__bars"><i></i><i></i><i></i></div>
               </div>
             </div>
@@ -274,6 +273,6 @@
         </div>
       </section>
     </main>
-    <script src="/home.js?v=20260518-carousel-title-nav" type="module"></script>
+    <script src="/home.js?v=20260518-carousel-info-below" type="module"></script>
   </body>
 </html>

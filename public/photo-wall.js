@@ -22,8 +22,11 @@ const state = {
   startX: 0,
   startTarget: 0,
   lastDelta: 0,
+  lastTime: 0,
   moved: false,
   pointerId: null,
+  clickIndex: null,
+  wavePower: 0,
   raf: 0
 };
 
@@ -61,11 +64,14 @@ async function loadItems() {
 function bindEvents() {
   stage.addEventListener("pointerdown", event => {
     event.preventDefault();
+    const card = event.target.closest?.(".photo-wall-card");
     state.dragging = true;
     state.pointerId = event.pointerId;
+    state.clickIndex = card ? Number(card.dataset.index || 0) : null;
     state.startX = event.clientX;
     state.startTarget = state.target;
     state.lastDelta = 0;
+    state.lastTime = performance.now();
     state.moved = false;
     stage.classList.add("is-dragging");
     stage.setPointerCapture?.(event.pointerId);
@@ -76,10 +82,15 @@ function bindEvents() {
     if (!state.dragging) return;
     event.preventDefault();
     const delta = event.clientX - state.startX;
-    state.velocity = delta - state.lastDelta;
+    const now = performance.now();
+    const elapsed = Math.max(8, now - state.lastTime);
+    const frameVelocity = ((delta - state.lastDelta) / elapsed) * 16.67;
+    state.velocity = lerp(state.velocity, frameVelocity, 0.38);
+    state.wavePower = lerp(state.wavePower, frameVelocity, 0.42);
+    state.lastTime = now;
     state.lastDelta = delta;
     state.target = clamp(state.startTarget + delta, state.min, state.max);
-    state.moved = state.moved || Math.abs(delta) > 5;
+    state.moved = state.moved || Math.abs(delta) > 8;
     updateActiveFromCenter();
   });
 
@@ -87,12 +98,20 @@ function bindEvents() {
   document.addEventListener("pointercancel", finishDrag);
 
   track.addEventListener("click", event => {
-    const card = event.target.closest(".photo-wall-card");
-    if (!card || state.moved) return;
-    openItem(Number(card.dataset.index || 0));
+    event.preventDefault();
   });
 
   track.addEventListener("dragstart", event => event.preventDefault());
+  shell.addEventListener("wheel", event => {
+    event.preventDefault();
+    const delta = Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : event.deltaY;
+    const push = clamp(-delta * 1.55, -280, 280);
+    state.velocity = lerp(state.velocity, push * 0.36, 0.55);
+    state.wavePower = lerp(state.wavePower, push * 0.62, 0.55);
+    state.target = clamp(state.target + push, state.min, state.max);
+    updateActiveFromCenter();
+    animate();
+  }, { passive: false });
   closeButton?.addEventListener("click", closeLightbox);
   lightbox?.addEventListener("click", event => {
     if (event.target === lightbox) closeLightbox();
@@ -109,8 +128,17 @@ function finishDrag(event) {
   state.dragging = false;
   state.pointerId = null;
   stage.classList.remove("is-dragging");
-  state.target = clamp(state.target + state.velocity * 22, state.min, state.max);
-  state.velocity *= 0.82;
+  if (!state.moved && state.clickIndex !== null) {
+    openItem(state.clickIndex);
+    state.clickIndex = null;
+    state.velocity = 0;
+    state.wavePower = 0;
+    return;
+  }
+  state.clickIndex = null;
+  state.target = clamp(state.target + state.velocity * 34, state.min, state.max);
+  state.velocity *= 0.9;
+  state.wavePower = state.velocity;
   animate();
 }
 
@@ -155,22 +183,30 @@ function animate() {
   if (state.raf) return;
   const frame = () => {
     state.raf = 0;
-    state.current += (state.target - state.current) * 0.13;
-    state.velocity *= state.dragging ? 0.92 : 0.88;
+    const ease = state.dragging ? 0.22 : 0.075;
+    state.current += (state.target - state.current) * ease;
+    state.velocity *= state.dragging ? 0.94 : 0.93;
+    state.wavePower *= state.dragging ? 0.95 : 0.91;
     track.style.transform = `translate3d(${state.current}px, 0, 0)`;
 
     const cards = [...track.children];
+    const center = stage.clientWidth / 2 - state.current;
     cards.forEach((card, index) => {
-      const phase = index * 0.68 + state.current * 0.018;
-      const pull = clamp(state.velocity * (0.28 + (index % 6) * 0.025), -28, 28);
-      const wave = Math.sin(phase) * 12 + pull;
-      const tilt = clamp(state.velocity * 0.018 + Math.sin(phase * 0.7) * 0.9, -5, 5);
-      const stretch = 1 + Math.min(Math.abs(state.velocity) * 0.002, 0.05);
-      card.style.transform = `translate3d(0, ${wave}px, 0) rotate(${tilt}deg) scaleY(${stretch})`;
+      const cardCenter = card.offsetLeft + card.offsetWidth / 2;
+      const distance = Math.abs(cardCenter - center);
+      const centerBoost = 1 + Math.max(0, 1 - distance / Math.max(1, stage.clientWidth * 0.46)) * 0.45;
+      const phase = index * 0.62 + state.current * 0.014;
+      const speed = Math.min(Math.abs(state.wavePower), 180);
+      const ripple = (7 + speed * 0.48) * centerBoost;
+      const lag = clamp(state.wavePower * (0.18 + (index % 8) * 0.018), -44, 44);
+      const wave = Math.sin(phase) * ripple + clamp(state.wavePower * 0.2, -42, 42);
+      const tilt = clamp(state.wavePower * 0.035 + Math.sin(phase * 0.7) * (1.1 + speed * 0.012), -11, 11);
+      const stretch = 1 + Math.min(speed * 0.0008, 0.12);
+      card.style.transform = `translate3d(${lag}px, ${wave}px, 0) rotate(${tilt}deg) scaleY(${stretch})`;
       card.style.zIndex = String(100 - Math.round(Math.abs(index - state.active)));
     });
 
-    const settled = Math.abs(state.target - state.current) < 0.35 && Math.abs(state.velocity) < 0.06;
+    const settled = Math.abs(state.target - state.current) < 0.35 && Math.abs(state.velocity) < 0.06 && Math.abs(state.wavePower) < 0.06;
     if (!settled || state.dragging) {
       state.raf = requestAnimationFrame(frame);
     }
@@ -247,6 +283,10 @@ function fallbackItems() {
 
 function clamp(value, min, max) {
   return Math.min(max, Math.max(min, value));
+}
+
+function lerp(from, to, amount) {
+  return from + (to - from) * amount;
 }
 
 function debounce(fn, delay = 120) {

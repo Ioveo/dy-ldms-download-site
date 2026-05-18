@@ -52,7 +52,7 @@ async function loadGallery() {
         thumbUrl: item.thumbUrl || item.imageUrl,
         tags: item.tags || []
       }));
-    setHeroImage(randomHeroItem(galleryItems));
+    setHeroImage(heroBackgroundItem(galleryItems));
     renderTags();
     renderGallery();
   } catch {
@@ -298,11 +298,18 @@ function setHeroImage(item) {
   hero.style.setProperty("--hero-image", `url("${cssUrl(item.imageUrl)}")`);
 }
 
-function randomHeroItem(items) {
+function heroBackgroundItem(items) {
   if (!items.length) return null;
   const featured = items.filter(item => item.featured);
-  const pool = featured.length ? featured : items;
-  return pool[Math.floor(Math.random() * pool.length)];
+  return latestGalleryItem(featured.length ? featured : items);
+}
+
+function latestGalleryItem(items) {
+  return [...items].sort((a, b) => galleryTime(b) - galleryTime(a))[0] || null;
+}
+
+function galleryTime(item) {
+  return Number(item?.updatedAt || item?.createdAt || 0);
 }
 
 function renderNavigation(catalog) {

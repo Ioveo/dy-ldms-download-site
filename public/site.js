@@ -354,7 +354,7 @@ function defaultNavigation() {
   return [
     { label: "首页", href: "/" },
     { label: "下载", href: "/download.html" },
-    { label: "照片墙", href: "/#photo-wall" },
+    { label: "照片墙", href: "/photo-wall.html" },
     { label: "文章", href: "/articles.html" },
     { label: "授权", href: "/license.html" },
     { label: "购买授权", href: "https://mk.nsy.me/buy", external: true }

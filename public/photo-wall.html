@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>照片墙 - 天才猫</title>
+    <meta name="description" content="天才猫照片墙，横向拖动浏览照片，点击放大查看。" />
+    <link rel="icon" type="image/png" href="/logo.png?v=20260509" />
+    <link rel="apple-touch-icon" href="/logo.png?v=20260509" />
+    <link rel="stylesheet" href="/photo-wall.css?v=20260518-photo-wall-page" />
+  </head>
+  <body class="photo-wall-page">
+    <main class="photo-wall-shell" data-photo-wall>
+      <header class="photo-wall-chrome">
+        <a class="photo-wall-brand" href="/">NSY</a>
+        <div class="photo-wall-scale" aria-hidden="true">
+          <i></i><i></i><i></i><i></i><i></i><span data-photo-wall-index>01</span><b></b><span data-photo-wall-total>24</span><i></i><i></i><i></i><i></i><i></i>
+        </div>
+        <a class="photo-wall-about" href="/gallery.html">GALLERY</a>
+      </header>
+
+      <section class="photo-wall-stage" aria-label="照片墙">
+        <div class="photo-wall-track" data-photo-wall-track></div>
+      </section>
+
+      <footer class="photo-wall-footer">
+        <span>TIANCAIMAO PHOTO WALL</span>
+        <strong data-photo-wall-title>NSY Gallery</strong>
+        <a href="/gallery.html">ALL PHOTOS</a>
+      </footer>
+    </main>
+
+    <div class="photo-wall-lightbox" data-photo-wall-lightbox hidden>
+      <button class="photo-wall-lightbox__close" type="button" data-photo-wall-close aria-label="关闭照片">×</button>
+      <img data-photo-wall-lightbox-image alt="" />
+      <div class="photo-wall-lightbox__meta">
+        <strong data-photo-wall-lightbox-title></strong>
+        <a data-photo-wall-lightbox-link href="/gallery.html">OPEN</a>
+      </div>
+    </div>
+
+    <script src="/photo-wall.js?v=20260518-photo-wall-page" type="module"></script>
+  </body>
+</html>

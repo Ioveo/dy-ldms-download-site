@@ -11,7 +11,7 @@ export const DEFAULT_CATEGORIES = [
 export const DEFAULT_NAVIGATION = [
   { id: "home", label: "首页", href: "/", sortOrder: 10, status: "active", external: false },
   { id: "download", label: "下载", href: "/download.html", sortOrder: 20, status: "active", external: false },
-  { id: "photo-wall", label: "照片墙", href: "/#photo-wall", sortOrder: 25, status: "active", external: false },
+  { id: "photo-wall", label: "照片墙", href: "/photo-wall.html", sortOrder: 25, status: "active", external: false },
   { id: "articles", label: "文章", href: "/articles.html", sortOrder: 30, status: "active", external: false },
   { id: "license", label: "授权", href: "/license.html", sortOrder: 40, status: "active", external: false },
   { id: "buy", label: "购买授权", href: "https://mk.nsy.me/buy", sortOrder: 50, status: "active", external: true }
@@ -308,13 +308,13 @@ export function normalizeNavigation(items) {
   const withGallery = withMusic.some(item => item.id === "gallery" || item.href === "/gallery.html")
     ? withMusic
     : [...withMusic, { id: "gallery", label: "画廊", href: "/gallery.html", sortOrder: 37, status: "active", external: false }];
-  const withPhotoWall = withGallery.some(item => item.id === "photo-wall" || item.href === "/#photo-wall")
+  const withPhotoWall = withGallery.some(item => item.id === "photo-wall" || item.href === "/photo-wall.html")
     ? withGallery
-    : [...withGallery, { id: "photo-wall", label: "照片墙", href: "/#photo-wall", sortOrder: 25, status: "active", external: false }];
+    : [...withGallery, { id: "photo-wall", label: "照片墙", href: "/photo-wall.html", sortOrder: 25, status: "active", external: false }];
   return withPhotoWall.map((item, index) => ({
     id: String(item.id || `nav-${index + 1}`),
     label: String(item.label || item.name || "导航"),
-    href: String(item.href || "/"),
+    href: String(item.href === "/#photo-wall" ? "/photo-wall.html" : item.href || "/"),
     sortOrder: Number(item.sortOrder ?? item.sort_order ?? index),
     status: item.status || "active",
     external: Boolean(item.external)

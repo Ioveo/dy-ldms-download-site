@@ -1,0 +1,291 @@
+:root {
+  color-scheme: dark;
+  --bg: #080706;
+  --text: #fff8f5;
+  --muted: rgba(255, 248, 245, 0.58);
+  --line: rgba(255, 255, 255, 0.16);
+  --red: #ff4d45;
+}
+
+* { box-sizing: border-box; }
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  overflow: hidden;
+}
+
+body {
+  color: var(--text);
+  background:
+    radial-gradient(circle at 22% 34%, rgba(122, 22, 18, 0.44), transparent 32rem),
+    radial-gradient(circle at 74% 66%, rgba(255, 77, 69, 0.14), transparent 34rem),
+    linear-gradient(180deg, #120607 0%, #080706 48%, #060505 100%);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.photo-wall-shell {
+  position: relative;
+  isolation: isolate;
+  width: 100vw;
+  height: 100svh;
+  overflow: hidden;
+  user-select: none;
+}
+
+.photo-wall-shell::before,
+.photo-wall-shell::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.photo-wall-shell::before {
+  background:
+    linear-gradient(90deg, rgba(5, 5, 5, 0.9), transparent 16%, transparent 84%, rgba(5, 5, 5, 0.92)),
+    linear-gradient(180deg, rgba(5, 5, 5, 0.78), transparent 25%, transparent 72%, rgba(5, 5, 5, 0.9));
+}
+
+.photo-wall-shell::after {
+  opacity: 0.12;
+  background-image: linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 100% 5px;
+  mask-image: linear-gradient(180deg, transparent, #000 22%, #000 74%, transparent);
+}
+
+.photo-wall-chrome,
+.photo-wall-footer {
+  position: absolute;
+  z-index: 5;
+  left: clamp(28px, 4vw, 70px);
+  right: clamp(28px, 4vw, 70px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 22px;
+  color: rgba(255, 248, 245, 0.72);
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+}
+
+.photo-wall-chrome {
+  top: clamp(28px, 5vh, 54px);
+}
+
+.photo-wall-footer {
+  bottom: clamp(28px, 5vh, 54px);
+}
+
+.photo-wall-brand {
+  color: #fff;
+  font-size: clamp(20px, 2.2vw, 34px);
+  letter-spacing: -0.04em;
+}
+
+.photo-wall-about,
+.photo-wall-footer a {
+  color: rgba(255, 248, 245, 0.84);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.photo-wall-scale {
+  position: absolute;
+  left: 50%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transform: translateX(-50%);
+}
+
+.photo-wall-scale i {
+  width: 1px;
+  height: 16px;
+  background: rgba(255, 248, 245, 0.24);
+}
+
+.photo-wall-scale b {
+  width: 28px;
+  height: 14px;
+  border: 1px solid rgba(255, 248, 245, 0.6);
+}
+
+.photo-wall-footer strong {
+  position: absolute;
+  left: 50%;
+  max-width: min(560px, 46vw);
+  overflow: hidden;
+  color: #fff;
+  font-size: clamp(16px, 2vw, 28px);
+  letter-spacing: 0;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transform: translateX(-50%);
+}
+
+.photo-wall-stage {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: clamp(360px, 43vh, 500px);
+  transform: translateY(-50%);
+  cursor: grab;
+  touch-action: none;
+}
+
+.photo-wall-stage.is-dragging {
+  cursor: grabbing;
+}
+
+.photo-wall-track {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: flex;
+  align-items: center;
+  gap: clamp(16px, 1.2vw, 24px);
+  height: 100%;
+  padding-inline: clamp(28px, 3.8vw, 74px);
+  will-change: transform;
+}
+
+.photo-wall-card {
+  position: relative;
+  display: block;
+  flex: 0 0 clamp(92px, 6.5vw, 128px);
+  height: 100%;
+  overflow: hidden;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  background: #151414;
+  cursor: pointer;
+  box-shadow: 0 28px 70px rgba(0, 0, 0, 0.44);
+  will-change: transform, filter;
+  -webkit-user-drag: none;
+}
+
+.photo-wall-card img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(1) brightness(0.48) contrast(1.15);
+  transform: scale(1.08);
+  transition: filter 280ms ease, transform 360ms ease;
+  pointer-events: none;
+  -webkit-user-drag: none;
+}
+
+.photo-wall-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.07), transparent 24%, rgba(0, 0, 0, 0.32));
+  pointer-events: none;
+}
+
+.photo-wall-card.is-active img,
+.photo-wall-card:hover img {
+  filter: grayscale(0.12) brightness(0.96) contrast(1.04);
+  transform: scale(1.14);
+}
+
+.photo-wall-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  padding: clamp(28px, 5vw, 76px);
+  background:
+    radial-gradient(circle at 50% 52%, rgba(255, 66, 58, 0.18), transparent 42%),
+    rgba(5, 5, 5, 0.88);
+  backdrop-filter: blur(18px);
+}
+
+.photo-wall-lightbox[hidden] {
+  display: none;
+}
+
+.photo-wall-lightbox img {
+  max-width: min(92vw, 1380px);
+  max-height: 82vh;
+  object-fit: contain;
+  box-shadow: 0 42px 120px rgba(0, 0, 0, 0.68);
+  animation: photoWallZoom 360ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.photo-wall-lightbox__close {
+  position: fixed;
+  top: 28px;
+  right: 32px;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.08);
+  font-size: 28px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.photo-wall-lightbox__meta {
+  position: fixed;
+  left: clamp(24px, 4vw, 68px);
+  right: clamp(24px, 4vw, 68px);
+  bottom: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.photo-wall-lightbox__meta a {
+  color: #ffb5af;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+@keyframes photoWallZoom {
+  from {
+    opacity: 0;
+    transform: scale(0.86);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@media (max-width: 720px) {
+  .photo-wall-scale {
+    display: none;
+  }
+
+  .photo-wall-stage {
+    height: clamp(320px, 48vh, 430px);
+  }
+
+  .photo-wall-card {
+    flex-basis: 84px;
+  }
+
+  .photo-wall-footer strong {
+    display: none;
+  }
+}

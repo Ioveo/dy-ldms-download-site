@@ -11,6 +11,7 @@ export const DEFAULT_CATEGORIES = [
 export const DEFAULT_NAVIGATION = [
   { id: "home", label: "首页", href: "/", sortOrder: 10, status: "active", external: false },
   { id: "download", label: "下载", href: "/download.html", sortOrder: 20, status: "active", external: false },
+  { id: "photo-wall", label: "照片墙", href: "/#photo-wall", sortOrder: 25, status: "active", external: false },
   { id: "articles", label: "文章", href: "/articles.html", sortOrder: 30, status: "active", external: false },
   { id: "license", label: "授权", href: "/license.html", sortOrder: 40, status: "active", external: false },
   { id: "buy", label: "购买授权", href: "https://mk.nsy.me/buy", sortOrder: 50, status: "active", external: true }
@@ -104,6 +105,7 @@ export function normalizeCatalog(catalog) {
     navigation: normalizeNavigation(catalog?.navigation || []),
     site: normalizeSite(catalog?.site || catalog?.settings || {}),
     siteCarousel: normalizeSiteCarousel(catalog?.siteCarousel || catalog?.site_carousel || []),
+    photoWall: normalizePhotoWall(catalog?.photoWall || catalog?.photo_wall || []),
     software: software.map((item, index) => normalizeSoftware(item, index, now)).sort(bySortOrder),
     articles: normalizeArticles(catalog?.articles || []),
     music: normalizeMusic(catalog?.music || catalog?.tracks || []),
@@ -187,6 +189,7 @@ export function publicCatalog(catalog) {
     navigation: (catalog.navigation || DEFAULT_NAVIGATION).filter(item => item.status !== "disabled"),
     site: normalizeSite(catalog.site || {}),
     siteCarousel: (catalog.siteCarousel || []).filter(item => item.status === "published"),
+    photoWall: (catalog.photoWall || []).filter(item => item.status === "published"),
     software: catalog.software
       .filter(item => item.status !== "disabled")
       .map(item => ({
@@ -213,6 +216,23 @@ export function normalizeSiteCarousel(items) {
     imageUrl: String(item.imageUrl || item.image_url || item.url || ""),
     thumbUrl: String(item.thumbUrl || item.thumb_url || item.imageUrl || item.image_url || item.url || ""),
     suggestion: String(item.suggestion || ""),
+    status: item.status || "draft",
+    sortOrder: Number(item.sortOrder ?? item.sort_order ?? index),
+    createdAt: Number(item.createdAt || Date.now()),
+    updatedAt: Number(item.updatedAt || Date.now())
+  })).sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0) || (b.updatedAt || 0) - (a.updatedAt || 0)) : [];
+}
+
+export function normalizePhotoWall(items) {
+  return Array.isArray(items) ? items.map((item, index) => ({
+    id: String(item.id || `photo-wall-${index + 1}`),
+    title: String(item.title || item.text || "Untitled"),
+    description: String(item.description || ""),
+    imageUrl: String(item.imageUrl || item.image_url || item.url || ""),
+    thumbUrl: String(item.thumbUrl || item.thumb_url || item.imageUrl || item.image_url || item.url || ""),
+    linkUrl: String(item.linkUrl || item.link_url || item.href || ""),
+    linkText: String(item.linkText || item.link_text || ""),
+    assetKey: String(item.assetKey || item.asset_key || item.key || ""),
     status: item.status || "draft",
     sortOrder: Number(item.sortOrder ?? item.sort_order ?? index),
     createdAt: Number(item.createdAt || Date.now()),
@@ -288,7 +308,10 @@ export function normalizeNavigation(items) {
   const withGallery = withMusic.some(item => item.id === "gallery" || item.href === "/gallery.html")
     ? withMusic
     : [...withMusic, { id: "gallery", label: "画廊", href: "/gallery.html", sortOrder: 37, status: "active", external: false }];
-  return withGallery.map((item, index) => ({
+  const withPhotoWall = withGallery.some(item => item.id === "photo-wall" || item.href === "/#photo-wall")
+    ? withGallery
+    : [...withGallery, { id: "photo-wall", label: "照片墙", href: "/#photo-wall", sortOrder: 25, status: "active", external: false }];
+  return withPhotoWall.map((item, index) => ({
     id: String(item.id || `nav-${index + 1}`),
     label: String(item.label || item.name || "导航"),
     href: String(item.href || "/"),

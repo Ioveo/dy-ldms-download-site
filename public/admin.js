@@ -58,6 +58,8 @@ const ADMIN_MODULES = {
       { panel: "siteHomePanel", label: "首页文案", action: "主页内容" },
       { panel: "siteCarouselPanel", view: "siteCarouselEdit", label: "添加轮播图", action: "首页专用" },
       { panel: "siteCarouselPanel", view: "siteCarouselList", label: "轮播图列表", action: "编辑/删除" },
+      { panel: "photoWallPanel", view: "photoWallEdit", label: "添加照片墙", action: "首页专用" },
+      { panel: "photoWallPanel", view: "photoWallList", label: "照片墙列表", action: "编辑/删除" },
       { panel: "navigationPanel", label: "导航设置", action: "菜单配置" },
       { panel: "healthPanel", label: "系统状态", action: "部署检查" }
     ]
@@ -107,6 +109,7 @@ byId("storageForm").addEventListener("submit", saveStorage);
 byId("navigationForm").addEventListener("submit", saveNavigation);
 byId("siteHomeForm").addEventListener("submit", saveSiteHome);
 byId("siteCarouselForm").addEventListener("submit", saveSiteCarousel);
+byId("photoWallForm").addEventListener("submit", savePhotoWall);
 byId("articleForm").addEventListener("submit", saveArticle);
 byId("musicForm").addEventListener("submit", saveMusic);
 byId("galleryForm").addEventListener("submit", saveGallery);
@@ -131,6 +134,11 @@ byId("loadSiteCarouselAssets").addEventListener("click", loadSiteCarouselAssets)
 byId("useSiteCarouselAsset").addEventListener("click", useSiteCarouselAsset);
 byId("uploadSiteCarouselImage").addEventListener("click", uploadSiteCarouselImage);
 byId("previewSiteCarouselImage").addEventListener("click", previewSiteCarouselImage);
+byId("resetPhotoWall").addEventListener("click", resetPhotoWallForm);
+byId("loadPhotoWallAssets").addEventListener("click", loadPhotoWallAssets);
+byId("usePhotoWallAsset").addEventListener("click", usePhotoWallAsset);
+byId("uploadPhotoWallImage").addEventListener("click", uploadPhotoWallImage);
+byId("previewPhotoWallImage").addEventListener("click", previewPhotoWallImage);
 byId("resetCategory").addEventListener("click", resetCategoryForm);
 byId("resetStorage").addEventListener("click", resetStorageForm);
 byId("resetNavigation").addEventListener("click", resetNavigationForm);
@@ -238,6 +246,7 @@ function render(nextCatalog) {
   renderMusicRows();
   renderGalleryRows();
   renderSiteCarouselRows();
+  renderPhotoWallRows();
   renderReleaseRows();
 }
 
@@ -252,6 +261,22 @@ function renderSiteCarouselRows() {
       actionButton("预览", () => window.open(item.imageUrl, "_blank")),
       actionButton("编辑", () => fillSiteCarouselForm(item)),
       actionButton("删除", () => deleteSiteCarousel(item.id), "danger")
+    );
+    rows.append(tr);
+  }
+}
+
+function renderPhotoWallRows() {
+  const rows = byId("photoWallRows");
+  if (!rows) return;
+  rows.innerHTML = "";
+  for (const item of catalog.photoWall || []) {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td>${item.imageUrl ? `<img class="thumb" src="${escapeAttr(item.thumbUrl || item.imageUrl)}" alt="">` : "-"} <strong>${escapeHtml(item.title)}</strong><br><small>${escapeHtml(item.imageUrl || "")}</small></td><td>${escapeHtml(item.description || "")}</td><td><small>${escapeHtml(item.linkUrl || "-")}</small></td><td>${item.sortOrder}</td><td class="status-${item.status === "published" ? "active" : item.status === "draft" ? "draft" : "disabled"}">${item.status === "published" ? "已发布" : item.status === "draft" ? "草稿" : "隐藏"}</td><td class="row-actions"></td>`;
+    tr.lastElementChild.append(
+      actionButton("预览", () => window.open(item.imageUrl, "_blank")),
+      actionButton("编辑", () => fillPhotoWallForm(item)),
+      actionButton("删除", () => deletePhotoWall(item.id), "danger")
     );
     rows.append(tr);
   }
@@ -281,6 +306,7 @@ function renderCategoryOptions() {
   loadMusicCoverAssets();
   loadGalleryAssets();
   loadSiteCarouselAssets();
+  loadPhotoWallAssets();
 }
 
 function renderArticleOptions() {
@@ -683,6 +709,59 @@ function previewSiteCarouselImage() {
   window.open(url, "_blank");
 }
 
+async function loadPhotoWallAssets() {
+  const select = byId("photoWallAsset");
+  if (!select) return;
+  select.innerHTML = `<option value="">选择图片</option>`;
+  const result = await api("/api/admin/assets/list", { kind: "image", status: "active", pageSize: 100 });
+  if (!result.success) return toast(result.msg || "读取 R2 图片失败", true);
+  for (const asset of result.assets || []) {
+    if (asset.kind !== "image" && asset.kind !== "site") continue;
+    const url = asset.url || asset.publicUrl || (asset.key ? `/media/${encodeURIComponent(asset.key)}` : "");
+    if (!url) continue;
+    const option = document.createElement("option");
+    option.value = JSON.stringify({
+      url,
+      key: asset.key || "",
+      storageId: asset.storageId || "default"
+    });
+    option.textContent = `${asset.fileName || asset.key} (${formatBytes(asset.fileSize)})`;
+    select.append(option);
+  }
+}
+
+function usePhotoWallAsset() {
+  const value = byId("photoWallAsset").value;
+  if (!value) return toast("请先选择一张 R2 图片", true);
+  const asset = JSON.parse(value);
+  byId("photoWallImageUrl").value = asset.url || "";
+  byId("photoWallThumbUrl").value = asset.url || "";
+  byId("photoWallAssetKey").value = asset.key || "";
+  toast("已使用选中的照片墙图片");
+}
+
+async function uploadPhotoWallImage() {
+  const file = byId("photoWallFile").files[0];
+  if (!file) return toast("请选择本地图片", true);
+  const error = validateGalleryFile(file);
+  if (error) return toast(error, true);
+  toast("正在上传照片墙图片");
+  const result = await uploadAssetMedia(file, "image", "photo-wall", "photo-wall");
+  if (!result.success || !result.url) return toast(result.msg || "照片墙图片上传失败", true);
+  byId("photoWallImageUrl").value = result.url;
+  byId("photoWallThumbUrl").value = result.url;
+  byId("photoWallAssetKey").value = result.asset?.key || result.key || "";
+  byId("photoWallFile").value = "";
+  await loadPhotoWallAssets();
+  toast("照片墙图片已上传");
+}
+
+function previewPhotoWallImage() {
+  const url = byId("photoWallImageUrl").value.trim();
+  if (!url) return toast("请先填写或选择图片地址", true);
+  window.open(url, "_blank");
+}
+
 async function uploadGalleryImage() {
   const file = byId("galleryFile").files[0];
   if (!file) return toast("请选择本地图片", true);
@@ -896,6 +975,42 @@ async function saveSiteCarousel(event) {
   toast("首页轮播图已保存");
 }
 
+async function savePhotoWall(event) {
+  event.preventDefault();
+  const file = byId("photoWallFile").files[0];
+  if (file) {
+    const error = validateGalleryFile(file);
+    if (error) return toast(error, true);
+    toast("正在上传照片墙图片");
+    const uploaded = await uploadAssetMedia(file, "image", "photo-wall", "photo-wall");
+    if (!uploaded.success || !uploaded.url) return toast(uploaded.msg || "照片墙图片上传失败", true);
+    byId("photoWallImageUrl").value = uploaded.url;
+    byId("photoWallThumbUrl").value = uploaded.url;
+    byId("photoWallAssetKey").value = uploaded.asset?.key || uploaded.key || "";
+    byId("photoWallFile").value = "";
+  }
+  const imageUrl = byId("photoWallImageUrl").value.trim();
+  const payload = {
+    id: byId("photoWallId").value,
+    title: byId("photoWallTitle").value.trim(),
+    description: byId("photoWallDescription").value.trim(),
+    imageUrl,
+    thumbUrl: byId("photoWallThumbUrl").value.trim() || imageUrl,
+    linkUrl: byId("photoWallLinkUrl").value.trim(),
+    linkText: byId("photoWallLinkText").value.trim(),
+    assetKey: byId("photoWallAssetKey").value.trim(),
+    sortOrder: Number(byId("photoWallSort").value || 0),
+    status: byId("photoWallStatus").value
+  };
+  if (!payload.title || !payload.imageUrl) return toast("请填写文字和图片地址", true);
+  const result = await api("/api/admin/photo-wall", payload);
+  if (!result.success) return toast(result.msg || "保存失败", true);
+  resetPhotoWallForm();
+  render(result.catalog);
+  showPanel("photoWallPanel", { moduleId: "site", view: "photoWallList" });
+  toast("照片墙已保存");
+}
+
 function fillSiteHomeForm(site = {}) {
   for (const key of SITE_HOME_FIELDS) {
     const input = byId(key);
@@ -914,6 +1029,15 @@ async function deleteSiteCarousel(id) {
   render(result.catalog);
   showPanel("siteCarouselPanel", { moduleId: "site", view: "siteCarouselList" });
   toast("首页轮播图已删除");
+}
+
+async function deletePhotoWall(id) {
+  if (!confirm("确定删除这张照片墙图片吗？图片文件不会自动删除。")) return;
+  const result = await api("/api/admin/photo-wall", { action: "delete", id });
+  if (!result.success) return toast(result.msg || "删除失败", true);
+  render(result.catalog);
+  showPanel("photoWallPanel", { moduleId: "site", view: "photoWallList" });
+  toast("照片墙图片已删除");
 }
 
 async function saveArticle(event) {
@@ -1517,6 +1641,21 @@ function fillSiteCarouselForm(item) {
   loadSiteCarouselAssets();
 }
 
+function fillPhotoWallForm(item) {
+  showPanel("photoWallPanel", { moduleId: "site", view: "photoWallEdit" });
+  byId("photoWallId").value = item.id;
+  byId("photoWallTitle").value = item.title || "";
+  byId("photoWallDescription").value = item.description || "";
+  byId("photoWallImageUrl").value = item.imageUrl || "";
+  byId("photoWallThumbUrl").value = item.thumbUrl || "";
+  byId("photoWallLinkUrl").value = item.linkUrl || "";
+  byId("photoWallLinkText").value = item.linkText || "";
+  byId("photoWallAssetKey").value = item.assetKey || "";
+  byId("photoWallSort").value = item.sortOrder || 0;
+  byId("photoWallStatus").value = item.status || "draft";
+  loadPhotoWallAssets();
+}
+
 function currentAdminModule() {
   return document.querySelector(".module-sidebar button.is-active")?.dataset.module || "software";
 }
@@ -1648,6 +1787,15 @@ function resetSiteCarouselForm() {
   byId("siteCarouselSort").value = "10";
   byId("siteCarouselStatus").value = "published";
   loadSiteCarouselAssets();
+}
+
+function resetPhotoWallForm() {
+  byId("photoWallForm").reset();
+  byId("photoWallId").value = "";
+  byId("photoWallAssetKey").value = "";
+  byId("photoWallSort").value = "10";
+  byId("photoWallStatus").value = "published";
+  loadPhotoWallAssets();
 }
 
 function resetStorageForm() {

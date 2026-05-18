@@ -251,6 +251,33 @@
           <div class="table-wrap"><table><thead><tr><th>轮播图</th><th>说明</th><th>排序</th><th>状态</th><th>操作</th></tr></thead><tbody id="siteCarouselRows"></tbody></table></div>
         </section>
 
+        <section class="panel tab-panel" id="photoWallPanel" hidden>
+          <div class="panel__head">
+            <div>
+              <h2>照片墙管理</h2>
+              <p>管理首页照片墙的图片、文字、跳转链接和 R2 素材。</p>
+            </div>
+          </div>
+          <form class="form-grid" id="photoWallForm">
+            <input type="hidden" id="photoWallId" />
+            <input type="hidden" id="photoWallAssetKey" />
+            <label>文字标题<input id="photoWallTitle" required placeholder="显示在首页照片墙底部" /></label>
+            <label>排序<input id="photoWallSort" type="number" value="10" /></label>
+            <label class="span-2">图片地址<input id="photoWallImageUrl" required placeholder="/media/images/... 或 https://..." /></label>
+            <label class="span-2">缩略图地址<input id="photoWallThumbUrl" placeholder="可留空，默认使用图片地址" /></label>
+            <label>R2 图片<select id="photoWallAsset"><option value="">选择图片</option></select></label>
+            <div class="form-actions"><button class="ghost" type="button" id="loadPhotoWallAssets">加载图片</button><button class="ghost" type="button" id="usePhotoWallAsset">使用选中图片</button></div>
+            <label>本地图片<input id="photoWallFile" type="file" accept="image/png,image/jpeg,image/webp,image/gif,image/avif" /></label>
+            <div class="form-actions"><button class="ghost" type="button" id="uploadPhotoWallImage">上传图片</button><button class="ghost" type="button" id="previewPhotoWallImage">预览</button></div>
+            <label class="span-2">超级链接<input id="photoWallLinkUrl" placeholder="/gallery.html 或 https://..." /></label>
+            <label>链接文字<input id="photoWallLinkText" placeholder="OPEN" /></label>
+            <label>状态<select id="photoWallStatus"><option value="published">发布</option><option value="draft">草稿</option><option value="disabled">隐藏</option></select></label>
+            <label class="span-2">说明<textarea id="photoWallDescription" rows="3" placeholder="备注、场景或图片说明"></textarea></label>
+            <div class="form-actions span-2"><button type="submit">保存照片墙</button><button class="ghost" type="button" id="resetPhotoWall">清空</button></div>
+          </form>
+          <div class="table-wrap"><table><thead><tr><th>图片</th><th>文字</th><th>链接</th><th>排序</th><th>状态</th><th>操作</th></tr></thead><tbody id="photoWallRows"></tbody></table></div>
+        </section>
+
         <section class="panel tab-panel" id="navigationPanel" hidden>
           <div class="panel__head">
             <div>

@@ -4,6 +4,8 @@ let galleryItems = [];
 let visibleItems = [];
 let activeIndex = -1;
 let openingAnimation = null;
+let viewerWheelDelta = 0;
+let viewerWheelLock = false;
 
 const masonry = byId("galleryMasonry");
 const viewer = byId("galleryViewer");
@@ -28,6 +30,8 @@ byId("gallerySearch").addEventListener("input", event => {
 viewer.addEventListener("click", event => {
   if (event.target === viewer) closeViewer();
 });
+
+viewer.addEventListener("wheel", handleViewerWheel, { passive: false });
 
 viewerImage.addEventListener("click", toggleOriginalView);
 
@@ -160,6 +164,24 @@ function moveViewer(step) {
   openViewer(activeIndex);
 }
 
+function handleViewerWheel(event) {
+  if (viewer.hidden || visibleItems.length < 2) return;
+  event.preventDefault();
+  const delta = Math.abs(event.deltaY) >= Math.abs(event.deltaX) ? event.deltaY : event.deltaX;
+  if (!delta) return;
+  viewerWheelDelta += delta;
+  if (viewerWheelLock || Math.abs(viewerWheelDelta) < 90) return;
+  const direction = viewerWheelDelta > 0 ? 1 : -1;
+  viewerWheelDelta = 0;
+  viewerWheelLock = true;
+  viewer.classList.add(direction > 0 ? "is-wheel-next" : "is-wheel-prev");
+  moveViewer(direction);
+  window.setTimeout(() => {
+    viewer.classList.remove("is-wheel-next", "is-wheel-prev");
+    viewerWheelLock = false;
+  }, 260);
+}
+
 async function toggleOriginalView() {
   if (figure.classList.contains("is-compact-size")) {
     enterScreenFitView();
@@ -247,7 +269,7 @@ async function animateViewerImageFromThumbnail(sourceImage) {
 }
 
 function targetImageRect() {
-  const gap = window.innerWidth <= 760 ? 24 : 56;
+  const gap = window.innerWidth <= 760 ? 16 : 24;
   const maxWidth = Math.max(1, window.innerWidth - gap);
   const maxHeight = Math.max(1, window.innerHeight - gap);
   const naturalWidth = viewerImage.naturalWidth || maxWidth;
@@ -299,11 +321,13 @@ function closeViewer() {
     openingAnimation = null;
   }
   viewer.hidden = true;
+  viewerWheelDelta = 0;
+  viewerWheelLock = false;
   viewerImage.removeAttribute("src");
   viewerBackdrop.style.removeProperty("background-image");
   viewerImage.classList.remove("is-opening");
   clearOpeningImageStyle();
-  viewer.classList.remove("is-loading", "is-ready", "is-entering", "is-zooming");
+  viewer.classList.remove("is-loading", "is-ready", "is-entering", "is-zooming", "is-wheel-next", "is-wheel-prev");
   figure.classList.remove("is-mode-changing", "is-compact-size", "is-original-size");
   enterScreenFitView();
   document.body.classList.remove("gallery-viewer-open");

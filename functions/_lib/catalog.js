@@ -29,7 +29,8 @@ export const DEFAULT_SITE = {
   aiPromptTwo: "生成话术",
   aiPromptThree: "整理标签",
   readyKicker: "Ready",
-  readyTitle: "进入天才猫工作台。"
+  readyTitle: "进入天才猫工作台。",
+  footerWordmark: "NSY"
 };
 
 export async function loadCatalog(env) {

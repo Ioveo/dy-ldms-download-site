@@ -88,7 +88,8 @@ const SITE_HOME_FIELDS = [
   "aiPromptTwo",
   "aiPromptThree",
   "readyKicker",
-  "readyTitle"
+  "readyTitle",
+  "footerWordmark"
 ];
 let articleDraftTimer = null;
 

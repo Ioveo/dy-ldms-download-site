@@ -29,6 +29,17 @@ const state = {
   wavePower: 0,
   raf: 0
 };
+const lightboxDrag = {
+  active: false,
+  pointerId: null,
+  startX: 0,
+  startY: 0,
+  lastX: 0,
+  lastY: 0,
+  lastTime: 0,
+  velocity: 0,
+  distance: 0
+};
 
 init();
 
@@ -116,6 +127,10 @@ function bindEvents() {
   lightbox?.addEventListener("click", event => {
     if (event.target === lightbox) closeLightbox();
   });
+  lightboxImage?.addEventListener("pointerdown", startLightboxDrag);
+  document.addEventListener("pointermove", moveLightboxDrag);
+  document.addEventListener("pointerup", finishLightboxDrag);
+  document.addEventListener("pointercancel", finishLightboxDrag);
   document.addEventListener("keydown", event => {
     if (event.key === "Escape") closeLightbox();
   });
@@ -194,15 +209,20 @@ function animate() {
     cards.forEach((card, index) => {
       const cardCenter = card.offsetLeft + card.offsetWidth / 2;
       const distance = Math.abs(cardCenter - center);
-      const centerBoost = 1 + Math.max(0, 1 - distance / Math.max(1, stage.clientWidth * 0.46)) * 0.45;
+      const proximity = Math.max(0, 1 - distance / Math.max(1, stage.clientWidth * 0.48));
+      const centerBoost = 1 + proximity * 0.7;
       const phase = index * 0.62 + state.current * 0.014;
       const speed = Math.min(Math.abs(state.wavePower), 180);
-      const ripple = (7 + speed * 0.48) * centerBoost;
-      const lag = clamp(state.wavePower * (0.18 + (index % 8) * 0.018), -44, 44);
-      const wave = Math.sin(phase) * ripple + clamp(state.wavePower * 0.2, -42, 42);
-      const tilt = clamp(state.wavePower * 0.035 + Math.sin(phase * 0.7) * (1.1 + speed * 0.012), -11, 11);
-      const stretch = 1 + Math.min(speed * 0.0008, 0.12);
-      card.style.transform = `translate3d(${lag}px, ${wave}px, 0) rotate(${tilt}deg) scaleY(${stretch})`;
+      const ripple = (10 + speed * 0.58) * centerBoost;
+      const lift = -proximity * (46 + speed * 0.12);
+      const lag = clamp(state.wavePower * (0.2 + (index % 8) * 0.021), -54, 54);
+      const wave = Math.sin(phase) * ripple + clamp(state.wavePower * 0.22, -48, 48) + lift;
+      const tilt = clamp(state.wavePower * 0.038 + Math.sin(phase * 0.7) * (1.4 + speed * 0.014), -13, 13);
+      const rotateX = -proximity * (5 + speed * 0.025);
+      const scale = 1 + proximity * 0.16 + Math.min(speed * 0.00036, 0.08);
+      const stretch = 1 + Math.min(speed * 0.0009, 0.12);
+      card.style.transform = `translate3d(${lag}px, ${wave}px, ${proximity * 56}px) rotateX(${rotateX}deg) rotate(${tilt}deg) scale(${scale}, ${scale * stretch})`;
+      card.style.filter = `drop-shadow(0 ${Math.round(20 + proximity * 42)}px ${Math.round(18 + proximity * 34)}px rgba(0,0,0,${0.28 + proximity * 0.24}))`;
       card.style.zIndex = String(100 - Math.round(Math.abs(index - state.active)));
     });
 
@@ -262,10 +282,72 @@ function openItem(index) {
     lightboxLink.hidden = !item.linkUrl;
   }
   lightbox.hidden = false;
+  resetLightboxDragStyle();
 }
 
 function closeLightbox() {
-  if (lightbox) lightbox.hidden = true;
+  if (!lightbox) return;
+  lightbox.hidden = true;
+  resetLightboxDragStyle();
+}
+
+function startLightboxDrag(event) {
+  if (!lightbox || lightbox.hidden) return;
+  event.preventDefault();
+  lightboxDrag.active = true;
+  lightboxDrag.pointerId = event.pointerId;
+  lightboxDrag.startX = event.clientX;
+  lightboxDrag.startY = event.clientY;
+  lightboxDrag.lastX = event.clientX;
+  lightboxDrag.lastY = event.clientY;
+  lightboxDrag.lastTime = performance.now();
+  lightboxDrag.velocity = 0;
+  lightboxDrag.distance = 0;
+  lightbox.classList.add("is-dragging");
+  lightboxImage?.setPointerCapture?.(event.pointerId);
+}
+
+function moveLightboxDrag(event) {
+  if (!lightboxDrag.active) return;
+  if (lightboxDrag.pointerId !== null && event.pointerId !== lightboxDrag.pointerId) return;
+  event.preventDefault();
+  const dx = event.clientX - lightboxDrag.startX;
+  const dy = event.clientY - lightboxDrag.startY;
+  const now = performance.now();
+  const elapsed = Math.max(8, now - lightboxDrag.lastTime);
+  const frameDistance = Math.hypot(event.clientX - lightboxDrag.lastX, event.clientY - lightboxDrag.lastY);
+  lightboxDrag.velocity = lerp(lightboxDrag.velocity, (frameDistance / elapsed) * 16.67, 0.45);
+  lightboxDrag.distance = Math.hypot(dx, dy);
+  lightboxDrag.lastX = event.clientX;
+  lightboxDrag.lastY = event.clientY;
+  lightboxDrag.lastTime = now;
+
+  const opacity = clamp(1 - lightboxDrag.distance / 520, 0.35, 1);
+  const scale = clamp(1 - lightboxDrag.distance / 1800, 0.86, 1);
+  if (lightboxImage) {
+    lightboxImage.style.transform = `translate3d(${dx}px, ${dy}px, 0) scale(${scale})`;
+    lightboxImage.style.opacity = String(opacity);
+  }
+}
+
+function finishLightboxDrag(event) {
+  if (!lightboxDrag.active) return;
+  if (lightboxDrag.pointerId !== null && event.pointerId !== lightboxDrag.pointerId) return;
+  const shouldClose = lightboxDrag.distance > 150 || lightboxDrag.velocity > 18;
+  lightboxDrag.active = false;
+  lightboxDrag.pointerId = null;
+  lightbox?.classList.remove("is-dragging");
+  if (shouldClose) {
+    closeLightbox();
+  } else {
+    resetLightboxDragStyle();
+  }
+}
+
+function resetLightboxDragStyle() {
+  if (!lightboxImage) return;
+  lightboxImage.style.transform = "";
+  lightboxImage.style.opacity = "";
 }
 
 function fallbackItems() {

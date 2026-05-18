@@ -6,7 +6,6 @@ const aiPrompts = [...document.querySelectorAll("[data-ai-slide]")];
 const aiStage = document.querySelector("[data-ai-stage]");
 const aiMedia = document.querySelector("[data-ai-media]");
 const aiDots = document.querySelector("[data-ai-dots]");
-const aiProgress = document.querySelector("[data-ai-progress]");
 const aiNext = document.querySelector("[data-ai-next]");
 const aiCommandList = document.querySelector("[data-ai-command-list]");
 const aiKicker = document.querySelector("[data-ai-kicker]");
@@ -148,6 +147,8 @@ function renderAiDots() {
     const button = document.createElement("button");
     button.type = "button";
     button.ariaLabel = `查看第 ${index + 1} 张 AI 素材`;
+    const fill = document.createElement("span");
+    button.append(fill);
     button.addEventListener("click", () => {
       setAiSlide(index);
       startAiCarousel();
@@ -188,10 +189,7 @@ function setAiSlide(index) {
   const imageSlideIndexes = aiSlides.map((item, slideIndex) => item.imageUrl ? slideIndex : -1).filter(index => index >= 0);
   images.forEach((image, imageIndex) => image.classList.toggle("is-active", imageSlideIndexes[imageIndex] === activeAiSlide));
   aiPrompts.forEach((prompt, promptIndex) => prompt.classList.toggle("is-active", promptIndex === activeAiSlide % aiPrompts.length));
-  [...(aiDots?.children || [])].forEach((dot, dotIndex) => dot.classList.toggle("is-active", dotIndex === activeAiSlide));
-  if (aiProgress) {
-    aiProgress.style.setProperty("--progress", `${((activeAiSlide + 1) / aiSlides.length) * 100}%`);
-  }
+  updateAiDots();
   if (aiKicker) aiKicker.textContent = slide.kicker;
   if (aiTitle) aiTitle.textContent = slide.title;
   if (aiDescription) aiDescription.textContent = slide.description;
@@ -201,12 +199,25 @@ function setAiSlide(index) {
 
 function startAiCarousel() {
   stopAiCarousel();
+  aiDots?.classList.remove("is-paused");
   if (aiSlides.length < 2) return;
   aiTimer = window.setInterval(() => setAiSlide(activeAiSlide + 1), 4200);
 }
 
 function stopAiCarousel() {
+  aiDots?.classList.add("is-paused");
   if (!aiTimer) return;
   window.clearInterval(aiTimer);
   aiTimer = null;
+}
+
+function updateAiDots() {
+  const dots = [...(aiDots?.children || [])];
+  dots.forEach((dot, dotIndex) => {
+    dot.classList.remove("is-active");
+    if (dotIndex === activeAiSlide) {
+      void dot.offsetWidth;
+      dot.classList.add("is-active");
+    }
+  });
 }

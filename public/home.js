@@ -8,6 +8,7 @@ const aiMedia = document.querySelector("[data-ai-media]");
 const aiDots = document.querySelector("[data-ai-dots]");
 const aiProgress = document.querySelector("[data-ai-progress]");
 const aiNext = document.querySelector("[data-ai-next]");
+const aiCommandList = document.querySelector("[data-ai-command-list]");
 const aiKicker = document.querySelector("[data-ai-kicker]");
 const aiTitle = document.querySelector("[data-ai-title]");
 const aiDescription = document.querySelector("[data-ai-description]");
@@ -42,6 +43,7 @@ async function initAiCarousel() {
   if (!aiStage || !aiMedia) return;
   aiSlides = await loadAiSlides();
   renderAiImages();
+  renderAiCommands();
   renderAiDots();
   setAiSlide(0);
   startAiCarousel();
@@ -154,6 +156,30 @@ function renderAiDots() {
   });
 }
 
+function renderAiCommands() {
+  if (!aiCommandList) return;
+  const label = aiCommandList.querySelector("span")?.textContent || "Tiancaimao AI";
+  aiCommandList.replaceChildren();
+  const heading = document.createElement("span");
+  heading.textContent = label;
+  aiCommandList.append(heading);
+  aiSlides.forEach((slide, index) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.dataset.aiCommand = String(index);
+    button.textContent = slide.title || `轮播图 ${index + 1}`;
+    button.addEventListener("click", () => {
+      setAiSlide(index);
+      startAiCarousel();
+    });
+    aiCommandList.append(button);
+  });
+}
+
+function aiCommandButtons() {
+  return [...document.querySelectorAll("[data-ai-command]")];
+}
+
 function setAiSlide(index) {
   if (!aiSlides.length) return;
   activeAiSlide = (index + aiSlides.length) % aiSlides.length;
@@ -170,6 +196,7 @@ function setAiSlide(index) {
   if (aiTitle) aiTitle.textContent = slide.title;
   if (aiDescription) aiDescription.textContent = slide.description;
   if (aiSuggestion) aiSuggestion.textContent = slide.suggestion;
+  aiCommandButtons().forEach(button => button.classList.toggle("is-active", Number(button.dataset.aiCommand) === activeAiSlide));
 }
 
 function startAiCarousel() {

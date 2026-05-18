@@ -10,7 +10,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="/raycast-home.css?v=20260517-tiancaimao-workspace" />
+    <link rel="stylesheet" href="/raycast-home.css?v=20260518-carousel-title-nav" />
   </head>
   <body class="home-page">
     <div class="site-glow site-glow--left"></div>
@@ -182,12 +182,9 @@
           <div class="ai-window">
             <div class="window-dots"><i></i><i></i><i></i></div>
             <div class="ai-window__body">
-              <aside class="ai-command-list">
+              <aside class="ai-command-list" data-ai-command-list>
                 <span>Tiancaimao AI</span>
-                <button type="button" class="is-active">分析当前素材</button>
-                <button type="button">生成直播话术</button>
-                <button type="button">整理发布标签</button>
-                <button type="button">推荐配套音乐</button>
+                <button type="button" class="is-active" data-ai-command="0">等待后台图片</button>
               </aside>
               <div class="ai-preview">
                 <div class="ai-preview__media" data-ai-media>
@@ -207,6 +204,7 @@
             </div>
           </div>
           <div class="ai-progress" data-ai-progress><span></span></div>
+          <div class="ai-dots" data-ai-dots aria-label="首页轮播分页"></div>
         </div>
       </section>
 
@@ -276,6 +274,6 @@
         </div>
       </section>
     </main>
-    <script src="/home.js?v=20260517-extension-tabs" type="module"></script>
+    <script src="/home.js?v=20260518-carousel-title-nav" type="module"></script>
   </body>
 </html>

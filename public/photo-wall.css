@@ -203,10 +203,6 @@ a {
   transform: scale(1.14);
 }
 
-.photo-wall-card.is-active {
-  box-shadow: 0 52px 120px rgba(0, 0, 0, 0.62);
-}
-
 .photo-wall-lightbox {
   position: fixed;
   inset: 0;

@@ -204,10 +204,6 @@ a { color: inherit; text-decoration: none; }
   color: #ffaaa4;
 }
 
-.home-page .home-announcement {
-  display: none;
-}
-
 .photo-wall-home {
   position: relative;
   isolation: isolate;

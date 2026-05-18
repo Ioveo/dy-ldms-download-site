@@ -300,8 +300,7 @@ function setHeroImage(item) {
 
 function heroBackgroundItem(items) {
   if (!items.length) return null;
-  const featured = items.filter(item => item.featured);
-  return latestGalleryItem(featured.length ? featured : items);
+  return latestGalleryItem(items);
 }
 
 function latestGalleryItem(items) {

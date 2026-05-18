@@ -27,7 +27,7 @@
 
 .gallery-hero {
   position: relative;
-  min-height: clamp(520px, 66svh, 700px);
+  min-height: clamp(560px, 72svh, 780px);
   display: flex;
   align-items: flex-start;
   overflow: hidden;
@@ -61,8 +61,8 @@
   inset: 0;
   z-index: -2;
   background:
-    linear-gradient(90deg, rgba(5, 5, 6, 0.96), rgba(5, 5, 6, 0.7) 42%, rgba(5, 5, 6, 0.34)),
-    linear-gradient(180deg, rgba(5, 5, 6, 0.06), rgba(5, 5, 6, 0.74) 78%, #050506),
+    linear-gradient(90deg, rgba(5, 5, 6, 0.9), rgba(5, 5, 6, 0.58) 42%, rgba(5, 5, 6, 0.28)),
+    linear-gradient(180deg, rgba(5, 5, 6, 0.02), rgba(5, 5, 6, 0.58) 72%, #050506),
     radial-gradient(circle at 18% 14%, rgba(255, 77, 69, 0.26), transparent 34%),
     radial-gradient(circle at 76% 54%, rgba(255, 139, 84, 0.12), transparent 28%);
 }
@@ -121,9 +121,9 @@
   position: relative;
   z-index: 2;
   width: 100%;
-  margin: -36px auto 0;
-  padding: 36px 0 84px;
-  background: linear-gradient(180deg, rgba(5, 5, 6, 0.78), #020203 220px);
+  margin: -72px auto 0;
+  padding: 72px 0 84px;
+  background: linear-gradient(180deg, rgba(5, 5, 6, 0.28), #020203 220px);
 }
 
 .gallery-toolbar {
@@ -137,7 +137,7 @@
   padding: 14px clamp(12px, 3vw, 28px) 18px;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  background: linear-gradient(180deg, rgba(18, 15, 16, 0.78), rgba(10, 8, 9, 0.58));
+  background: linear-gradient(180deg, rgba(18, 15, 16, 0.72), rgba(10, 8, 9, 0.52));
   backdrop-filter: blur(20px);
 }
 
@@ -388,8 +388,8 @@
 }
 
 .gallery-viewer figure.is-compact-size {
-  max-width: 78vw;
-  max-height: 78svh;
+  max-width: 65vw;
+  max-height: 65svh;
   gap: 0;
 }
 
@@ -454,8 +454,8 @@
 }
 
 .gallery-viewer figure.is-compact-size img {
-  max-width: 78vw;
-  max-height: 78svh;
+  max-width: 65vw;
+  max-height: 65svh;
   border-radius: 0;
   cursor: zoom-in;
 }
@@ -633,8 +633,8 @@
 
   .gallery-viewer figure.is-compact-size,
   .gallery-viewer figure.is-compact-size img {
-    max-width: 82vw;
-    max-height: 82svh;
+    max-width: 68vw;
+    max-height: 68svh;
   }
 
   .gallery-viewer figcaption {

@@ -18,12 +18,12 @@
 
 .gallery-hero {
   position: relative;
-  min-height: calc(100svh - 72px);
+  min-height: min(720px, 70svh);
   display: flex;
   align-items: center;
   overflow: hidden;
   isolation: isolate;
-  padding: clamp(96px, 12vw, 170px) clamp(18px, 6vw, 78px) clamp(74px, 9vw, 112px);
+  padding: clamp(84px, 9vw, 132px) clamp(18px, 6vw, 78px) clamp(56px, 7vw, 88px);
   border-bottom: 1px solid var(--gallery-line);
   background: #09070d;
 }
@@ -582,8 +582,8 @@
 
 @media (max-width: 760px) {
   .gallery-hero {
-    min-height: 78svh;
-    padding-top: 110px;
+    min-height: 64svh;
+    padding-top: 96px;
   }
 
   .gallery-toolbar {

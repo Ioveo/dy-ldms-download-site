@@ -39,6 +39,12 @@ document.addEventListener("keydown", event => {
   if (event.key === "Enter" || event.key.toLowerCase() === "f") toggleOriginalView();
 });
 
+window.addEventListener("resize", () => {
+  if (!viewer.hidden && figure.classList.contains("is-compact-size")) {
+    applyCompactImageSize();
+  }
+});
+
 async function loadGallery() {
   try {
     const response = await fetch("/api/catalog", { cache: "no-store" });
@@ -175,10 +181,16 @@ function enterScreenFitView() {
 function enterCompactView() {
   figure.classList.remove("is-screen-fit");
   figure.classList.add("is-compact-size");
-  viewerImage.style.removeProperty("width");
-  viewerImage.style.removeProperty("height");
+  applyCompactImageSize();
   byId("galleryFullscreen").textContent = "放大";
   flashViewerMode();
+}
+
+function applyCompactImageSize() {
+  const rect = targetImageRect();
+  const compactScale = window.innerWidth <= 760 ? 0.68 : 0.65;
+  viewerImage.style.width = `${Math.max(1, rect.width * compactScale)}px`;
+  viewerImage.style.height = `${Math.max(1, rect.height * compactScale)}px`;
 }
 
 function markViewerImageReady() {

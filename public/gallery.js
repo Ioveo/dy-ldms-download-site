@@ -295,12 +295,13 @@ function preloadNeighbor(step) {
 function setHeroImage(item) {
   const hero = byId("galleryHero");
   if (!hero || !item?.imageUrl) return;
-  hero.style.setProperty("--hero-image", `url("${cssUrl(item.imageUrl)}")`);
+  hero.style.setProperty("--hero-image", `url("${cssUrl(withCacheBust(item.imageUrl, galleryTime(item)))}")`);
+  hero.classList.add("has-hero-image");
 }
 
 function heroBackgroundItem(items) {
   if (!items.length) return null;
-  return latestGalleryItem(items);
+  return latestGalleryItem(items.filter(item => item.imageUrl));
 }
 
 function latestGalleryItem(items) {
@@ -308,7 +309,11 @@ function latestGalleryItem(items) {
 }
 
 function galleryTime(item) {
-  return Number(item?.updatedAt || item?.createdAt || 0);
+  const value = item?.updatedAt || item?.createdAt || 0;
+  const numeric = Number(value);
+  if (Number.isFinite(numeric) && numeric > 0) return numeric;
+  const parsed = Date.parse(value);
+  return Number.isFinite(parsed) ? parsed : 0;
 }
 
 function renderNavigation(catalog) {
@@ -345,4 +350,10 @@ function escapeAttr(value) {
 
 function cssUrl(value) {
   return String(value || "").replace(/["\\\n\r]/g, encodeURIComponent);
+}
+
+function withCacheBust(url, version) {
+  if (!url || !version) return url;
+  const joiner = String(url).includes("?") ? "&" : "?";
+  return `${url}${joiner}v=${encodeURIComponent(version)}`;
 }

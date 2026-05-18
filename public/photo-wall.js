@@ -223,23 +223,22 @@ function animate() {
         return;
       }
 
-      const proximity = Math.max(0, 1 - distance / Math.max(1, stage.clientWidth * 0.5));
+      const proximity = Math.max(0, 1 - distance / Math.max(1, stage.clientWidth * 0.54));
       const direction = state.wavePower < 0 ? -1 : 1;
-      const side = index % 2 === 0 ? 1 : -1;
-      const phase = index * 0.72 + state.current * 0.012;
-      const fold = motion * (18 + proximity * 42);
-      const rotateY = direction * side * fold;
-      const rotateX = -motion * proximity * (8 + speed * 0.03);
-      const rotateZ = clamp(Math.sin(phase) * motion * 5 + state.wavePower * 0.01, -8, 8);
-      const lag = clamp(state.wavePower * (0.16 + (index % 8) * 0.018), -44, 44) * motion;
-      const float = -motion * proximity * (30 + speed * 0.2);
-      const wave = Math.sin(phase) * motion * (12 + speed * 0.2) + float;
-      const depth = motion * proximity * (70 + speed * 0.22);
-      const scaleX = 1 - motion * 0.045;
-      const scaleY = 1 + motion * Math.min(speed * 0.00055, 0.085);
-      card.style.transformOrigin = side > 0 ? "left center" : "right center";
-      card.style.transform = `translate3d(${lag}px, ${wave}px, ${depth}px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) rotate(${rotateZ}deg) scale(${scaleX}, ${scaleY})`;
-      card.style.filter = `drop-shadow(${Math.round(direction * side * motion * 18)}px ${Math.round(20 + proximity * 34)}px ${Math.round(18 + proximity * 30)}px rgba(0,0,0,${0.26 + proximity * 0.22}))`;
+      const sideOfCenter = cardCenter < center ? -1 : 1;
+      const phase = index * 0.48 + state.current * 0.01;
+      const fold = motion * (34 + proximity * 58 + Math.min(speed * 0.08, 16));
+      const rotateY = clamp(-sideOfCenter * direction * fold, -76, 76);
+      const rotateX = -motion * proximity * (3 + speed * 0.018);
+      const rotateZ = clamp(Math.sin(phase) * motion * 2.4, -4, 4);
+      const gather = clamp((center - cardCenter) * motion * 0.22, -120, 120);
+      const lag = clamp(state.wavePower * 0.11, -32, 32) * (1 - proximity * 0.35);
+      const float = -motion * proximity * (18 + speed * 0.06);
+      const depth = motion * proximity * (130 + speed * 0.46);
+      const scale = 1 + motion * proximity * 0.08;
+      card.style.transformOrigin = sideOfCenter < 0 ? "right center" : "left center";
+      card.style.transform = `translate3d(${gather + lag}px, ${float}px, ${depth}px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) rotate(${rotateZ}deg) scale(${scale})`;
+      card.style.filter = `drop-shadow(${Math.round(-sideOfCenter * direction * motion * 24)}px ${Math.round(18 + proximity * 28)}px ${Math.round(18 + proximity * 34)}px rgba(0,0,0,${0.26 + proximity * 0.24}))`;
       card.style.zIndex = String(100 - Math.round(Math.abs(index - state.active)));
     });
 

@@ -157,6 +157,7 @@ a {
   gap: clamp(16px, 1.2vw, 24px);
   height: 100%;
   padding-inline: clamp(28px, 3.8vw, 74px);
+  transform-style: preserve-3d;
   will-change: transform;
 }
 
@@ -172,7 +173,8 @@ a {
   background: #151414;
   cursor: pointer;
   box-shadow: 0 28px 70px rgba(0, 0, 0, 0.44);
-  transform-origin: center bottom;
+  transform-origin: center center;
+  backface-visibility: hidden;
   will-change: transform, filter, box-shadow;
   -webkit-user-drag: none;
 }

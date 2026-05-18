@@ -187,10 +187,9 @@ function enterCompactView() {
 }
 
 function applyCompactImageSize() {
-  const rect = targetImageRect();
-  const compactScale = window.innerWidth <= 760 ? 0.68 : 0.65;
-  viewerImage.style.width = `${Math.max(1, rect.width * compactScale)}px`;
-  viewerImage.style.height = `${Math.max(1, rect.height * compactScale)}px`;
+  const rect = edgeFitImageRect();
+  viewerImage.style.width = `${rect.width}px`;
+  viewerImage.style.height = `${rect.height}px`;
 }
 
 function markViewerImageReady() {
@@ -261,6 +260,20 @@ function targetImageRect() {
     top: (window.innerHeight - height) / 2,
     width,
     height
+  };
+}
+
+function edgeFitImageRect() {
+  const maxWidth = Math.max(1, window.innerWidth);
+  const maxHeight = Math.max(1, window.innerHeight);
+  const naturalWidth = viewerImage.naturalWidth || maxWidth;
+  const naturalHeight = viewerImage.naturalHeight || maxHeight;
+  const heightScale = maxHeight / naturalHeight;
+  const widthAtFullHeight = naturalWidth * heightScale;
+  const scale = widthAtFullHeight <= maxWidth ? heightScale : maxWidth / naturalWidth;
+  return {
+    width: Math.max(1, naturalWidth * scale),
+    height: Math.max(1, naturalHeight * scale)
   };
 }
 
